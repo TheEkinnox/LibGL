@@ -1,0 +1,5 @@
+add_subdirectory(Core)
+add_subdirectory(Physics)
+add_subdirectory(Resources)
+add_subdirectory(LowRenderer)
+add_subdirectory(App)
