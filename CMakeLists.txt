@@ -9,6 +9,9 @@ set(GLFW_NAME ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/GLFW/lib-vc2019/glfw3.lib
 set(GLFW_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/GLFW/include)
 set(STB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/dependencies/STB)
 
+set(ASSETS_DIR_NAME assets)
+set(ASSETS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/${ASSETS_DIR_NAME})
+
 project(Modern_OpenGL_Loick)
 
 add_subdirectory(source)

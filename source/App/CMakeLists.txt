@@ -19,6 +19,7 @@ file(GLOB_RECURSE SOURCE_FILES
 	
 # Add header files
 set(PROJECT_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
+
 file(GLOB_RECURSE HEADER_FILES 
 	${CMAKE_CURRENT_SOURCE_DIR}/*.h
 	${CMAKE_CURRENT_SOURCE_DIR}/*.hpp
@@ -34,7 +35,11 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${PROJECT_FILES})
 ###############################
 
 add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})
-include_directories(${PROJECT_INCLUDE_DIR} ${GLAD_INCLUDE_DIR} ${GLFW_INCLUDE_DIR} ${STB_INCLUDE_DIR} ${CORE_INCLUDE_DIR} ${RESOURCES_INCLUDE_DIR} ${RENDERER_INCLUDE_DIR} ${PHYSICS_INCLUDE_DIR})
+
+include_directories(${PROJECT_INCLUDE_DIR}
+    ${GLAD_INCLUDE_DIR} ${GLFW_INCLUDE_DIR} ${STB_INCLUDE_DIR}
+    ${CORE_INCLUDE_DIR} ${RESOURCES_INCLUDE_DIR} ${RENDERER_INCLUDE_DIR} ${PHYSICS_INCLUDE_DIR})
+
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
 	${GLFW_NAME}
@@ -42,9 +47,19 @@ target_link_libraries(${PROJECT_NAME}
 	${RESOURCES_NAME}
 	${RENDERER_NAME}
 	${PHYSICS_NAME})
+
 if(MSVC)
+  set_property(TARGET ${PROJECT_NAME} PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "$<TARGET_FILE_DIR:${PROJECT_NAME}>")
   target_compile_options(${PROJECT_NAME} PRIVATE /W4 /WX)
   target_link_options(${PROJECT_NAME} PRIVATE /FORCE:UNRESOLVED)
 else()
   target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic -Werror)
 endif()
+
+# remove the existing assets folder from the build directory (ensures removes are also replicated)
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E rm -rf $<TARGET_FILE_DIR:${PROJECT_NAME}>/${ASSETS_DIR_NAME})
+
+# copy the assets folder in the target build directory
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${ASSETS_DIR} $<TARGET_FILE_DIR:${PROJECT_NAME}>/${ASSETS_DIR_NAME})

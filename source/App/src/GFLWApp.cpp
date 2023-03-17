@@ -1,10 +1,9 @@
+#include "Debug/Log.h"
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
-
-#include <iostream>
 
 void APIENTRY glDebugOutput(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -16,40 +15,48 @@ void APIENTRY glDebugOutput(GLenum source, GLenum type, GLuint id, GLenum severi
 	// ignore non-significant error/warning codes
 	if (id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
 
-	std::cout << "---------------" << std::endl;
-	std::cout << "Debug message (" << id << "): " << message << std::endl;
+	My::Debug::Log::Print("---------------\n");
+	My::Debug::Log::Print("Debug message (%ui): %s\n", id, message);
 
 	switch (source)
 	{
-	case GL_DEBUG_SOURCE_API:             std::cout << "Source: API"; break;
-	case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   std::cout << "Source: Window System"; break;
-	case GL_DEBUG_SOURCE_SHADER_COMPILER: std::cout << "Source: Shader Compiler"; break;
-	case GL_DEBUG_SOURCE_THIRD_PARTY:     std::cout << "Source: Third Party"; break;
-	case GL_DEBUG_SOURCE_APPLICATION:     std::cout << "Source: Application"; break;
-	case GL_DEBUG_SOURCE_OTHER:           std::cout << "Source: Other"; break;
-	} std::cout << std::endl;
+	case GL_DEBUG_SOURCE_API:             My::Debug::Log::Print("Source: API"); break;
+	case GL_DEBUG_SOURCE_WINDOW_SYSTEM:   My::Debug::Log::Print("Source: Window System"); break;
+	case GL_DEBUG_SOURCE_SHADER_COMPILER: My::Debug::Log::Print("Source: Shader Compiler"); break;
+	case GL_DEBUG_SOURCE_THIRD_PARTY:     My::Debug::Log::Print("Source: Third Party"); break;
+	case GL_DEBUG_SOURCE_APPLICATION:     My::Debug::Log::Print("Source: Application"); break;
+	default:
+	case GL_DEBUG_SOURCE_OTHER:           My::Debug::Log::Print("Source: Other"); break;
+	}
+
+	My::Debug::Log::Print("\n");
 
 	switch (type)
 	{
-	case GL_DEBUG_TYPE_ERROR:               std::cout << "Type: Error"; break;
-	case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: std::cout << "Type: Deprecated Behaviour"; break;
-	case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  std::cout << "Type: Undefined Behaviour"; break;
-	case GL_DEBUG_TYPE_PORTABILITY:         std::cout << "Type: Portability"; break;
-	case GL_DEBUG_TYPE_PERFORMANCE:         std::cout << "Type: Performance"; break;
-	case GL_DEBUG_TYPE_MARKER:              std::cout << "Type: Marker"; break;
-	case GL_DEBUG_TYPE_PUSH_GROUP:          std::cout << "Type: Push Group"; break;
-	case GL_DEBUG_TYPE_POP_GROUP:           std::cout << "Type: Pop Group"; break;
-	case GL_DEBUG_TYPE_OTHER:               std::cout << "Type: Other"; break;
-	} std::cout << std::endl;
+	case GL_DEBUG_TYPE_ERROR:               My::Debug::Log::Print("Type: Error"); break;
+	case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: My::Debug::Log::Print("Type: Deprecated Behaviour"); break;
+	case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:  My::Debug::Log::Print("Type: Undefined Behaviour"); break;
+	case GL_DEBUG_TYPE_PORTABILITY:         My::Debug::Log::Print("Type: Portability"); break;
+	case GL_DEBUG_TYPE_PERFORMANCE:         My::Debug::Log::Print("Type: Performance"); break;
+	case GL_DEBUG_TYPE_MARKER:              My::Debug::Log::Print("Type: Marker"); break;
+	case GL_DEBUG_TYPE_PUSH_GROUP:          My::Debug::Log::Print("Type: Push Group"); break;
+	case GL_DEBUG_TYPE_POP_GROUP:           My::Debug::Log::Print("Type: Pop Group"); break;
+	default:
+	case GL_DEBUG_TYPE_OTHER:               My::Debug::Log::Print("Type: Other"); break;
+	}
+
+	My::Debug::Log::Print("\n");
 
 	switch (severity)
 	{
-	case GL_DEBUG_SEVERITY_HIGH:         std::cout << "Severity: high"; break;
-	case GL_DEBUG_SEVERITY_MEDIUM:       std::cout << "Severity: medium"; break;
-	case GL_DEBUG_SEVERITY_LOW:          std::cout << "Severity: low"; break;
-	case GL_DEBUG_SEVERITY_NOTIFICATION: std::cout << "Severity: notification"; break;
-	} std::cout << std::endl;
-	std::cout << std::endl;
+	case GL_DEBUG_SEVERITY_HIGH:         My::Debug::Log::Print("Severity: high"); break;
+	case GL_DEBUG_SEVERITY_MEDIUM:       My::Debug::Log::Print("Severity: medium"); break;
+	case GL_DEBUG_SEVERITY_LOW:          My::Debug::Log::Print("Severity: low"); break;
+	case GL_DEBUG_SEVERITY_NOTIFICATION: My::Debug::Log::Print("Severity: notification"); break;
+	default:                             My::Debug::Log::Print("Severity: unknown"); break;
+	}
+
+	My::Debug::Log::Print("\n\n");
 }
 
 
@@ -57,8 +64,8 @@ void APIENTRY glDebugOutput(GLenum source, GLenum type, GLuint id, GLenum severi
 
 
 // settings
-const unsigned int SCR_WIDTH = 800;
-const unsigned int SCR_HEIGHT = 600;
+constexpr unsigned int SCR_WIDTH = 800;
+constexpr unsigned int SCR_HEIGHT = 600;
 
 const char *vertexShaderSource = "#version 330 core\n"
 "layout(location = 0) in vec3 aPos;"
@@ -103,10 +110,17 @@ int main()
 
 	// glfw window creation
 	// --------------------
-	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
-	if (window == NULL)
+	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", nullptr, nullptr);
+	My::Debug::Log::OpenFile("Debug.log");
+	My::Debug::Log::Print("File: %s | Line: %d | Val: %i\n", __FILE__, __LINE__, 42);
+
+	DEBUG_LOG("This is a test %s\n", "message");
+	const std::filesystem::path cwd = std::filesystem::current_path();
+	DEBUG_LOG("Current working directory: %s\n", cwd.string().c_str());
+
+	if (window == nullptr)
 	{
-		std::cout << "Failed to create GLFW window" << std::endl;
+		DEBUG_LOG("Failed to create GLFW window\n");
 		glfwTerminate();
 		return -1;
 	}
@@ -115,9 +129,9 @@ int main()
 
 	// glad: load all OpenGL function pointers
 	// ---------------------------------------
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+	if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
 	{
-		std::cout << "Failed to initialize GLAD" << std::endl;
+		DEBUG_LOG("Failed to initialize GLAD\n");
 		return -1;
 	}
 
@@ -136,8 +150,8 @@ int main()
 	// build and compile our shader program
 	// ------------------------------------
 	// vertex shader
-	int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
+	const int vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vertexShader, 1, &vertexShaderSource, nullptr);
 	glCompileShader(vertexShader);
 	// check for shader compile errors
 	int success;
@@ -145,44 +159,44 @@ int main()
 	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
 	if (!success)
 	{
-		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
+		glGetShaderInfoLog(vertexShader, 512, nullptr, infoLog);
+		DEBUG_LOG("ERROR::SHADER::VERTEX::COMPILATION_FAILED\n%s\n", infoLog);
 	}
 	// fragment shader
-	int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
+	const int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragmentShader, 1, &fragmentShaderSource, nullptr);
 	glCompileShader(fragmentShader);
 	// check for shader compile errors
 	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
 	if (!success)
 	{
-		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
+		glGetShaderInfoLog(fragmentShader, 512, nullptr, infoLog);
+		DEBUG_LOG("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n%s\n", infoLog);
 	}
 	// link shaders
-	int shaderProgram = glCreateProgram();
+	const int shaderProgram = glCreateProgram();
 	glAttachShader(shaderProgram, vertexShader);
 	glAttachShader(shaderProgram, fragmentShader);
 	glLinkProgram(shaderProgram);
 	// check for linking errors
 	glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
 	if (!success) {
-		glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
+		glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
+		DEBUG_LOG("ERROR::SHADER::PROGRAM::LINKING_FAILED\n%s\n", infoLog);
 	}
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 
 	// set up vertex data (and buffer(s)) and configure vertex attributes
 	// ------------------------------------------------------------------
-	float vertices[] = {
+	constexpr float vertices[] = {
 		// positions          // colors           // texture coords
 		 0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
 		 0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
 		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
 		-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left
 	};
-	unsigned int indices[] = {
+	const unsigned int indices[] = {
 		0, 1, 3, // first triangle
 		1, 2, 3  // second triangle
 	};
@@ -206,13 +220,13 @@ int main()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	// position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), static_cast<void*>(nullptr));
 	glEnableVertexAttribArray(0);
 	// color attribute
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void*>(3U * sizeof(float)));
 	glEnableVertexAttribArray(1);
 	// texture coord attribute
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), reinterpret_cast<void*>(6U * sizeof(float)));
 	glEnableVertexAttribArray(2);
 
 
@@ -221,7 +235,7 @@ int main()
 	int width, height, nrChannels;
 
 	stbi_set_flip_vertically_on_load(true);
-	unsigned char *data = stbi_load("sample.png", &width, &height, &nrChannels, 0);
+	unsigned char *data = stbi_load("assets/textures/sample.png", &width, &height, &nrChannels, 0);
 
 	GLuint texture;
 	glGenTextures(1, &texture);
@@ -232,7 +246,7 @@ int main()
 
 	stbi_image_free(data);
 
-	data = stbi_load("sample2.png", &width, &height, &nrChannels, 0);
+	data = stbi_load("assets/textures/sample2.png", &width, &height, &nrChannels, 0);
 
 	GLuint texture2;
 
@@ -245,7 +259,7 @@ int main()
 	stbi_image_free(data);
 
 
-	// create a sampler and parameterize it
+	// create a sampler and parametrize it
 	// ------------------------------------
 	GLuint sampler = 0;
 	glGenSamplers(1, &sampler);
@@ -291,7 +305,7 @@ int main()
 
 		glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
 
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
 		// glBindVertexArray(0); // no need to unbind it every time
 
@@ -311,7 +325,7 @@ int main()
 	//glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 
-	// uncomment this call to draw in wireframe polygons.
+	// uncomment this call to draw in wire-frame polygons.
 	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 
@@ -344,7 +358,7 @@ void processInput(GLFWwindow *window)
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
 // ---------------------------------------------------------------------------------------------
-void framebuffer_size_callback([[maybe_unused]] GLFWwindow* window, int width, int height)
+void framebuffer_size_callback([[maybe_unused]] GLFWwindow* window, const int width, const int height)
 {
 	// make sure the viewport matches the new window dimensions; note that width and
 	// height will be significantly larger than specified on retina displays.
