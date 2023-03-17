@@ -10,22 +10,27 @@ namespace My::Debug
 	class Log
 	{
 	public:
-		Log() = default;
 		~Log();
 
-		template <class ... Args>
-		static std::string Format(const char* format, Args ... args);
+		static void			OpenFile(std::filesystem::path const& filePath);
+
+		template			<class ... Args>
+		static std::string	Format(const char* format, Args ... args);
 
 		template <typename ... Args>
-		static void DebugLog(const char* file, size_t line, const char* format, Args ... args);
+		static void			Print(const char* format, Args ... args);
 
-		void OpenFile(std::filesystem::path const& filePath);
-
-		template <typename ... Args>
-		void Print(const char* format, Args ... args);
+		template			<typename ... Args>
+		static void			DebugLog(const char* file, size_t line, const char* format, Args ... args);
 
 	private:
-		std::ofstream m_file;
+		Log() = default;
+
+		static Log&			GetInstance();
+		static void			RemoveInstance();
+
+		std::ofstream		m_file;
+		inline static Log*	m_instance = nullptr;
 	};
 }
 
