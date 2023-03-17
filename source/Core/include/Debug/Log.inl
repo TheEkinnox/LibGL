@@ -10,7 +10,7 @@
 namespace My::Debug
 {
 	template<typename ... Args>
-	std::string Log::Format(const char* format, Args ... args)
+	std::string Log::Format(const char* const format, Args ... args)
 	{
 		// If no template parameters are passed
 		// return the format string as is to avoid unnecessary allocation
