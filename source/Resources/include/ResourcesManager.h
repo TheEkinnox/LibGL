@@ -10,6 +10,14 @@ namespace My::Resources
 	class ResourceManager
 	{
 	public:
+		ResourceManager() = default;
+		ResourceManager(const ResourceManager& other);
+		ResourceManager(ResourceManager&& other) noexcept;
+		~ResourceManager();
+
+		ResourceManager& operator=(const ResourceManager& other);
+		ResourceManager& operator=(ResourceManager&& other) noexcept;
+
 		template	<typename T>
 		T*			Create(const std::string& fileName);
 
@@ -19,7 +27,7 @@ namespace My::Resources
 		void		Delete(const std::string& fileName);
 
 	private:
-		using		ResourcePtr = std::unique_ptr<IResource>;
+		using		ResourcePtr = IResource*;
 		using		ResourceMap = std::unordered_map<std::string, ResourcePtr>;
 
 		ResourceMap	m_resources;

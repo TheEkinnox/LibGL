@@ -5,9 +5,8 @@ namespace My::Resources
 	class IResource
 	{
 	public:
-		virtual ~IResource() = 0;
+		virtual			~IResource() = default;
 
-	protected:
-		virtual void LoadFromFile(const std::string& fileName) = 0;
+		virtual void	LoadFromFile(const std::string& fileName) = 0;
 	};
 }
