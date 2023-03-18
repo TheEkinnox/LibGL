@@ -15,10 +15,10 @@ namespace My::Resources
 		Model(Model&& other) noexcept;
 		~Model() override = default;
 
-		Model& operator=(const Model& other);
-		Model& operator=(Model&& other) noexcept;
+		Model&	operator=(const Model& other);
+		Model&	operator=(Model&& other) noexcept;
 
-		void LoadFromFile(const std::string& fileName) override;
+		bool	LoadFromFile(const std::string& fileName) override;
 
 	public:
 		std::vector<Vertex>		m_vertices;

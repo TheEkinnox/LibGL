@@ -7,6 +7,6 @@ namespace My::Resources
 	public:
 		virtual			~IResource() = default;
 
-		virtual void	LoadFromFile(const std::string& fileName) = 0;
+		virtual bool	LoadFromFile(const std::string& fileName) = 0;
 	};
 }

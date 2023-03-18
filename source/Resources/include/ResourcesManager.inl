@@ -1,7 +1,6 @@
 #pragma once
 #include "ResourcesManager.h"
 #include "IResource.h"
-#include "Debug/Assertion.h"
 
 namespace My::Resources
 {
@@ -15,7 +14,11 @@ namespace My::Resources
 
 		T* ptr = new T();
 
-		ptr->LoadFromFile(fileName);
+		if (!ptr->LoadFromFile(fileName))
+		{
+			delete ptr;
+			return nullptr;
+		}
 
 		m_resources[fileName] = ptr;
 

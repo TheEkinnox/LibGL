@@ -40,14 +40,14 @@ My::Resources::Model& My::Resources::Model::operator=(Model&& other) noexcept
 	return *this;
 }
 
-void My::Resources::Model::LoadFromFile(const std::string& fileName)
+bool My::Resources::Model::LoadFromFile(const std::string& fileName)
 {
 	std::ifstream fs(fileName);
 
 	if (!fs.is_open())
 	{
 		DEBUG_LOG("Unable to open file at path \"%s\"\n", fileName.c_str());
-		return;
+		return false;
 	}
 
 	struct FaceIndex
@@ -55,13 +55,6 @@ void My::Resources::Model::LoadFromFile(const std::string& fileName)
 		size_t	m_pos;
 		size_t	m_uv;
 		size_t	m_normal;
-
-		bool operator==(const FaceIndex& other) const
-		{
-			return other.m_pos == m_pos
-			&& other.m_uv == m_uv
-			&& other.m_normal == m_normal;
-		}
 	};
 
 	std::vector<Vector3>	positions, normals;
@@ -107,7 +100,6 @@ void My::Resources::Model::LoadFromFile(const std::string& fileName)
 		}
 		else if (token == "f ")
 		{
-			// TODO: Add face
 			FaceIndex indices[3]{};
 
 			ASSERT(sscanf_s(line.c_str(), "f %llu/%llu/%llu %llu/%llu/%llu %llu/%llu/%llu",
@@ -143,4 +135,6 @@ void My::Resources::Model::LoadFromFile(const std::string& fileName)
 			}
 		}
 	}
+
+	return true;
 }
