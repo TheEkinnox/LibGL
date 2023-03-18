@@ -1,6 +1,5 @@
 #pragma once
 #include <string>
-#include <memory> // unique_ptr
 #include <unordered_map>
 
 namespace My::Resources

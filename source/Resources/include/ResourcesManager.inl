@@ -14,7 +14,7 @@ namespace My::Resources
 
 		T* ptr = new T();
 
-		if (!ptr->LoadFromFile(fileName))
+		if (!ptr->LoadFromFile("assets/" + fileName))
 		{
 			delete ptr;
 			return nullptr;
@@ -33,6 +33,6 @@ namespace My::Resources
 		if (m_resources.find(fileName) == m_resources.end())
 			return nullptr;
 
-		return m_resources[fileName];
+		return reinterpret_cast<T*>(m_resources.at(fileName));
 	}
 }
