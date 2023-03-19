@@ -5,7 +5,7 @@
 namespace My::Resources
 {
 	template <typename T>
-	T* ResourceManager::Create(const std::string& fileName)
+	T* ResourceManager::create(const std::string& fileName)
 	{
 		static_assert(std::is_same_v<IResource, T> || std::is_base_of_v<IResource, T>);
 
@@ -14,7 +14,7 @@ namespace My::Resources
 
 		T* ptr = new T();
 
-		if (!ptr->LoadFromFile("assets/" + fileName))
+		if (!ptr->loadFromFile("assets/" + fileName))
 		{
 			delete ptr;
 			return nullptr;
@@ -26,7 +26,7 @@ namespace My::Resources
 	}
 
 	template <typename T>
-	T* ResourceManager::Get(const std::string& fileName) const
+	T* ResourceManager::get(const std::string& fileName) const
 	{
 		static_assert(std::is_same_v<IResource, T> || std::is_base_of_v<IResource, T>);
 

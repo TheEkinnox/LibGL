@@ -10,7 +10,7 @@
 namespace My::Debug
 {
 	template<typename ... Args>
-	std::string Log::Format(const char* const format, Args ... args)
+	std::string Log::format(const char* const format, Args ... args)
 	{
 		// If no template parameters are passed
 		// return the format string as is to avoid unnecessary allocation
@@ -44,23 +44,23 @@ namespace My::Debug
 	}
 
 	template <typename ... Args>
-	void Log::Print(const char* format, Args ... args)
+	void Log::print(const char* format, Args ... args)
 	{
-		const std::string message = Log::Format(format, args...);
+		const std::string message = Log::format(format, args...);
 
 		std::cout << message << std::flush;
 
-		if (GetInstance().m_file.is_open())
-			GetInstance().m_file << message << std::flush;
+		if (getInstance().m_file.is_open())
+			getInstance().m_file << message << std::flush;
 	}
 
 	template <typename ... Args>
-	void Log::DebugLog(const char* file, const size_t line, const char* format, Args... args)
+	void Log::debugLog(const char* file, const size_t line, const char* format, Args... args)
 	{
-		std::string message = Log::Format(format, args...);
-		message = Log::Format("%s(%d): %s", file, line, message.c_str());
+		std::string message = Log::format(format, args...);
+		message = Log::format("%s(%d): %s", file, line, message.c_str());
 
-		Log::Print(message.c_str());
+		Log::print(message.c_str());
 
 #ifdef _WINDOWS_
 		OutputDebugString(message.c_str());

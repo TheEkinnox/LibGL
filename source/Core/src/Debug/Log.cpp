@@ -11,26 +11,26 @@ namespace My::Debug
 			m_file.close();
 	}
 
-	void Log::OpenFile(std::filesystem::path const& filePath)
+	void Log::openFile(std::filesystem::path const& filePath)
 	{
-		if (GetInstance().m_file.is_open())
-			GetInstance().m_file.close();
+		if (getInstance().m_file.is_open())
+			getInstance().m_file.close();
 
-		GetInstance().m_file.open(filePath);
+		getInstance().m_file.open(filePath);
 	}
 
-	Log& Log::GetInstance()
+	Log& Log::getInstance()
 	{
 		if (m_instance == nullptr)
 		{
 			m_instance = new Log();
-			ASSERT(atexit(RemoveInstance) == 0);
+			ASSERT(atexit(removeInstance) == 0);
 		}
 
 		return *m_instance;
 	}
 
-	void Log::RemoveInstance()
+	void Log::removeInstance()
 	{
 		delete m_instance;
 	}

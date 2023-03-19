@@ -40,7 +40,7 @@ My::Resources::Model& My::Resources::Model::operator=(Model&& other) noexcept
 	return *this;
 }
 
-bool My::Resources::Model::LoadFromFile(const std::string& fileName)
+bool My::Resources::Model::loadFromFile(const std::string& fileName)
 {
 	std::ifstream fs(fileName);
 

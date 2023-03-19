@@ -18,12 +18,12 @@ namespace My::Resources
 		ResourceManager& operator=(ResourceManager&& other) noexcept;
 
 		template	<typename T>
-		T*			Create(const std::string& fileName);
+		T*			create(const std::string& fileName);
 
 		template	<typename T>
-		T*			Get(const std::string& fileName) const;
+		T*			get(const std::string& fileName) const;
 
-		void		Delete(const std::string& fileName);
+		void		remove(const std::string& fileName);
 
 	private:
 		using		ResourcePtr = IResource*;

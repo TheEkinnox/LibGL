@@ -27,7 +27,7 @@ namespace My
 #endif
 
 		// Initialize debugger
-		Debug::Log::OpenFile("debug.log");
+		Debug::Log::openFile("debug.log");
 
 		// Create glfw window
 		m_window = glfwCreateWindow(windowWidth, windowHeight, title, nullptr, nullptr);
@@ -71,7 +71,7 @@ namespace My
 
 	void Application::run() const
 	{
-		Shader* shader = m_resourceManager.Create<Shader>(DEFAULT_SHADER);
+		Shader* shader = m_resourceManager.create<Shader>(DEFAULT_SHADER);
 		ASSERT(shader->setVertexShader());
 		ASSERT(shader->link());
 
@@ -101,7 +101,7 @@ namespace My
 		glClearColor(0.f, 0.f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		const Shader* shader = m_resourceManager.Get<Shader>(DEFAULT_SHADER);
+		const Shader* shader = m_resourceManager.get<Shader>(DEFAULT_SHADER);
 		shader->use();
 	}
 
@@ -119,86 +119,86 @@ namespace My
 		// ignore non-significant error/warning codes
 		if (id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
 
-		Debug::Log::Print("---------------\n");
-		Debug::Log::Print("Debug message (%ui): %s\n", id, message);
+		Debug::Log::print("---------------\n");
+		Debug::Log::print("Debug message (%ui): %s\n", id, message);
 
 		switch (source)
 		{
 		case GL_DEBUG_SOURCE_API:
-			Debug::Log::Print("Source: API");
+			Debug::Log::print("Source: API");
 			break;
 		case GL_DEBUG_SOURCE_WINDOW_SYSTEM:
-			Debug::Log::Print("Source: Window System"); break;
+			Debug::Log::print("Source: Window System"); break;
 		case GL_DEBUG_SOURCE_SHADER_COMPILER:
-			Debug::Log::Print("Source: Shader Compiler");
+			Debug::Log::print("Source: Shader Compiler");
 			break;
 		case GL_DEBUG_SOURCE_THIRD_PARTY:
-			Debug::Log::Print("Source: Third Party");
+			Debug::Log::print("Source: Third Party");
 			break;
 		case GL_DEBUG_SOURCE_APPLICATION:
-			Debug::Log::Print("Source: Application");
+			Debug::Log::print("Source: Application");
 			break;
 		case GL_DEBUG_SOURCE_OTHER:
 		default:
-			Debug::Log::Print("Source: Other");
+			Debug::Log::print("Source: Other");
 			break;
 		}
 
-		Debug::Log::Print("\n");
+		Debug::Log::print("\n");
 
 		switch (type)
 		{
 		case GL_DEBUG_TYPE_ERROR:
-			Debug::Log::Print("Type: Error");
+			Debug::Log::print("Type: Error");
 			break;
 		case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
-			Debug::Log::Print("Type: Deprecated Behaviour");
+			Debug::Log::print("Type: Deprecated Behaviour");
 			break;
 		case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
-			Debug::Log::Print("Type: Undefined Behaviour");
+			Debug::Log::print("Type: Undefined Behaviour");
 			break;
 		case GL_DEBUG_TYPE_PORTABILITY:
-			Debug::Log::Print("Type: Portability");
+			Debug::Log::print("Type: Portability");
 			break;
 		case GL_DEBUG_TYPE_PERFORMANCE:
-			Debug::Log::Print("Type: Performance");
+			Debug::Log::print("Type: Performance");
 			break;
 		case GL_DEBUG_TYPE_MARKER:
-			Debug::Log::Print("Type: Marker");
+			Debug::Log::print("Type: Marker");
 			break;
 		case GL_DEBUG_TYPE_PUSH_GROUP:
-			Debug::Log::Print("Type: Push Group");
+			Debug::Log::print("Type: Push Group");
 			break;
 		case GL_DEBUG_TYPE_POP_GROUP:
-			Debug::Log::Print("Type: Pop Group");
+			Debug::Log::print("Type: Pop Group");
 			break;
 		case GL_DEBUG_TYPE_OTHER:
 		default:
-			Debug::Log::Print("Type: Other");
+			Debug::Log::print("Type: Other");
 			break;
 		}
 
-		Debug::Log::Print("\n");
+		Debug::Log::print("\n");
 
 		switch (severity)
 		{
 		case GL_DEBUG_SEVERITY_HIGH:
-			Debug::Log::Print("Severity: high");
+			Debug::Log::print("Severity: high");
 			break;
 		case GL_DEBUG_SEVERITY_MEDIUM:
-			Debug::Log::Print("Severity: medium");
+			Debug::Log::print("Severity: medium");
 			break;
 		case GL_DEBUG_SEVERITY_LOW:
-			Debug::Log::Print("Severity: low");
+			Debug::Log::print("Severity: low");
 			break;
 		case GL_DEBUG_SEVERITY_NOTIFICATION:
-			Debug::Log::Print("Severity: notification");
+			Debug::Log::print("Severity: notification");
 			break;
 		default:
-			Debug::Log::Print("Severity: unknown");
+			Debug::Log::print("Severity: unknown");
 			break;
 		}
 
-		Debug::Log::Print("\n\n");
+		Debug::Log::print("\n\n");
 	}
 }

@@ -40,7 +40,7 @@ namespace My::Resources
 		return *this;
 	}
 
-	void ResourceManager::Delete(const std::string& fileName)
+	void ResourceManager::remove(const std::string& fileName)
 	{
 		if (m_resources.find(fileName) != m_resources.end())
 		{

@@ -14,7 +14,7 @@ namespace My::Resources
 		glDeleteProgram(m_program);
 	}
 
-	bool Shader::LoadFromFile(const std::string& fileName)
+	bool Shader::loadFromFile(const std::string& fileName)
 	{
 		const std::ifstream fs(fileName);
 

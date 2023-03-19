@@ -17,7 +17,7 @@ namespace My::Resources
 		 * \param fileName The path of the source file to load
 		 * \return True if the source code could be loaded. False otherwise.
 		 */
-		bool LoadFromFile(const std::string& fileName) override;
+		bool loadFromFile(const std::string& fileName) override;
 
 		/**
 		 * \brief Compiles the vertex shader from the current source

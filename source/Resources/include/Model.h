@@ -18,7 +18,7 @@ namespace My::Resources
 		Model&	operator=(const Model& other);
 		Model&	operator=(Model&& other) noexcept;
 
-		bool	LoadFromFile(const std::string& fileName) override;
+		bool	loadFromFile(const std::string& fileName) override;
 
 	public:
 		std::vector<Vertex>		m_vertices;
