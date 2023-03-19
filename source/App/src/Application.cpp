@@ -120,7 +120,7 @@ namespace My
 		if (id == 131169 || id == 131185 || id == 131218 || id == 131204) return;
 
 		Debug::Log::print("---------------\n");
-		Debug::Log::print("Debug message (%ui): %s\n", id, message);
+		Debug::Log::print("Debug message (%u): %s\n", id, message);
 
 		switch (source)
 		{
