@@ -1,9 +1,16 @@
 #include "Debug/Log.h"
 #include "Application.h"
 
+#include "Shader.h"
+#include "Debug/Assertion.h"
+
+#define DEFAULT_SHADER "shaders/Basic.glsl"
+
 namespace My
 {
 	using namespace Exceptions;
+
+	ResourceManager Application::m_resourceManager = ResourceManager();
 
 	Application::Application(const int windowWidth, const int windowHeight, const char* title)
 	{
@@ -64,6 +71,10 @@ namespace My
 
 	void Application::run() const
 	{
+		Shader* shader = m_resourceManager.Create<Shader>(DEFAULT_SHADER);
+		ASSERT(shader->setVertexShader());
+		ASSERT(shader->link());
+
 		// Run main loop
 		while (!glfwWindowShouldClose(m_window))
 		{
@@ -85,10 +96,13 @@ namespace My
 			glfwSetWindowShouldClose(m_window, true);
 	}
 
-	void Application::render() const
+	void Application::render()
 	{
 		glClearColor(0.f, 0.f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
+
+		const Shader* shader = m_resourceManager.Get<Shader>(DEFAULT_SHADER);
+		shader->use();
 	}
 
 	void Application::onFrameBufferResize(GLFWwindow*,

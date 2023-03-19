@@ -4,8 +4,12 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "ResourcesManager.h"
+
 namespace My
 {
+	using namespace Resources;
+
 	namespace Exceptions
 	{
 		class WindowCreationFailed : public std::runtime_error
@@ -54,10 +58,11 @@ namespace My
 		/**
 		 * \brief Starts the application's main loop
 		 */
-		void		run() const;
+		void run() const;
 
 	private:
-		GLFWwindow*	m_window;
+		static ResourceManager	m_resourceManager;
+		GLFWwindow*				m_window;
 
 		/**
 		 * \brief Processes user input
@@ -67,7 +72,7 @@ namespace My
 		/**
 		 * \brief Handles the application's rendering
 		 */
-		void render() const;
+		static void render();
 
 		/**
 		 * \brief OpenGL frame buffer size change callback
