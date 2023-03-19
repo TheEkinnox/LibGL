@@ -33,8 +33,8 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${PROJECT_FILES})
 #                             #
 ###############################
 
-add_library(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})
-include_directories(${PROJECT_INCLUDE_DIR} ${CORE_INCLUDE_DIR} ${PHYSICS_INCLUDE_DIR})
+add_library(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES} ${GLAD_SOURCE})
+include_directories(${PROJECT_INCLUDE_DIR} ${GLAD_INCLUDE_DIR} ${CORE_INCLUDE_DIR} ${PHYSICS_INCLUDE_DIR})
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
 	${CORE_NAME}
