@@ -4,11 +4,13 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include "Camera.h"
 #include "ResourcesManager.h"
 
 namespace My
 {
 	using namespace Resources;
+	using namespace Rendering;
 
 	namespace Exceptions
 	{
@@ -63,6 +65,7 @@ namespace My
 	private:
 		static ResourceManager	m_resourceManager;
 		GLFWwindow*				m_window;
+		Camera					m_camera;
 
 		/**
 		 * \brief Processes user input
