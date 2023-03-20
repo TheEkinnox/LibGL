@@ -4,7 +4,8 @@
 
 #include "Maths/Arithmetic.h"
 #include "Maths/Trigonometry.h"
-#include "Maths/Angle/Radian.h"
+#include "Maths/Angle.h"
+
 #include "Maths/Vector/Vector3.h"
 
 using namespace LibMath::Exceptions;
@@ -202,6 +203,11 @@ namespace LibMath
 		return translationMatrix;
 	}
 
+	Matrix4x4 Matrix4x4::translation(const Vector3& translation)
+	{
+		return Matrix4x4::translation(translation.m_x, translation.m_y, translation.m_z);
+	}
+
 	Matrix4x4 Matrix4x4::scaling(const float x, const float y, const float z)
 	{
 		Matrix4x4 scalingMatrix;
@@ -212,6 +218,11 @@ namespace LibMath
 		scalingMatrix[scalingMatrix.getIndex(3, 3)] = 1.f;
 
 		return scalingMatrix;
+	}
+
+	Matrix4x4 Matrix4x4::scaling(const Vector3& scale)
+	{
+		return scaling(scale.m_x, scale.m_y, scale.m_z);
 	}
 
 	Matrix4x4 Matrix4x4::rotation(const Radian& angle, const Vector3& axis)
@@ -281,9 +292,25 @@ namespace LibMath
 		return rotationMat;
 	}
 
+	Matrix4x4 Matrix4x4::rotation(const Vector3& angles, const bool isRadian)
+	{
+		if (isRadian)
+			return rotation(Radian(angles.m_x), Radian(angles.m_y), Radian(angles.m_z));
+
+		return rotation(Degree(angles.m_x), Degree(angles.m_y), Degree(angles.m_z));
+	}
+
 	Matrix4x4 Matrix4x4::rotationEuler(const Radian& xAngle, const Radian& yAngle, const Radian& zAngle)
 	{
 		return rotation(zAngle, xAngle, yAngle);
+	}
+
+	Matrix4x4 Matrix4x4::rotationEuler(const Vector3& angles, const bool isRadian)
+	{
+		if (isRadian)
+			return rotationEuler(Radian(angles.m_x), Radian(angles.m_y), Radian(angles.m_z));
+
+		return rotationEuler(Degree(angles.m_x), Degree(angles.m_y), Degree(angles.m_z));
 	}
 
 	// Adapted from https://gist.github.com/kevinmoran/b45980723e53edeb8a5a43c49f134724
