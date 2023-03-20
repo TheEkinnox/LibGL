@@ -1,10 +1,12 @@
 #include "Debug/Log.h"
 #include "Application.h"
 
+#include "Model.h"
 #include "Shader.h"
 #include "Debug/Assertion.h"
 
-#define DEFAULT_SHADER "shaders/Basic.glsl"
+#define DEFAULT_SHADER "shaders/Default.glsl"
+#define TEST_MODEL "meshes/diablo3_pose/diablo3_pose.obj"
 
 namespace My
 {
@@ -72,8 +74,12 @@ namespace My
 	void Application::run() const
 	{
 		Shader* shader = m_resourceManager.create<Shader>(DEFAULT_SHADER);
+		ASSERT(shader != nullptr);
 		ASSERT(shader->setVertexShader());
+		ASSERT(shader->setFragmentShader());
 		ASSERT(shader->link());
+
+		ASSERT(m_resourceManager.create<Model>(TEST_MODEL) != nullptr);
 
 		// Run main loop
 		while (!glfwWindowShouldClose(m_window))
@@ -103,6 +109,9 @@ namespace My
 
 		const Shader* shader = m_resourceManager.get<Shader>(DEFAULT_SHADER);
 		shader->use();
+
+		const Model* model = m_resourceManager.get<Model>(TEST_MODEL);
+		model->draw();
 	}
 
 	void Application::onFrameBufferResize(GLFWwindow*,

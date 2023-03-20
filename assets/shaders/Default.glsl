@@ -1,31 +1,27 @@
 #shader vertex
 #version 330 core
 
-layout(location = 0) in vec3 aPos;
-layout(location = 1) in vec3 aColor;
-layout(location = 2) in vec2 aTexCoord;
+layout(location = 0) in vec3 _pos;
+layout(location = 1) in vec3 _normal;
+layout(location = 2) in vec2 _texCoord;
 
-out vec3 ourColor;
 out vec2 TexCoord;
 
 void main()
 {
-	gl_Position = vec4(aPos, 1.0);
-	ourColor = aColor;
-	TexCoord = aTexCoord;
+	gl_Position = vec4(_pos, 1.0);
+	TexCoord = _texCoord;
 }
 
 #shader fragment
 #version 330 core
 out vec4 FragColor;
 
-in vec3 ourColor;
 in vec2 TexCoord;
 
-uniform sampler2D texture1;
-uniform sampler2D texture2;
+uniform sampler2D _texture;
 
 void main()
 {
-	FragColor = mix(texture(texture1, TexCoord), texture(texture2, TexCoord), 0.5);
+	FragColor = texture(_texture, TexCoord);
 }
