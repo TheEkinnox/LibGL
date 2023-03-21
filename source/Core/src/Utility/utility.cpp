@@ -1,6 +1,6 @@
-#include "utility.h"
+#include "Utility/utility.h"
 
-namespace My
+namespace My::Utility
 {
 	std::vector<std::string> splitString(const std::string& str, char const* delimiter,
 		const bool includeEmpty)

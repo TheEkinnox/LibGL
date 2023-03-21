@@ -7,7 +7,7 @@
 #include <sstream>
 #include <glad/glad.h>
 
-#include "utility.h"
+#include "Utility/utility.h"
 
 using namespace LibMath;
 
@@ -206,7 +206,8 @@ namespace My::Resources
 			}
 			else if (token == "f ")
 			{
-				const auto faceStrings = splitString(line.substr(token.size()), " ", true);
+				line = line.substr(token.size());
+				const auto faceStrings = Utility::splitString(line, " ", true);
 
 				ASSERT(faceStrings.size() == 3);
 
@@ -214,7 +215,7 @@ namespace My::Resources
 				{
 					size_t posIdx = 0, uvIdx = 0, normalIdx = 0;
 
-					const auto faceData = splitString(faceStr, "/", true);
+					const auto faceData = Utility::splitString(faceStr, "/", true);
 
 					if (!faceData[0].empty())
 					{

@@ -3,7 +3,7 @@
 
 #include <sstream>
 
-#include "utility.h"
+#include "Utility/utility.h"
 
 namespace My::Resources
 {
@@ -35,7 +35,7 @@ namespace My::Resources
 
 	std::string Shader::getSource(GLenum shaderType)
 	{
-		const auto sources = splitString(m_source, "#shader ", true);
+		const auto sources = Utility::splitString(m_source, "#shader ", true);
 
 		if (sources.size() < 2)
 			return m_source;

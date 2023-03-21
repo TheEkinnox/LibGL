@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 
-namespace My
+namespace My::Utility
 {
 	/**
 	 * \brief Splits the given string using the given delimiter
