@@ -461,6 +461,16 @@ namespace LibMath
 		return row * m_columns + column;
 	}
 
+	float* Matrix::getArray()
+	{
+		return m_values;
+	}
+
+	const float* Matrix::getArray() const
+	{
+		return m_values;
+	}
+
 	Matrix::~Matrix()
 	{
 		delete[] m_values;

@@ -80,6 +80,8 @@ namespace LibMath
 		length_t		getRowCount() const;
 		length_t		getColumnCount() const;
 		length_t		getIndex(length_t row, length_t column) const;
+		float*			getArray();
+		const float*	getArray() const;
 
 		float			determinant() const;
 		float			cofactor(length_t row, length_t column) const;
