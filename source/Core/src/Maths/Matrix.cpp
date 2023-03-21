@@ -295,9 +295,9 @@ namespace LibMath
 	Matrix4x4 Matrix4x4::rotation(const Vector3& angles, const bool isRadian)
 	{
 		if (isRadian)
-			return rotation(Radian(angles.m_x), Radian(angles.m_y), Radian(angles.m_z));
+			return rotation(Radian(angles.m_y), Radian(angles.m_x), Radian(angles.m_z));
 
-		return rotation(Degree(angles.m_x), Degree(angles.m_y), Degree(angles.m_z));
+		return rotation(Degree(angles.m_y), Degree(angles.m_x), Degree(angles.m_z));
 	}
 
 	Matrix4x4 Matrix4x4::rotationEuler(const Radian& xAngle, const Radian& yAngle, const Radian& zAngle)
