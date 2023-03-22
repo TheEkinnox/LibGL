@@ -4,7 +4,7 @@
 #include <iostream>
 #include <string>
 
-#include "Vector/Vector3.h"
+#include "Vector3.h"
 
 namespace LibMath
 {
