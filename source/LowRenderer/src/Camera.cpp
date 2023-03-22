@@ -77,6 +77,7 @@ void My::Rendering::Camera::onChange()
 
 void My::Rendering::Camera::updateMatrices()
 {
-	m_viewMatrix = getMatrix().inverse();
+	const auto camCenter = getPosition() + forward();
+	m_viewMatrix = Matrix4::lookAt(getPosition(), camCenter, Vector3::up());
 	m_viewProjectionMatrix = m_projectionMatrix * m_viewMatrix;
 }
