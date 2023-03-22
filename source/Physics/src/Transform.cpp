@@ -139,9 +139,9 @@ namespace My::Physics
 		return *this;
 	}
 
-	Transform& Transform::translate(const Vector3& position)
+	Transform& Transform::translate(const Vector3& translation)
 	{
-		m_position += position;
+		m_position += translation;
 
 		onChange();
 
@@ -168,8 +168,8 @@ namespace My::Physics
 
 	void Transform::onChange()
 	{
-		m_matrix = Matrix4::scaling(m_scale)
+		m_matrix = Matrix4::translation(m_position)
 			* Matrix4::rotation(m_rotation, false)
-			* Matrix4::translation(m_position);
+			* Matrix4::scaling(m_scale);
 	}
 }

@@ -31,7 +31,7 @@ namespace My::Physics
 		Transform&		setRotation(const Vector3& rotation);
 		Transform&		setScale(const Vector3& scale);
 
-		Transform&		translate(const Vector3& position);
+		Transform&		translate(const Vector3& translation);
 		Transform&		rotate(const Vector3& rotation);
 		Transform&		scale(const Vector3& scale);
 
