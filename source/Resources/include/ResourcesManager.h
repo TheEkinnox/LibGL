@@ -23,6 +23,9 @@ namespace My::Resources
 		template	<typename T>
 		T*			get(const std::string& fileName) const;
 
+		template	<typename T>
+		T*			getOrCreate(const std::string& fileName);
+
 		void		remove(const std::string& fileName);
 
 	private:

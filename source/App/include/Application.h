@@ -5,10 +5,13 @@
 #include <GLFW/glfw3.h>
 
 #include "Camera.h"
+#include "Mesh.h"
 #include "ResourcesManager.h"
+#include "Utility/Timer.h"
 
 namespace My
 {
+	using namespace Utility;
 	using namespace Resources;
 	using namespace Rendering;
 
@@ -60,22 +63,29 @@ namespace My
 		/**
 		 * \brief Starts the application's main loop
 		 */
-		void run() const;
+		void run();
 
 	private:
 		static ResourceManager	m_resourceManager;
 		GLFWwindow*				m_window;
 		Camera					m_camera;
+		Timer					m_timer;
+		std::vector<Mesh>		m_meshes;
+
+		/**
+		 * \brief Creates the 3d environment
+		 */
+		void createScene();
 
 		/**
 		 * \brief Processes user input
 		 */
-		void processInput() const;
+		void processInput();
 
 		/**
 		 * \brief Handles the application's rendering
 		 */
-		static void render();
+		void render() const;
 
 		/**
 		 * \brief OpenGL frame buffer size change callback

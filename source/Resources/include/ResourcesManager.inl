@@ -35,4 +35,15 @@ namespace My::Resources
 
 		return reinterpret_cast<T*>(m_resources.at(fileName));
 	}
+
+	template <typename T>
+	T* ResourceManager::getOrCreate(const std::string& fileName)
+	{
+		T* resource = get<T>(fileName);
+
+		if (resource != nullptr)
+			return resource;
+
+		return create<T>(fileName);
+	}
 }

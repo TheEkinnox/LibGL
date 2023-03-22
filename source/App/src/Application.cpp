@@ -4,17 +4,24 @@
 #include "Model.h"
 #include "Shader.h"
 #include "Debug/Assertion.h"
+#include "Maths/Angle.h"
 
 #define DEFAULT_SHADER "shaders/Default.glsl"
-#define TEST_MODEL "meshes/diablo3_pose/diablo3_pose.obj"
+#define MOVE_SPEED .5f
+#define ROTATION_SPEED 30
 
 namespace My
 {
 	using namespace Exceptions;
+	using namespace Literal;
 
 	ResourceManager Application::m_resourceManager = ResourceManager();
 
 	Application::Application(const int windowWidth, const int windowHeight, const char* title)
+		: m_camera(Transform(),
+			Matrix4::perspectiveProjection(90_deg,
+				static_cast<float>(windowWidth) / static_cast<float>(windowHeight),
+				0.1f, 8.f))
 	{
 		// Initialize and configure glfw
 		glfwInit();
@@ -71,19 +78,22 @@ namespace My
 		glfwTerminate();
 	}
 
-	void Application::run() const
+	void Application::run()
 	{
+		createScene();
+
 		Shader* shader = m_resourceManager.create<Shader>(DEFAULT_SHADER);
 		ASSERT(shader != nullptr);
 		ASSERT(shader->setVertexShader());
 		ASSERT(shader->setFragmentShader());
 		ASSERT(shader->link());
 
-		ASSERT(m_resourceManager.create<Model>(TEST_MODEL) != nullptr);
-
 		// Run main loop
 		while (!glfwWindowShouldClose(m_window))
 		{
+			// Update the timer
+			m_timer.update();
+
 			// Handle inputs
 			processInput();
 
@@ -96,13 +106,75 @@ namespace My
 		}
 	}
 
-	void Application::processInput() const
+	void Application::createScene()
+	{
+		// Load the models
+		const Model* floorModel = m_resourceManager.getOrCreate<Model>("meshes/floor.obj");
+		ASSERT(floorModel != nullptr);
+
+		const Model* headModel = m_resourceManager.getOrCreate<Model>("meshes/boggie/head.obj");
+		ASSERT(headModel != nullptr);
+
+		const Model* diabloModel = m_resourceManager.getOrCreate<Model>("meshes/diablo3_pose/diablo3_pose.obj");
+		ASSERT(diabloModel != nullptr);
+
+		// Place the meshes
+		Mesh mesh(*floorModel);
+		m_meshes.push_back(mesh);
+
+		mesh = Mesh(*headModel);
+		mesh.m_transform.setPosition(Vector3(- 1, 1, -1));
+		m_meshes.push_back(mesh);
+
+		mesh = Mesh(*diabloModel);
+		mesh.m_transform.setPosition(Vector3(1, 0, -1));
+		mesh.m_transform.setScale(Vector3(.5f));
+		m_meshes.push_back(mesh);
+	}
+
+	void Application::processInput()
 	{
 		if (glfwGetKey(m_window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(m_window, true);
+
+		if (glfwGetKey(m_window, GLFW_KEY_R))
+			m_camera.setPosition(Vector3::zero());
+
+		// Movement
+		float moveSpeed = MOVE_SPEED * m_timer.getDeltaTime();
+
+		if (glfwGetKey(m_window, GLFW_KEY_LEFT_SHIFT))
+			moveSpeed *= 1.5f;
+
+		if (glfwGetKey(m_window, GLFW_KEY_W))
+			m_camera.translate(m_camera.forward() * moveSpeed);
+
+		if (glfwGetKey(m_window, GLFW_KEY_S))
+			m_camera.translate(-m_camera.forward() * moveSpeed);
+
+		if (glfwGetKey(m_window, GLFW_KEY_Q))
+			m_camera.translate(-m_camera.right() * moveSpeed);
+
+		if (glfwGetKey(m_window, GLFW_KEY_E))
+			m_camera.translate(m_camera.right() * moveSpeed);
+
+		// Rotation
+		if (glfwGetKey(m_window, GLFW_KEY_UP))
+			m_camera.rotate(ROTATION_SPEED * Vector3::right() * m_timer.getDeltaTime());
+
+		if (glfwGetKey(m_window, GLFW_KEY_DOWN))
+			m_camera.rotate(-ROTATION_SPEED * Vector3::right() * m_timer.getDeltaTime());
+
+		if (glfwGetKey(m_window, GLFW_KEY_A) ||
+			glfwGetKey(m_window, GLFW_KEY_LEFT))
+			m_camera.rotate(-ROTATION_SPEED * Vector3::up() * m_timer.getDeltaTime());
+
+		if (glfwGetKey(m_window, GLFW_KEY_D) ||
+			glfwGetKey(m_window, GLFW_KEY_RIGHT))
+			m_camera.rotate(ROTATION_SPEED * Vector3::up() * m_timer.getDeltaTime());
 	}
 
-	void Application::render()
+	void Application::render() const
 	{
 		glClearColor(0.f, 0.f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -110,8 +182,17 @@ namespace My
 		const Shader* shader = m_resourceManager.get<Shader>(DEFAULT_SHADER);
 		shader->use();
 
-		const Model* model = m_resourceManager.get<Model>(TEST_MODEL);
-		model->draw();
+		const GLint mvpMatUniformLoc = shader->getUniformLocation("mvp");
+		const Matrix4 viewProjMat = m_camera.getViewProjectionMatrix();
+
+		for (const auto& mesh : m_meshes)
+		{
+			const Matrix4 mvpMat = viewProjMat * mesh.m_transform.getMatrix();
+			
+			glUniformMatrix4fv(mvpMatUniformLoc, 1, GL_TRUE, mvpMat.getArray());
+
+			mesh.draw();
+		}
 	}
 
 	void Application::onFrameBufferResize(GLFWwindow*,
