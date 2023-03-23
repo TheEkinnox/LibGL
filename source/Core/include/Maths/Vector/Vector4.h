@@ -81,7 +81,7 @@ namespace LibMath
 }
 
 #ifdef __LIBMATH__MATRIX__MATRIX4_H__
-#include "Matrix4Vector4Operation.h"
+#include "Maths/Matrix4Vector4Operation.h"
 #endif // __LIBMATH__MATRIX__MATRIX4_H__
 
 #endif // !__LIBMATH__VECTOR__VECTOR4_H__
