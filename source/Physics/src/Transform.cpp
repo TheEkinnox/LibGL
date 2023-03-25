@@ -92,6 +92,21 @@ namespace My::Physics
 		return right().cross(forward());
 	}
 
+	Vector3 Transform::back() const
+	{
+		return -forward();
+	}
+
+	Vector3 Transform::left() const
+	{
+		return -right();
+	}
+
+	Vector3 Transform::down() const
+	{
+		return -up();
+	}
+
 	Vector3 Transform::getPosition() const
 	{
 		return m_position;
