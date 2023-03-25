@@ -89,7 +89,7 @@ namespace My::Physics
 
 	Vector3 Transform::up() const
 	{
-		return forward().cross(right());
+		return right().cross(forward());
 	}
 
 	Vector3 Transform::getPosition() const
