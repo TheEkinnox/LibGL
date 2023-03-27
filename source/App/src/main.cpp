@@ -6,8 +6,18 @@ constexpr unsigned int SCR_HEIGHT = 600;
 
 int main()
 {
-	My::Application app(SCR_WIDTH, SCR_HEIGHT, "Modern OpenGL Project - Loick");
-	app.run();
+#ifdef _DEBUG
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+#endif
+
+	{
+		My::Application app(SCR_WIDTH, SCR_HEIGHT, "Modern OpenGL Project - Loick");
+		app.run();
+	}
+
+#ifdef _DEBUG
+	_CrtDumpMemoryLeaks();
+#endif
 
 	return 0;
 }
