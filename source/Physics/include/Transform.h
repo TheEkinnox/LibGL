@@ -22,6 +22,10 @@ namespace My::Physics
 		Vector3			right() const;
 		Vector3			up() const;
 
+		Vector3			back() const;
+		Vector3			left() const;
+		Vector3			down() const;
+
 		Vector3			getPosition() const;
 		Vector3			getRotation() const;
 		Vector3			getScale() const;
