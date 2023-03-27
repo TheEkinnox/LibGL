@@ -115,7 +115,10 @@ vec4 calculateDirLight(DirLight light, vec3 normal, vec3 viewDir, vec4 fragColor
 		specular = pow(specularAngle, shininess);
 	}
 
-	return (light.ambient + light.diffuse * lambertian + light.specular * specular);
+	vec4 ambientColor = light.ambient * fragColor;
+	vec4 diffuseColor = light.diffuse * fragColor;
+
+	return (ambientColor + diffuseColor * lambertian + light.specular * specular);
 }
 
 vec4 calculatePointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec4 fragColor)
@@ -137,7 +140,10 @@ vec4 calculatePointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewD
 	float attenuation = 1.0 / (light.constant + light.linear * distance +
 				 light.quadratic * (distance * distance));
 
-	return (light.ambient * fragColor + light.diffuse * lambertian * fragColor + light.specular * specular) * attenuation;
+	vec4 ambientColor = light.ambient * fragColor;
+	vec4 diffuseColor = light.diffuse * fragColor;
+
+	return (ambientColor + diffuseColor * lambertian + light.specular * specular) * attenuation;
 }
 
 vec4 calculateSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, vec4 fragColor)
