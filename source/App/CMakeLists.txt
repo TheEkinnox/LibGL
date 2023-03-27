@@ -27,6 +27,14 @@ file(GLOB_RECURSE HEADER_FILES
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${PROJECT_FILES})
 
+file(GLOB_RECURSE ASSETS_FILES
+	${ASSETS_DIR}/shaders/*
+	${ASSETS_DIR}/textures/*)
+
+source_group(TREE ${ASSETS_DIR} PREFIX Assets FILES ${ASSETS_FILES})
+
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${ASSETS_FILES})
+
 
 ###############################
 #                             #
@@ -34,7 +42,7 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${PROJECT_FILES})
 #                             #
 ###############################
 
-add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})
+add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES} ${ASSETS_FILES})
 
 include_directories(${PROJECT_INCLUDE_DIR}
     ${GLAD_INCLUDE_DIR} ${GLFW_INCLUDE_DIR}
