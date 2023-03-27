@@ -7,11 +7,52 @@
 
 namespace My::Resources
 {
+	Shader::Shader(const Shader& other) :
+		m_source(other.m_source), m_vertexShader(other.m_vertexShader),
+		m_fragmentShader(other.m_fragmentShader), m_program(other.m_program)
+	{
+	}
+
+	Shader::Shader(Shader&& other) noexcept :
+		m_source(std::move(other.m_source)), m_vertexShader(other.m_vertexShader),
+		m_fragmentShader(other.m_fragmentShader), m_program(other.m_program)
+	{
+		other.m_vertexShader = other.m_fragmentShader = other.m_program = 0;
+	}
+
 	Shader::~Shader()
 	{
 		glDeleteShader(m_vertexShader);
 		glDeleteShader(m_fragmentShader);
 		glDeleteProgram(m_program);
+	}
+
+	Shader& Shader::operator=(const Shader& other)
+	{
+		if (&other == this)
+			return *this;
+
+		m_source = other.m_source;
+		m_vertexShader = other.m_vertexShader;
+		m_fragmentShader = other.m_fragmentShader;
+		m_program = other.m_program;
+
+		return *this;
+	}
+
+	Shader& Shader::operator=(Shader&& other) noexcept
+	{
+		if (&other == this)
+			return *this;
+
+		m_source = other.m_source;
+		m_vertexShader = other.m_vertexShader;
+		m_fragmentShader = other.m_fragmentShader;
+		m_program = other.m_program;
+
+		other.m_vertexShader = other.m_fragmentShader = other.m_program = 0;
+
+		return *this;
 	}
 
 	bool Shader::loadFromFile(const std::string& fileName)

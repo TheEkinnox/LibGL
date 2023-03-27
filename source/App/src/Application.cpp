@@ -3,6 +3,7 @@
 
 #include "Model.h"
 #include "Shader.h"
+#include "Texture.h"
 #include "Debug/Assertion.h"
 #include "Maths/Angle.h"
 #include "Maths/Trigonometry.h"
@@ -384,14 +385,20 @@ namespace My
 		glClearColor(0.f, 0.f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		const Texture* texture = m_resourceManager.getOrCreate<Texture>("textures/container.jpg");
+		ASSERT(texture != nullptr);
+
 		//const Shader* shader = setupUnlitShader("shaders/Default.glsl");
 		const Shader* shader = setupLitShader("shaders/Lit.glsl");
 
 		const GLint mvpMatUniformLoc = shader->getUniformLocation("mvp");
 		const GLint normalMatUniformLoc = shader->getUniformLocation("normalMat");
 		const GLint shininessUniformLoc = shader->getUniformLocation("shininess");
+		const GLint textureUniformLoc = shader->getUniformLocation("_texture");
 
 		const Matrix4 viewProjMat = m_camera.getViewProjectionMatrix();
+
+		glUniform1i(textureUniformLoc, 0);
 
 		for (const auto& mesh : m_meshes)
 		{
@@ -402,6 +409,8 @@ namespace My
 			glUniformMatrix4fv(mvpMatUniformLoc, 1, GL_TRUE, mvpMat.getArray());
 			glUniformMatrix4fv(normalMatUniformLoc, 1, GL_TRUE, normalMat.getArray());
 			glUniform1f(shininessUniformLoc, shininess);
+
+			texture->use();
 
 			mesh.draw();
 		}

@@ -10,7 +10,12 @@ namespace My::Resources
 	{
 	public:
 		Shader() = default;
+		Shader(const Shader& other);
+		Shader(Shader&& other) noexcept;
 		~Shader() override;
+
+		Shader& operator=(const Shader& other);
+		Shader& operator=(Shader&& other) noexcept;
 
 		/**
 		 * \brief Loads the source code of a shader from a given file
