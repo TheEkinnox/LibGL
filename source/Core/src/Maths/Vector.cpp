@@ -150,6 +150,16 @@ namespace LibMath
 		return *this;
 	}
 
+	float* Vector2::getArray()
+	{
+		return &m_x;
+	}
+
+	const float* Vector2::getArray() const
+	{
+		return &m_x;
+	}
+
 	Radian Vector2::angleFrom(Vector2 const& other) const
 	{
 		return acos(this->dot(other) / squareRoot(this->magnitudeSquared() * other.magnitudeSquared()));
@@ -530,6 +540,16 @@ namespace LibMath
 		this->m_z /= value;
 
 		return *this;
+	}
+
+	float* Vector3::getArray()
+	{
+		return &m_x;
+	}
+
+	const float* Vector3::getArray() const
+	{
+		return &m_x;
 	}
 
 	Radian Vector3::angleFrom(Vector3 const& other) const

@@ -42,6 +42,9 @@ namespace LibMath
 		Vector3&		operator-=(float const&);						// subtract a value from all components
 		Vector3&		operator*=(float const&);						// multiply all components by a value
 		Vector3&		operator/=(float const&);						// divide all components by a value
+		
+		float*			getArray();
+		const float*	getArray() const;
 
 		Radian			angleFrom(Vector3 const& other) const;			// return smallest angle between 2 vectors
 		Radian			signedAngleFrom(Vector3 const& other,
