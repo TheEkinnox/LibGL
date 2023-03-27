@@ -5,8 +5,8 @@
 #include "Shader.h"
 #include "Debug/Assertion.h"
 #include "Maths/Angle.h"
+#include "Maths/Trigonometry.h"
 
-#define DEFAULT_SHADER "shaders/Default.glsl"
 #define MOVE_SPEED .5f
 #define ROTATION_SPEED 30
 
@@ -59,6 +59,14 @@ namespace My
 			throw GLADInitFailed("Failed to initialize GLAD");
 		}
 
+		// Enable back-face culling
+		glFrontFace(GL_CCW);
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
+
+		// Enable depth-test
+		glEnable(GL_DEPTH_TEST);
+
 		// Setup OpenGL debugging
 		GLint flags = 0;
 		glGetIntegerv(GL_CONTEXT_FLAGS, &flags);
@@ -81,12 +89,6 @@ namespace My
 	void Application::run()
 	{
 		createScene();
-
-		Shader* shader = m_resourceManager.create<Shader>(DEFAULT_SHADER);
-		ASSERT(shader != nullptr);
-		ASSERT(shader->setVertexShader());
-		ASSERT(shader->setFragmentShader());
-		ASSERT(shader->link());
 
 		// Run main loop
 		while (!glfwWindowShouldClose(m_window))
@@ -120,16 +122,192 @@ namespace My
 
 		// Place the meshes
 		Mesh mesh(*floorModel);
+		mesh.m_transform.setScale(Vector3( 7, 1, 7 ));
 		m_meshes.push_back(mesh);
 
 		mesh = Mesh(*headModel);
-		mesh.m_transform.setPosition(Vector3(- 1, 1, -1));
+		mesh.m_transform.setPosition(Vector3(-1, -1, -1.f));
 		m_meshes.push_back(mesh);
 
 		mesh = Mesh(*diabloModel);
-		mesh.m_transform.setPosition(Vector3(1, 0, -1));
+		mesh.m_transform.setPosition(Vector3(.5f, -.5f, -1.f));
 		mesh.m_transform.setScale(Vector3(.5f));
 		m_meshes.push_back(mesh);
+
+		// Setup the lights
+		m_dirLight =
+		{
+			{
+				Vector4(.2f, .08f, 0.f, 1),
+				Vector4(.4f, .15f, 0.f, 1),
+				Vector4(.4f, .15f, 0.f, 1),
+			},
+			Vector3(0, -1, 0)
+		};
+
+		const Light pointLightBase
+		{
+				Vector4(0.f, 0.f, .1f, 1),
+				Vector4(0.f, 0.f, .5f, 1),
+				Vector4(0.f, 0.f, .5f, 1),
+		};
+
+		m_pointLights[0] =
+		{
+			pointLightBase,
+			{ -1, 1, 1 },
+			1.f,
+			.7f,
+			1.8f
+		};
+
+		m_pointLights[1] =
+		{
+			pointLightBase,
+			{ 1, 1, 1 },
+			1.f,
+			.7f,
+			1.8f
+		};
+
+		m_pointLights[2] =
+		{
+			pointLightBase,
+			{ 0, 1, -1 },
+			1.f,
+			.7f,
+			1.8f
+		};
+
+		m_spotLight =
+		{
+			{
+				Vector4(.1f, .1f, .1f, 1),
+				Vector4(.5f, .5f, .5f, 1),
+				Vector4(.5f, .5f, .5f, 1),
+			},
+			m_camera.getPosition(),
+			m_camera.forward(),
+			cos(12_deg),
+			cos(15_deg),
+			1.f,
+			.7f,
+			1.8f
+		};
+	}
+
+	Shader* Application::setupLitShader(const std::string& fileName) const
+	{
+		Shader* shader = m_resourceManager.get<Shader>(fileName);
+
+		if (shader == nullptr)
+		{
+			shader = m_resourceManager.create<Shader>(fileName);
+
+			ASSERT(shader != nullptr);
+			ASSERT(shader->setVertexShader());
+			ASSERT(shader->setFragmentShader());
+			ASSERT(shader->link());
+		}
+
+		shader->use();
+
+		// TODO: use ubos
+
+		// Setup camera
+		GLint uniformLoc = shader->getUniformLocation("viewPos");
+		glUniform3fv(uniformLoc, 1, m_camera.getPosition().getArray());
+
+		// Setup directional light
+		uniformLoc = shader->getUniformLocation("dirLight.ambient");
+		glUniform4fv(uniformLoc, 1, m_dirLight.m_ambient.getArray());
+
+		uniformLoc = shader->getUniformLocation("dirLight.diffuse");
+		glUniform4fv(uniformLoc, 1, m_dirLight.m_diffuse.getArray());
+
+		uniformLoc = shader->getUniformLocation("dirLight.specular");
+		glUniform4fv(uniformLoc, 1, m_dirLight.m_specular.getArray());
+
+		uniformLoc = shader->getUniformLocation("dirLight.direction");
+		glUniform3fv(uniformLoc, 1, m_dirLight.m_direction.getArray());
+
+		// Setup point lights
+		for (size_t i = 0; i < NB_POINT_LIGHTS; i++)
+		{
+			const std::string prefix = Debug::Log::format("pointLights[%i].", i);
+			uniformLoc = shader->getUniformLocation(prefix + "ambient");
+			glUniform4fv(uniformLoc, 1, m_pointLights[i].m_ambient.getArray());
+
+			uniformLoc = shader->getUniformLocation(prefix + "diffuse");
+			glUniform4fv(uniformLoc, 1, m_pointLights[i].m_diffuse.getArray());
+
+			uniformLoc = shader->getUniformLocation(prefix + "specular");
+			glUniform4fv(uniformLoc, 1, m_pointLights[i].m_specular.getArray());
+
+			uniformLoc = shader->getUniformLocation(prefix + "position");
+			glUniform3fv(uniformLoc, 1, m_pointLights[i].m_position.getArray());
+
+			uniformLoc = shader->getUniformLocation(prefix + "constant");
+			glUniform1f(uniformLoc, m_pointLights[i].m_constant);
+
+			uniformLoc = shader->getUniformLocation(prefix + "linear");
+			glUniform1f(uniformLoc, m_pointLights[i].m_linear);
+
+			uniformLoc = shader->getUniformLocation(prefix + "quadratic");
+			glUniform1f(uniformLoc, m_pointLights[i].m_quadratic);
+		}
+
+		// Setup spot light
+		uniformLoc = shader->getUniformLocation("spotLight.ambient");
+		glUniform4fv(uniformLoc, 1, m_spotLight.m_ambient.getArray());
+
+		uniformLoc = shader->getUniformLocation("spotLight.diffuse");
+		glUniform4fv(uniformLoc, 1, m_spotLight.m_diffuse.getArray());
+
+		uniformLoc = shader->getUniformLocation("spotLight.specular");
+		glUniform4fv(uniformLoc, 1, m_spotLight.m_specular.getArray());
+
+		uniformLoc = shader->getUniformLocation("spotLight.position");
+		glUniform3fv(uniformLoc, 1, m_spotLight.m_position.getArray());
+
+		uniformLoc = shader->getUniformLocation("spotLight.direction");
+		glUniform3fv(uniformLoc, 1, m_spotLight.m_direction.getArray());
+
+		uniformLoc = shader->getUniformLocation("spotLight.cutOff");
+		glUniform1f(uniformLoc, m_spotLight.m_cutOff);
+
+		uniformLoc = shader->getUniformLocation("spotLight.outerCutOff");
+		glUniform1f(uniformLoc, m_spotLight.m_outerCutoff);
+
+		uniformLoc = shader->getUniformLocation("spotLight.constant");
+		glUniform1f(uniformLoc, m_spotLight.m_constant);
+
+		uniformLoc = shader->getUniformLocation("spotLight.linear");
+		glUniform1f(uniformLoc, m_spotLight.m_linear);
+
+		uniformLoc = shader->getUniformLocation("spotLight.quadratic");
+		glUniform1f(uniformLoc, m_spotLight.m_quadratic);
+
+		return shader;
+	}
+
+	Shader* Application::setupUnlitShader(const std::string& fileName)
+	{
+		Shader* shader = m_resourceManager.get<Shader>(fileName);
+
+		if (shader == nullptr)
+		{
+			shader = m_resourceManager.create<Shader>(fileName);
+
+			ASSERT(shader != nullptr);
+			ASSERT(shader->setVertexShader());
+			ASSERT(shader->setFragmentShader());
+			ASSERT(shader->link());
+		}
+
+		shader->use();
+
+		return shader;
 	}
 
 	void Application::processInput()
@@ -138,25 +316,49 @@ namespace My
 			glfwSetWindowShouldClose(m_window, true);
 
 		if (glfwGetKey(m_window, GLFW_KEY_R))
+		{
 			m_camera.setPosition(Vector3::zero());
+			m_camera.setRotation(Vector3::zero());
+		}
+
+		// Dir light rotation
+		if (glfwGetKey(m_window, GLFW_KEY_I))
+			m_dirLight.m_direction.rotate(Degree(ROTATION_SPEED * m_timer.getDeltaTime()), Vector3::right());
+
+		if (glfwGetKey(m_window, GLFW_KEY_J))
+			m_dirLight.m_direction.rotate(Degree(-ROTATION_SPEED * m_timer.getDeltaTime()), Vector3::up());
+
+		if (glfwGetKey(m_window, GLFW_KEY_K))
+			m_dirLight.m_direction.rotate(Degree(-ROTATION_SPEED * m_timer.getDeltaTime()), Vector3::right());
+
+		if (glfwGetKey(m_window, GLFW_KEY_L))
+			m_dirLight.m_direction.rotate(Degree(ROTATION_SPEED * m_timer.getDeltaTime()), Vector3::up());
 
 		// Movement
 		float moveSpeed = MOVE_SPEED * m_timer.getDeltaTime();
 
-		if (glfwGetKey(m_window, GLFW_KEY_LEFT_SHIFT))
+		if (glfwGetKey(m_window, GLFW_KEY_LEFT_CONTROL)
+			|| glfwGetKey(m_window, GLFW_KEY_RIGHT_CONTROL))
 			moveSpeed *= 1.5f;
 
 		if (glfwGetKey(m_window, GLFW_KEY_W))
 			m_camera.translate(m_camera.forward() * moveSpeed);
 
 		if (glfwGetKey(m_window, GLFW_KEY_S))
-			m_camera.translate(-m_camera.forward() * moveSpeed);
+			m_camera.translate(m_camera.back() * moveSpeed);
 
-		if (glfwGetKey(m_window, GLFW_KEY_Q))
-			m_camera.translate(-m_camera.right() * moveSpeed);
+		if (glfwGetKey(m_window, GLFW_KEY_A))
+			m_camera.translate(m_camera.left() * moveSpeed);
 
-		if (glfwGetKey(m_window, GLFW_KEY_E))
+		if (glfwGetKey(m_window, GLFW_KEY_D))
 			m_camera.translate(m_camera.right() * moveSpeed);
+
+		if (glfwGetKey(m_window, GLFW_KEY_SPACE))
+			m_camera.translate(Vector3::up() * moveSpeed);
+
+		if (glfwGetKey(m_window, GLFW_KEY_LEFT_SHIFT)
+			|| glfwGetKey(m_window, GLFW_KEY_RIGHT_SHIFT))
+			m_camera.translate(Vector3::down() * moveSpeed);
 
 		// Rotation
 		if (glfwGetKey(m_window, GLFW_KEY_UP))
@@ -165,31 +367,41 @@ namespace My
 		if (glfwGetKey(m_window, GLFW_KEY_DOWN))
 			m_camera.rotate(-ROTATION_SPEED * Vector3::right() * m_timer.getDeltaTime());
 
-		if (glfwGetKey(m_window, GLFW_KEY_A) ||
+		if (glfwGetKey(m_window, GLFW_KEY_Q) ||
 			glfwGetKey(m_window, GLFW_KEY_LEFT))
 			m_camera.rotate(-ROTATION_SPEED * Vector3::up() * m_timer.getDeltaTime());
 
-		if (glfwGetKey(m_window, GLFW_KEY_D) ||
+		if (glfwGetKey(m_window, GLFW_KEY_E) ||
 			glfwGetKey(m_window, GLFW_KEY_RIGHT))
 			m_camera.rotate(ROTATION_SPEED * Vector3::up() * m_timer.getDeltaTime());
+
+		m_spotLight.m_position = m_camera.getPosition();
+		m_spotLight.m_direction = m_camera.forward();
 	}
 
 	void Application::render() const
 	{
 		glClearColor(0.f, 0.f, 1.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		const Shader* shader = m_resourceManager.get<Shader>(DEFAULT_SHADER);
-		shader->use();
+		//const Shader* shader = setupUnlitShader("shaders/Default.glsl");
+		const Shader* shader = setupLitShader("shaders/Lit.glsl");
 
 		const GLint mvpMatUniformLoc = shader->getUniformLocation("mvp");
+		const GLint normalMatUniformLoc = shader->getUniformLocation("normalMat");
+		const GLint shininessUniformLoc = shader->getUniformLocation("shininess");
+
 		const Matrix4 viewProjMat = m_camera.getViewProjectionMatrix();
 
 		for (const auto& mesh : m_meshes)
 		{
 			const Matrix4 mvpMat = viewProjMat * mesh.m_transform.getMatrix();
+			const Matrix4 normalMat = mesh.m_transform.getMatrix().inverse().transposed();
+			constexpr float shininess = 16.f;
 			
 			glUniformMatrix4fv(mvpMatUniformLoc, 1, GL_TRUE, mvpMat.getArray());
+			glUniformMatrix4fv(normalMatUniformLoc, 1, GL_TRUE, normalMat.getArray());
+			glUniform1f(shininessUniformLoc, shininess);
 
 			mesh.draw();
 		}

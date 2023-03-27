@@ -176,8 +176,8 @@ namespace My::Resources
 		glUseProgram(m_program);
 	}
 
-	GLint Shader::getUniformLocation(const GLchar* uniformName) const
+	GLint Shader::getUniformLocation(const std::string& uniformName) const
 	{
-		return glGetUniformLocation(m_program, uniformName);
+		return glGetUniformLocation(m_program, uniformName.c_str());
 	}
 }

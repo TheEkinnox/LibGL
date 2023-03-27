@@ -52,7 +52,7 @@ namespace My::Resources
 		 * \param uniformName The searched uniform variable's name
 		 * \return The location of the searched uniform variable
 		 */
-		GLint getUniformLocation(const GLchar* uniformName) const;
+		GLint getUniformLocation(const std::string& uniformName) const;
 
 	private:
 		std::string				m_source;

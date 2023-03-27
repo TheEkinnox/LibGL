@@ -5,12 +5,18 @@
 #include <GLFW/glfw3.h>
 
 #include "Camera.h"
+#include "Light.h"
 #include "Mesh.h"
 #include "ResourcesManager.h"
 #include "Utility/Timer.h"
 
 namespace My
 {
+	namespace Resources
+	{
+		class Shader;
+	}
+
 	using namespace Utility;
 	using namespace Resources;
 	using namespace Rendering;
@@ -66,16 +72,31 @@ namespace My
 		void run();
 
 	private:
+		static constexpr int NB_POINT_LIGHTS = 4;
+
 		static ResourceManager	m_resourceManager;
 		GLFWwindow*				m_window;
 		Camera					m_camera;
 		Timer					m_timer;
 		std::vector<Mesh>		m_meshes;
+		PointLight				m_pointLights[NB_POINT_LIGHTS];
+		DirectionalLight		m_dirLight;
+		SpotLight				m_spotLight;
 
 		/**
 		 * \brief Creates the 3d environment
 		 */
 		void createScene();
+
+		/**
+		 * \brief Loads or creates a new lit shader
+		 */
+		Shader* setupLitShader(const std::string& fileName) const;
+
+		/**
+		 * \brief Loads or creates a new unlit shader
+		 */
+		static Shader* setupUnlitShader(const std::string& fileName);
 
 		/**
 		 * \brief Processes user input
