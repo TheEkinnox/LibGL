@@ -1,11 +1,13 @@
 #pragma once
+#include "Scene.h"
 #include "Transform.h"
 
 namespace My::Rendering
 {
 	using namespace Physics;
+	using namespace Resources;
 
-	class Camera : public Transform
+	class Camera : public SceneNode
 	{
 	public:
 		/**
@@ -15,10 +17,11 @@ namespace My::Rendering
 
 		/**
 		 * \brief Creates a camera with the given transform and projection matrix
+		 * \param parent The camera's parent in the scene graph (nullptr if at the root)
 		 * \param transform The camera's initial transform
 		 * \param projectionMatrix The camera's projection matrix
 		 */
-		explicit Camera(const Transform& transform, Matrix4 projectionMatrix);
+		explicit Camera(SceneNode* parent, const Transform& transform, Matrix4 projectionMatrix);
 
 		/**
 		 * \brief Creates a copy of a given camera

@@ -1,26 +1,26 @@
 #include "Camera.h"
 
 My::Rendering::Camera::Camera()
-	: Transform(),
+	: SceneNode(),
 	m_projectionMatrix(Matrix4::orthographicProjection(-1, 1, -1, 1, -1, 1))
 {
 	updateMatrices();
 }
 
-My::Rendering::Camera::Camera(const Transform& transform, Matrix4 projectionMatrix)
-	: Transform(transform), m_projectionMatrix(std::move(projectionMatrix))
+My::Rendering::Camera::Camera(SceneNode* parent, const Transform& transform, Matrix4 projectionMatrix)
+	: SceneNode(parent, transform), m_projectionMatrix(std::move(projectionMatrix))
 {
 	updateMatrices();
 }
 
 My::Rendering::Camera::Camera(const Camera& other)
-	: Transform(other), m_projectionMatrix(other.m_projectionMatrix)
+	: SceneNode(other), m_projectionMatrix(other.m_projectionMatrix)
 {
 	updateMatrices();
 }
 
 My::Rendering::Camera::Camera(Camera&& other) noexcept
-	: Transform(std::move(other)),
+	: SceneNode(std::move(other)),
 	  m_projectionMatrix(std::move(other.m_projectionMatrix))
 {
 	updateMatrices();
@@ -71,7 +71,7 @@ My::Rendering::Camera& My::Rendering::Camera::setProjectionMatrix(const Matrix4&
 
 void My::Rendering::Camera::onChange()
 {
-	Transform::onChange();
+	SceneNode::onChange();
 	updateMatrices();
 }
 

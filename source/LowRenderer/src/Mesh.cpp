@@ -2,8 +2,8 @@
 
 namespace My::Rendering
 {
-	Mesh::Mesh(const Model& model)
-		: m_model(&model)
+	Mesh::Mesh(SceneNode* parent, const Model& model)
+		: SceneNode(parent, Transform()), m_model(&model)
 	{
 	}
 

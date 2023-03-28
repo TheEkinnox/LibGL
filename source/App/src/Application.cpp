@@ -20,7 +20,7 @@ namespace My
 	ResourceManager Application::m_resourceManager = ResourceManager();
 
 	Application::Application(const int windowWidth, const int windowHeight, const char* title)
-		: m_camera(Transform(),
+		: m_camera(nullptr, Transform(),
 			Matrix4::perspectiveProjection(90_deg,
 				static_cast<float>(windowWidth) / static_cast<float>(windowHeight),
 				0.1f, 8.f))
@@ -123,17 +123,17 @@ namespace My
 		ASSERT(diabloModel != nullptr);
 
 		// Place the meshes
-		Mesh mesh(*floorModel);
-		mesh.m_transform.setScale(Vector3( 7, 1, 7 ));
+		Mesh mesh(nullptr, *floorModel);
+		mesh.setScale(Vector3( 7, 1, 7 ));
 		m_meshes.push_back(mesh);
 
-		mesh = Mesh(*headModel);
-		mesh.m_transform.setPosition(Vector3(-1, -1, -1.f));
+		mesh = Mesh(nullptr, *headModel);
+		mesh.setPosition(Vector3(-1, -1, -1.f));
 		m_meshes.push_back(mesh);
 
-		mesh = Mesh(*diabloModel);
-		mesh.m_transform.setPosition(Vector3(.5f, -.5f, -1.f));
-		mesh.m_transform.setScale(Vector3(.5f));
+		mesh = Mesh(nullptr, *diabloModel);
+		mesh.setPosition(Vector3(.5f, -.5f, -1.f));
+		mesh.setScale(Vector3(.5f));
 		m_meshes.push_back(mesh);
 
 		// Setup the lights
@@ -336,10 +336,10 @@ namespace My
 
 		for (const auto& mesh : m_meshes)
 		{
-			const Matrix4 mvpMat = viewProjMat * mesh.m_transform.getMatrix();
-			const Matrix4 normalMat = mesh.m_transform.getMatrix().inverse().transposed();
+			const Matrix4 mvpMat = viewProjMat * mesh.getGlobalTransform();
+			const Matrix4 normalMat = mesh.getGlobalTransform().inverse().transposed();
 			constexpr float shininess = 16.f;
-			
+
 			glUniformMatrix4fv(mvpMatUniformLoc, 1, GL_TRUE, mvpMat.getArray());
 			glUniformMatrix4fv(normalMatUniformLoc, 1, GL_TRUE, normalMat.getArray());
 			glUniform1f(shininessUniformLoc, shininess);
