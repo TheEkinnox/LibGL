@@ -7,6 +7,7 @@
 #include "Debug/Assertion.h"
 #include "Maths/Angle.h"
 #include "Maths/Trigonometry.h"
+#include "Utility/utility.h"
 
 #define MOVE_SPEED .5f
 #define ROTATION_SPEED 30
@@ -149,51 +150,43 @@ namespace My
 		const Light pointLightBase
 		{
 				Vector4(0.f, 0.f, .1f, 1),
-				Vector4(0.f, 0.f, .5f, 1),
+				Vector4(0.f, 0.f, .4f, 1),
 				Vector4(0.f, 0.f, .5f, 1),
 		};
 
 		m_pointLights[0] =
 		{
 			pointLightBase,
-			{ -1, 1, 1 },
-			1.f,
-			.7f,
-			1.8f
+			{ -1, 0, 1 },
+			{ 1.f, .7f, 1.8f }
 		};
 
 		m_pointLights[1] =
 		{
 			pointLightBase,
-			{ 1, 1, 1 },
-			1.f,
-			.7f,
-			1.8f
+			{ 1, 0, 1 },
+			{ 1.f, .7f, 1.8f }
 		};
 
 		m_pointLights[2] =
 		{
 			pointLightBase,
-			{ 0, 1, -1 },
-			1.f,
-			.7f,
-			1.8f
+			{ 0, 0, -1 },
+			{ 1.f, .7f, 1.8f }
 		};
 
 		m_spotLight =
 		{
 			{
 				Vector4(.1f, .1f, .1f, 1),
-				Vector4(.5f, .5f, .5f, 1),
+				Vector4(.4f, .4f, .4f, 1),
 				Vector4(.5f, .5f, .5f, 1),
 			},
 			m_camera.getPosition(),
 			m_camera.forward(),
+			{ 1.f, .7f, 1.8f },
 			cos(12_deg),
 			cos(15_deg),
-			1.f,
-			.7f,
-			1.8f
 		};
 	}
 
@@ -213,81 +206,22 @@ namespace My
 
 		shader->use();
 
-		// TODO: use ubos
-
 		// Setup camera
-		GLint uniformLoc = shader->getUniformLocation("viewPos");
+		const GLint uniformLoc = shader->getUniformLocation("viewPos");
 		glUniform3fv(uniformLoc, 1, m_camera.getPosition().getArray());
 
 		// Setup directional light
-		uniformLoc = shader->getUniformLocation("dirLight.ambient");
-		glUniform4fv(uniformLoc, 1, m_dirLight.m_ambient.getArray());
-
-		uniformLoc = shader->getUniformLocation("dirLight.diffuse");
-		glUniform4fv(uniformLoc, 1, m_dirLight.m_diffuse.getArray());
-
-		uniformLoc = shader->getUniformLocation("dirLight.specular");
-		glUniform4fv(uniformLoc, 1, m_dirLight.m_specular.getArray());
-
-		uniformLoc = shader->getUniformLocation("dirLight.direction");
-		glUniform3fv(uniformLoc, 1, m_dirLight.m_direction.getArray());
+		m_dirLight.setupUniform("dirLight", *shader);
 
 		// Setup point lights
 		for (size_t i = 0; i < NB_POINT_LIGHTS; i++)
 		{
-			const std::string prefix = Debug::Log::format("pointLights[%i].", i);
-			uniformLoc = shader->getUniformLocation(prefix + "ambient");
-			glUniform4fv(uniformLoc, 1, m_pointLights[i].m_ambient.getArray());
-
-			uniformLoc = shader->getUniformLocation(prefix + "diffuse");
-			glUniform4fv(uniformLoc, 1, m_pointLights[i].m_diffuse.getArray());
-
-			uniformLoc = shader->getUniformLocation(prefix + "specular");
-			glUniform4fv(uniformLoc, 1, m_pointLights[i].m_specular.getArray());
-
-			uniformLoc = shader->getUniformLocation(prefix + "position");
-			glUniform3fv(uniformLoc, 1, m_pointLights[i].m_position.getArray());
-
-			uniformLoc = shader->getUniformLocation(prefix + "constant");
-			glUniform1f(uniformLoc, m_pointLights[i].m_constant);
-
-			uniformLoc = shader->getUniformLocation(prefix + "linear");
-			glUniform1f(uniformLoc, m_pointLights[i].m_linear);
-
-			uniformLoc = shader->getUniformLocation(prefix + "quadratic");
-			glUniform1f(uniformLoc, m_pointLights[i].m_quadratic);
+			const std::string prefix = formatString("pointLights[%i]", i);
+			m_pointLights[i].setupUniform(prefix, *shader);
 		}
 
 		// Setup spot light
-		uniformLoc = shader->getUniformLocation("spotLight.ambient");
-		glUniform4fv(uniformLoc, 1, m_spotLight.m_ambient.getArray());
-
-		uniformLoc = shader->getUniformLocation("spotLight.diffuse");
-		glUniform4fv(uniformLoc, 1, m_spotLight.m_diffuse.getArray());
-
-		uniformLoc = shader->getUniformLocation("spotLight.specular");
-		glUniform4fv(uniformLoc, 1, m_spotLight.m_specular.getArray());
-
-		uniformLoc = shader->getUniformLocation("spotLight.position");
-		glUniform3fv(uniformLoc, 1, m_spotLight.m_position.getArray());
-
-		uniformLoc = shader->getUniformLocation("spotLight.direction");
-		glUniform3fv(uniformLoc, 1, m_spotLight.m_direction.getArray());
-
-		uniformLoc = shader->getUniformLocation("spotLight.cutOff");
-		glUniform1f(uniformLoc, m_spotLight.m_cutOff);
-
-		uniformLoc = shader->getUniformLocation("spotLight.outerCutOff");
-		glUniform1f(uniformLoc, m_spotLight.m_outerCutoff);
-
-		uniformLoc = shader->getUniformLocation("spotLight.constant");
-		glUniform1f(uniformLoc, m_spotLight.m_constant);
-
-		uniformLoc = shader->getUniformLocation("spotLight.linear");
-		glUniform1f(uniformLoc, m_spotLight.m_linear);
-
-		uniformLoc = shader->getUniformLocation("spotLight.quadratic");
-		glUniform1f(uniformLoc, m_spotLight.m_quadratic);
+		m_spotLight.setupUniform("spotLight", *shader);
 
 		return shader;
 	}

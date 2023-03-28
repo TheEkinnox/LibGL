@@ -62,9 +62,29 @@ namespace My
 		Application(int windowWidth, int windowHeight, const char* title);
 
 		/**
+		 * \brief Disable the Application's copy constructor
+		 */
+		Application(const Application&) = delete;
+
+		/**
+		 * \brief Disable the Application's move constructor
+		 */
+		Application(Application&&) = delete;
+
+		/**
 		 * \brief Clears the application's previously allocated resources
 		 */
 		~Application();
+
+		/**
+		 * \brief Disable the Application's copy assignment operator
+		 */
+		Application& operator=(const Application&) = delete;
+
+		/**
+		 * \brief Disable the Application's move assignment operator
+		 */
+		Application& operator=(Application&&) = delete;
 
 		/**
 		 * \brief Starts the application's main loop

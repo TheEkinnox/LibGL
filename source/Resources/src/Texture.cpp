@@ -93,7 +93,6 @@ bool My::Resources::Texture::loadFromFile(const std::string& fileName)
 
 void My::Resources::Texture::use() const
 {
-	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_id);
 }
 

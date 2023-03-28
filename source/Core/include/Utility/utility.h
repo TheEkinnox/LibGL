@@ -5,6 +5,17 @@
 
 namespace My::Utility
 {
+
+	/**
+	 * \brief Formats a string using the printf syntax
+	 * \tparam Args The arguments to insert into the format string
+	 * \param format The format string (follows printf syntax)
+	 * \param args The arguments to insert into the format string
+	 * \return The formatted string
+	 */
+	template	<class ... Args>
+	std::string formatString(const char* format, Args ... args);
+
 	/**
 	 * \brief Splits the given string using the given delimiter
 	 * \param str The string to split
@@ -14,3 +25,5 @@ namespace My::Utility
 	 */
 	std::vector<std::string> splitString(const std::string& str, char const* delimiter, bool includeEmpty);
 }
+
+#include "Utility/utility.inl"

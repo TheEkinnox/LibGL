@@ -22,6 +22,9 @@ namespace My::Resources
 			Buffer& operator=(const Buffer& other) = delete;
 			Buffer& operator=(Buffer&& other) noexcept;
 
+			/**
+			 * \brief Binds the vertex buffer object and element buffer object
+			 */
 			void bind() const;
 
 		private:
@@ -42,6 +45,9 @@ namespace My::Resources
 			VertexAttributes& operator=(const VertexAttributes& other) = delete;
 			VertexAttributes& operator=(VertexAttributes&& other) noexcept;
 
+			/**
+			 * \brief Binds the vertex attributes object
+			 */
 			void bind() const;
 
 		private:

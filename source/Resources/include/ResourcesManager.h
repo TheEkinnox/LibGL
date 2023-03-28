@@ -17,16 +17,37 @@ namespace My::Resources
 		ResourceManager& operator=(const ResourceManager& other);
 		ResourceManager& operator=(ResourceManager&& other) noexcept;
 
-		template	<typename T>
-		T*			create(const std::string& fileName);
+		/**
+		 * \brief Tries to create the resource with the given file name.
+		 * \param fileName The name of the resource's file
+		 * \return A pointer to the resource on success, nullptr otherwise.
+		 */
+		template <typename T>
+		T* create(const std::string& fileName);
 
-		template	<typename T>
-		T*			get(const std::string& fileName) const;
 
-		template	<typename T>
-		T*			getOrCreate(const std::string& fileName);
+		/**
+		 * \brief Tries to find the resource with the given file name.
+		 * \param fileName The name of the resource's file
+		 * \return A pointer to the resource on success, nullptr otherwise.
+		 */
+		template <typename T>
+		T* get(const std::string& fileName) const;
 
-		void		remove(const std::string& fileName);
+		/**
+		 * \brief Tries to find the resource with the given file name.
+		 * If it can't be found, tries to create it.
+		 * \param fileName The name of the resource's file
+		 * \return A pointer to the resource on success, nullptr otherwise.
+		 */
+		template <typename T>
+		T* getOrCreate(const std::string& fileName);
+
+		/**
+		 * \brief Removes the resource with the given file name from the manager
+		 * \param fileName The name of the resource's file
+		 */
+		void remove(const std::string& fileName);
 
 	private:
 		using		ResourcePtr = IResource*;

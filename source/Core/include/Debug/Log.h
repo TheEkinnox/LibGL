@@ -12,10 +12,11 @@ namespace My::Debug
 	public:
 		~Log();
 
+		/**
+		 * \brief Sets the given file as the log output.
+		 * \param filePath The log file's path
+		 */
 		static void			openFile(std::filesystem::path const& filePath);
-
-		template			<class ... Args>
-		static std::string	format(const char* format, Args ... args);
 
 		template <typename ... Args>
 		static void			print(const char* format, Args ... args);

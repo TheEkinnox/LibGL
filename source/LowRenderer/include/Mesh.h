@@ -21,9 +21,16 @@ namespace My::Rendering
 		Mesh&			operator=(const Mesh& other) = default;
 		Mesh&			operator=(Mesh&& other) noexcept = default;
 
-		void			setModel(const Model& model);
+		/**
+		 * \brief Sets the mesh's model
+		 * \param model The mesh's new model
+		 */
+		void setModel(const Model& model);
 
-		void			draw() const;
+		/**
+		 * \brief Draws the mesh
+		 */
+		void draw() const;
 
 	private:
 		const Model*	m_model = nullptr;

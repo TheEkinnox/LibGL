@@ -5,8 +5,16 @@ namespace My::Resources
 	class IResource
 	{
 	public:
-		virtual			~IResource() = default;
+		/**
+		 * \brief Destroys the resource
+		 */
+		virtual ~IResource() = default;
 
-		virtual bool	loadFromFile(const std::string& fileName) = 0;
+		/**
+		 * \brief Tries to load the resource from the given file
+		 * \param fileName The resource's path
+		 * \return True if the resource was successfully loaded. False otherwise.
+		 */
+		virtual bool loadFromFile(const std::string& fileName) = 0;
 	};
 }
