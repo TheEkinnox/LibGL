@@ -5,8 +5,8 @@
 #include "Shader.h"
 #include "Texture.h"
 #include "Debug/Assertion.h"
-#include "Maths/Angle.h"
-#include "Maths/Trigonometry.h"
+#include "Angle.h"
+#include "Trigonometry.h"
 #include "Utility/utility.h"
 
 #define MOVE_SPEED .5f

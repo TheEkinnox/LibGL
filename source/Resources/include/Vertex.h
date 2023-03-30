@@ -1,6 +1,6 @@
 #pragma once
-#include "Maths/Vector/Vector2.h"
-#include "Maths/Vector/Vector3.h"
+#include "Vector/Vector2.h"
+#include "Vector/Vector3.h"
 
 namespace My::Resources
 {

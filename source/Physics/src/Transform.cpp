@@ -1,7 +1,7 @@
 #include "Transform.h"
 
-#include "Maths/Trigonometry.h"
-#include "Maths/Angle/Degree.h"
+#include "Trigonometry.h"
+#include "Angle/Degree.h"
 
 namespace My::Physics
 {

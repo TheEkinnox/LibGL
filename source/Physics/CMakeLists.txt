@@ -34,9 +34,10 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${PROJECT_FILES})
 ###############################
 
 add_library(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES})
-include_directories(${PROJECT_INCLUDE_DIR} ${CORE_INCLUDE_DIR})
+include_directories(${PROJECT_INCLUDE_DIR} ${LIBMATH_INCLUDE_DIR} ${CORE_INCLUDE_DIR})
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
+	${LIBMATH_NAME}
 	${CORE_NAME})
 if(MSVC)
   target_compile_options(${PROJECT_NAME} PRIVATE /W4 /WX)

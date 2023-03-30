@@ -1,3 +1,4 @@
+# Include sub directories
 add_subdirectory(Core)
 add_subdirectory(Physics)
 add_subdirectory(Resources)

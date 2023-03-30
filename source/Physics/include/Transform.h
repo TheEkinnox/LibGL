@@ -1,6 +1,6 @@
 #pragma once
-#include "Maths/Matrix/Matrix4.h"
-#include "Maths/Vector/Vector3.h"
+#include "Matrix/Matrix4.h"
+#include "Vector/Vector3.h"
 
 namespace My::Physics
 {
