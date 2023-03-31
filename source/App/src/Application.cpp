@@ -125,8 +125,11 @@ namespace My
 		const Model* floorModel = m_resourceManager.getOrCreate<Model>("meshes/floor.obj");
 		ASSERT(floorModel != nullptr);
 
-		const Texture* floorTexture = m_resourceManager.getOrCreate<Texture>("textures/container.jpg");
-		ASSERT(floorTexture != nullptr);
+		const Texture* floorDiffuse = m_resourceManager.getOrCreate<Texture>("textures/container2.png");
+		ASSERT(floorDiffuse != nullptr);
+
+		const Texture* floorSpecular = m_resourceManager.getOrCreate<Texture>("textures/container2_specular.png");
+		ASSERT(floorSpecular != nullptr);
 
 		const Model* headModel = m_resourceManager.getOrCreate<Model>("meshes/boggie/head.obj");
 		ASSERT(headModel != nullptr);
@@ -134,15 +137,21 @@ namespace My
 		const Texture* headDiffuse = m_resourceManager.getOrCreate<Texture>("meshes/boggie/head_diffuse.tga");
 		ASSERT(headDiffuse != nullptr);
 
+		const Texture* headSpecular = m_resourceManager.getOrCreate<Texture>("meshes/boggie/head_spec.tga");
+		ASSERT(headSpecular != nullptr);
+
 		const Model* diabloModel = m_resourceManager.getOrCreate<Model>("meshes/diablo3_pose/diablo3_pose.obj");
 		ASSERT(diabloModel != nullptr);
 
 		const Texture* diabloDiffuse = m_resourceManager.getOrCreate<Texture>("meshes/diablo3_pose/diablo3_pose_diffuse.tga");
 		ASSERT(diabloDiffuse != nullptr);
 
-		const Material floorMat(*shader, floorTexture, 32.f);
-		const Material headMat(*shader, headDiffuse, 8.f);
-		const Material diabloMat(*shader, diabloDiffuse, 16.f);
+		const Texture* diabloSpecular = m_resourceManager.getOrCreate<Texture>("meshes/diablo3_pose/diablo3_pose_spec.tga");
+		ASSERT(diabloSpecular != nullptr);
+
+		const Material floorMat(*shader, floorDiffuse, floorSpecular, 32.f);
+		const Material headMat(*shader, headDiffuse, headSpecular, 8.f);
+		const Material diabloMat(*shader, diabloDiffuse, diabloSpecular, 16.f);
 
 		// Place the meshes
 		Mesh mesh(nullptr, *floorModel, floorMat);

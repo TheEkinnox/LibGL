@@ -6,8 +6,8 @@
 namespace My::Rendering
 {
 	Material::Material(const Shader& shader, const Texture* diffuse,
-		const float shininess) : m_shader(&shader), m_diffuse(diffuse),
-		m_shininess(shininess)
+		const Texture* specular, const float shininess) : m_shader(&shader),
+		m_diffuse(diffuse), m_specular(specular), m_shininess(shininess)
 	{
 	}
 
@@ -35,15 +35,24 @@ namespace My::Rendering
 	{
 		m_shader->use();
 
+		glActiveTexture(GL_TEXTURE0);
 		if (m_diffuse != nullptr)
 			m_diffuse->use();
 		else
 			Texture::unbind();
 
-		const GLint shininessUniformLoc = m_shader->getUniformLocation("shininess");
-		const GLint diffuseUniformLoc = m_shader->getUniformLocation("_texture");
+		glActiveTexture(GL_TEXTURE1);
+		if (m_specular != nullptr)
+			m_specular->use();
+		else
+			Texture::unbind();
+
+		const GLint shininessUniformLoc = m_shader->getUniformLocation("_material.shininess");
+		const GLint diffuseUniformLoc = m_shader->getUniformLocation("_material.diffuse");
+		const GLint specularUniformLoc = m_shader->getUniformLocation("_material.specular");
 
 		glUniform1i(diffuseUniformLoc, 0);
+		glUniform1i(specularUniformLoc, 1);
 		glUniform1f(shininessUniformLoc, m_shininess);
 	}
 }

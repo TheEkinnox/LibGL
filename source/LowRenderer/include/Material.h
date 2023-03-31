@@ -16,7 +16,9 @@ namespace My::Rendering
 	{
 	public:
 		Material() = delete;
-		Material(const Shader& shader, const Texture* diffuse, float shininess);
+		Material(const Shader& shader, const Texture* diffuse,
+			const Texture* specular, float shininess);
+
 		Material(const Material& other) = default;
 		Material(Material&& other) = default;
 		~Material() = default;
@@ -53,6 +55,7 @@ namespace My::Rendering
 	private:
 		const Shader*	m_shader;
 		const Texture*	m_diffuse;
+		const Texture*	m_specular;
 		float			m_shininess;
 	};
 }
