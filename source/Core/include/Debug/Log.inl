@@ -4,7 +4,8 @@
 #include <iostream>
 
 #ifdef _WINDOWS
-#define WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN	// Disables unnecessary windows features
+#define NOMINMAX			// Avoids conflicts with LibMath's min and max
 #include <Windows.h>
 #endif
 
