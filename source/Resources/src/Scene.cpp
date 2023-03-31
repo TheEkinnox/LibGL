@@ -7,7 +7,7 @@ namespace My::Resources
 	{
 	}
 
-	Matrix4 SceneNode::getGlobalTransform() const
+	Transform SceneNode::getGlobalTransform() const
 	{
 		return m_globalTransform;
 	}
@@ -37,9 +37,16 @@ namespace My::Resources
 
 	void SceneNode::updateGlobalTransform()
 	{
-		m_globalTransform = getMatrix();
+		m_globalTransform = static_cast<Transform>(*this);
 
-		if (getParent() != nullptr)
-			m_globalTransform *= reinterpret_cast<SceneNode*>(getParent())->getGlobalTransform();
+		const SceneNode* castParent = reinterpret_cast<SceneNode*>(getParent());
+
+		if (castParent != nullptr)
+		{
+			const Transform parentTransform = castParent->getGlobalTransform();
+			m_globalTransform.translate(parentTransform.getPosition());
+			m_globalTransform.rotate(parentTransform.getRotation());
+			m_globalTransform.scale(parentTransform.getScale());
+		}
 	}
 }

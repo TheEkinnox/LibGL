@@ -102,6 +102,10 @@ namespace My
 		PointLight				m_pointLights[NB_POINT_LIGHTS];
 		DirectionalLight		m_dirLight;
 		SpotLight				m_spotLight;
+		Vector2					m_mousePos;
+		Vector2					m_lastMousePos;
+		Vector2					m_mouseDelta;
+		bool					m_isFirstMouse;
 
 		/**
 		 * \brief Creates the 3d environment
@@ -119,9 +123,14 @@ namespace My
 		static Shader* setupUnlitShader(const std::string& fileName);
 
 		/**
-		 * \brief Processes user input
+		 * \brief Processes user's keyboard input
 		 */
-		void processInput();
+		void handleKeyboard();
+
+		/**
+		 * \brief Processes user's mouse input
+		 */
+		void handleMouse();
 
 		/**
 		 * \brief Handles the application's rendering

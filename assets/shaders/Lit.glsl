@@ -10,12 +10,13 @@ out vec3 Normal;
 out vec2 TexCoord;
 
 uniform mat4 mvp;
+uniform mat4 modelMat;
 uniform mat4 normalMat;
 
 void main()
 {
 	gl_Position = mvp * vec4(_pos, 1.0);
-	FragPos = (transpose(inverse(normalMat)) * vec4(_pos, 1.0)).xyz;
+	FragPos = (modelMat * vec4(_pos, 1.0)).xyz;
 	Normal = (normalMat * vec4(_normal, 0)).xyz;
 	TexCoord = _texCoord;
 }

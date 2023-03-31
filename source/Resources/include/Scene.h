@@ -24,7 +24,7 @@ namespace My::Resources
 		 * \brief Gets the scene node's global transformation matrix
 		 * \return The scene node's global transformation matrix
 		 */
-		Matrix4 getGlobalTransform() const;
+		Transform getGlobalTransform() const;
 
 		/**
 		 * \brief Adds the given node as a child of the current node
@@ -45,7 +45,7 @@ namespace My::Resources
 		void onChange() override;
 
 	private:
-		Matrix4 m_globalTransform;
+		Transform	m_globalTransform;
 
 		void updateGlobalTransform();
 	};

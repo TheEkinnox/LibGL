@@ -1,3 +1,4 @@
+// Log.h must be included before glad - minwindef causes conflicts with APIENTRY
 #include "Debug/Log.h"
 #include "Application.h"
 
@@ -6,11 +7,13 @@
 #include "Texture.h"
 #include "Debug/Assertion.h"
 #include "Angle.h"
+#include "Arithmetic.h"
 #include "Trigonometry.h"
 #include "Utility/utility.h"
 
 #define MOVE_SPEED .5f
 #define ROTATION_SPEED 30
+#define MOUSE_SENSITIVITY 5.f
 
 namespace My
 {
@@ -23,7 +26,7 @@ namespace My
 		: m_camera(nullptr, Transform(),
 			Matrix4::perspectiveProjection(90_deg,
 				static_cast<float>(windowWidth) / static_cast<float>(windowHeight),
-				0.1f, 8.f))
+				0.1f, 8.f)), m_isFirstMouse(true)
 	{
 		// Initialize and configure glfw
 		glfwInit();
@@ -31,7 +34,6 @@ namespace My
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
 		glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 		glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
-
 #ifdef __APPLE__
 		// required to compile on OS X
 		glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
@@ -98,8 +100,9 @@ namespace My
 			// Update the timer
 			m_timer.update();
 
-			// Handle inputs
-			processInput();
+			// Handle keyboard and mouse inputs
+			handleKeyboard();
+			handleMouse();
 
 			// Handle rendering
 			render();
@@ -245,7 +248,7 @@ namespace My
 		return shader;
 	}
 
-	void Application::processInput()
+	void Application::handleKeyboard()
 	{
 		if (glfwGetKey(m_window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 			glfwSetWindowShouldClose(m_window, true);
@@ -314,6 +317,44 @@ namespace My
 		m_spotLight.m_direction = m_camera.forward();
 	}
 
+	void Application::handleMouse()
+	{
+		if (!glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_LEFT) &&
+			!glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_RIGHT))
+		{
+			glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+			m_isFirstMouse = true;
+			return;
+		}
+
+		glfwSetInputMode(m_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+		double mouseX, mouseY;
+		glfwGetCursorPos(m_window, &mouseX, &mouseY);
+
+		m_mousePos.m_x = static_cast<float>(mouseX);
+		m_mousePos.m_y = static_cast<float>(mouseY);
+
+		if (m_isFirstMouse)
+		{
+			m_lastMousePos = m_mousePos;
+			m_isFirstMouse = false;
+		}
+
+		m_mouseDelta = m_mousePos - m_lastMousePos;
+		m_lastMousePos = m_mousePos;
+
+		//update camera rotation
+		Vector3 camRotation = m_camera.getRotation();
+		camRotation.m_x += -m_mouseDelta.m_y * MOUSE_SENSITIVITY * m_timer.getDeltaTime();
+		camRotation.m_y += m_mouseDelta.m_x * MOUSE_SENSITIVITY * m_timer.getDeltaTime();
+
+		camRotation.m_x = clamp(camRotation.m_x, -80.f, 80.f);
+		camRotation.m_y = wrap(camRotation.m_y, 0.f, 360.f);
+
+		m_camera.setRotation(camRotation);
+	}
+
 	void Application::render() const
 	{
 		glClearColor(0.f, 0.f, 1.0f, 1.0f);
@@ -326,6 +367,7 @@ namespace My
 		const Shader* shader = setupLitShader("shaders/Lit.glsl");
 
 		const GLint mvpMatUniformLoc = shader->getUniformLocation("mvp");
+		const GLint modelMatUniformLoc = shader->getUniformLocation("modelMat");
 		const GLint normalMatUniformLoc = shader->getUniformLocation("normalMat");
 		const GLint shininessUniformLoc = shader->getUniformLocation("shininess");
 		const GLint textureUniformLoc = shader->getUniformLocation("_texture");
@@ -336,11 +378,13 @@ namespace My
 
 		for (const auto& mesh : m_meshes)
 		{
-			const Matrix4 mvpMat = viewProjMat * mesh.getGlobalTransform();
-			const Matrix4 normalMat = mesh.getGlobalTransform().inverse().transposed();
+			const Matrix4 modelMat = mesh.getGlobalTransform().getMatrix();
+			const Matrix4 normalMat = modelMat.inverse().transposed();
+			const Matrix4 mvpMat = viewProjMat * modelMat;
 			constexpr float shininess = 16.f;
 
 			glUniformMatrix4fv(mvpMatUniformLoc, 1, GL_TRUE, mvpMat.getArray());
+			glUniformMatrix4fv(modelMatUniformLoc, 1, GL_TRUE, modelMat.getArray());
 			glUniformMatrix4fv(normalMatUniformLoc, 1, GL_TRUE, normalMat.getArray());
 			glUniform1f(shininessUniformLoc, shininess);
 
