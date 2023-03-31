@@ -28,6 +28,8 @@ namespace My
 				static_cast<float>(windowWidth) / static_cast<float>(windowHeight),
 				0.1f, 8.f)), m_isFirstMouse(true)
 	{
+		Camera::setCurrent(m_camera);
+
 		// Initialize and configure glfw
 		glfwInit();
 		glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -115,37 +117,54 @@ namespace My
 
 	void Application::createScene()
 	{
+		//const Shader* shader = setupUnlitShader("shaders/Default.glsl");
+		const Shader* shader = setupLitShader("shaders/Lit.glsl");
+		ASSERT(shader != nullptr);
+
 		// Load the models
 		const Model* floorModel = m_resourceManager.getOrCreate<Model>("meshes/floor.obj");
 		ASSERT(floorModel != nullptr);
 
+		const Texture* floorTexture = m_resourceManager.getOrCreate<Texture>("textures/container.jpg");
+		ASSERT(floorTexture != nullptr);
+
 		const Model* headModel = m_resourceManager.getOrCreate<Model>("meshes/boggie/head.obj");
 		ASSERT(headModel != nullptr);
+
+		const Texture* headDiffuse = m_resourceManager.getOrCreate<Texture>("meshes/boggie/head_diffuse.tga");
+		ASSERT(headDiffuse != nullptr);
 
 		const Model* diabloModel = m_resourceManager.getOrCreate<Model>("meshes/diablo3_pose/diablo3_pose.obj");
 		ASSERT(diabloModel != nullptr);
 
+		const Texture* diabloDiffuse = m_resourceManager.getOrCreate<Texture>("meshes/diablo3_pose/diablo3_pose_diffuse.tga");
+		ASSERT(diabloDiffuse != nullptr);
+
+		const Material floorMat(*shader, floorTexture, 32.f);
+		const Material headMat(*shader, headDiffuse, 8.f);
+		const Material diabloMat(*shader, diabloDiffuse, 16.f);
+
 		// Place the meshes
-		Mesh mesh(nullptr, *floorModel);
+		Mesh mesh(nullptr, *floorModel, floorMat);
 		mesh.setScale(Vector3( 7, 1, 7 ));
-		m_meshes.push_back(mesh);
+		m_scene.addNode(mesh);
 
-		mesh = Mesh(nullptr, *headModel);
+		mesh = Mesh(nullptr, *headModel, headMat);
 		mesh.setPosition(Vector3(-1, -1, -1.f));
-		m_meshes.push_back(mesh);
+		m_scene.addNode(mesh);
 
-		mesh = Mesh(nullptr, *diabloModel);
+		mesh = Mesh(nullptr, *diabloModel, diabloMat);
 		mesh.setPosition(Vector3(.5f, -.5f, -1.f));
 		mesh.setScale(Vector3(.5f));
-		m_meshes.push_back(mesh);
+		m_scene.addNode(mesh);
 
 		// Setup the lights
 		m_dirLight =
 		{
 			{
-				Vector4(.2f, .08f, 0.f, 1),
-				Vector4(.4f, .15f, 0.f, 1),
-				Vector4(.4f, .15f, 0.f, 1),
+				Vector4(.11f, .16f, .18f, 1),
+				Vector4(.22f, .32f, .36f, 1),
+				Vector4(.22f, .32f, .36f, 1),
 			},
 			Vector3(0, -1, 0)
 		};
@@ -193,7 +212,7 @@ namespace My
 		};
 	}
 
-	Shader* Application::setupLitShader(const std::string& fileName) const
+	Shader* Application::setupLitShader(const std::string& fileName)
 	{
 		Shader* shader = m_resourceManager.get<Shader>(fileName);
 
@@ -206,25 +225,6 @@ namespace My
 			ASSERT(shader->setFragmentShader());
 			ASSERT(shader->link());
 		}
-
-		shader->use();
-
-		// Setup camera
-		const GLint uniformLoc = shader->getUniformLocation("viewPos");
-		glUniform3fv(uniformLoc, 1, m_camera.getPosition().getArray());
-
-		// Setup directional light
-		m_dirLight.setupUniform("dirLight", *shader);
-
-		// Setup point lights
-		for (size_t i = 0; i < NB_POINT_LIGHTS; i++)
-		{
-			const std::string prefix = formatString("pointLights[%i]", i);
-			m_pointLights[i].setupUniform(prefix, *shader);
-		}
-
-		// Setup spot light
-		m_spotLight.setupUniform("spotLight", *shader);
 
 		return shader;
 	}
@@ -242,8 +242,6 @@ namespace My
 			ASSERT(shader->setFragmentShader());
 			ASSERT(shader->link());
 		}
-
-		shader->use();
 
 		return shader;
 	}
@@ -355,47 +353,47 @@ namespace My
 		m_camera.setRotation(camRotation);
 	}
 
-	void Application::render() const
+	void Application::render()
 	{
 		glClearColor(0.f, 0.f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		const Texture* texture = m_resourceManager.getOrCreate<Texture>("textures/container.jpg");
-		ASSERT(texture != nullptr);
+		updateLitShader("shaders/Lit.glsl");
 
-		//const Shader* shader = setupUnlitShader("shaders/Default.glsl");
-		const Shader* shader = setupLitShader("shaders/Lit.glsl");
+		m_scene.update();
+	}
 
-		const GLint mvpMatUniformLoc = shader->getUniformLocation("mvp");
-		const GLint modelMatUniformLoc = shader->getUniformLocation("modelMat");
-		const GLint normalMatUniformLoc = shader->getUniformLocation("normalMat");
-		const GLint shininessUniformLoc = shader->getUniformLocation("shininess");
-		const GLint textureUniformLoc = shader->getUniformLocation("_texture");
+	void Application::updateLitShader(const std::string& fileName) const
+	{
+		const Shader* shader = setupLitShader(fileName);
 
-		const Matrix4 viewProjMat = m_camera.getViewProjectionMatrix();
+		if (shader == nullptr)
+			return;
 
-		glUniform1i(textureUniformLoc, 0);
+		shader->use();
 
-		for (const auto& mesh : m_meshes)
+		// Setup camera
+		const GLint uniformLoc = shader->getUniformLocation("viewPos");
+		glUniform3fv(uniformLoc, 1, m_camera.getGlobalTransform().getPosition().getArray());
+
+		// Setup directional light
+		m_dirLight.setupUniform("dirLight", *shader);
+
+		// Setup point lights
+		for (size_t i = 0; i < NB_POINT_LIGHTS; i++)
 		{
-			const Matrix4 modelMat = mesh.getGlobalTransform().getMatrix();
-			const Matrix4 normalMat = modelMat.inverse().transposed();
-			const Matrix4 mvpMat = viewProjMat * modelMat;
-			constexpr float shininess = 16.f;
-
-			glUniformMatrix4fv(mvpMatUniformLoc, 1, GL_TRUE, mvpMat.getArray());
-			glUniformMatrix4fv(modelMatUniformLoc, 1, GL_TRUE, modelMat.getArray());
-			glUniformMatrix4fv(normalMatUniformLoc, 1, GL_TRUE, normalMat.getArray());
-			glUniform1f(shininessUniformLoc, shininess);
-
-			texture->use();
-
-			mesh.draw();
+			const std::string prefix = formatString("pointLights[%i]", i);
+			m_pointLights[i].setupUniform(prefix, *shader);
 		}
+
+		// Setup spot light
+		m_spotLight.setupUniform("spotLight", *shader);
+
+		Shader::unbind();
 	}
 
 	void Application::onFrameBufferResize(GLFWwindow*,
-		const int width, const int height)
+	                                      const int width, const int height)
 	{
 		// make sure the viewport matches the new window dimensions
 		glViewport(0, 0, width, height);

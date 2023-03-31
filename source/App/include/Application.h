@@ -9,6 +9,7 @@
 #include "Mesh.h"
 #include "ResourcesManager.h"
 #include "Utility/Timer.h"
+#include "Vector/Vector2.h"
 
 namespace My
 {
@@ -98,7 +99,7 @@ namespace My
 		GLFWwindow*				m_window;
 		Camera					m_camera;
 		Timer					m_timer;
-		std::vector<Mesh>		m_meshes;
+		Scene					m_scene;
 		PointLight				m_pointLights[NB_POINT_LIGHTS];
 		DirectionalLight		m_dirLight;
 		SpotLight				m_spotLight;
@@ -113,12 +114,12 @@ namespace My
 		void createScene();
 
 		/**
-		 * \brief Loads or creates a new lit shader
+		 * \brief Loads or creates a new lit shader from the given file
 		 */
-		Shader* setupLitShader(const std::string& fileName) const;
+		static Shader* setupLitShader(const std::string& fileName);
 
 		/**
-		 * \brief Loads or creates a new unlit shader
+		 * \brief Loads or creates a new unlit shader from the given file
 		 */
 		static Shader* setupUnlitShader(const std::string& fileName);
 
@@ -135,7 +136,12 @@ namespace My
 		/**
 		 * \brief Handles the application's rendering
 		 */
-		void render() const;
+		void render();
+
+		/**
+		 * \brief Update the lighting data for the shader with the given file name
+		 */
+		void updateLitShader(const std::string& fileName) const;
 
 		/**
 		 * \brief OpenGL frame buffer size change callback

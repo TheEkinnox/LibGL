@@ -73,7 +73,21 @@ namespace My::Rendering
 		 */
 		Camera& setProjectionMatrix(const Matrix4& projectionMatrix);
 
+		/**
+		 * \brief Gets a reference to the currently rendering camera
+		 * \return A reference to the current camera
+		 */
+		static Camera& getCurrent();
+
+		/**
+		 * \brief Sets the currently rendering camera
+		 * \param cam The currently rendering camera
+		 */
+		static void setCurrent(Camera& cam);
+
 	private:
+		static Camera*	m_current;
+
 		Matrix4		m_viewMatrix;
 		Matrix4		m_projectionMatrix;
 		Matrix4		m_viewProjectionMatrix;

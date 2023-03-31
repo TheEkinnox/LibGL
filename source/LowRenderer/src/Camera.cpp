@@ -1,5 +1,7 @@
 #include "Camera.h"
 
+My::Rendering::Camera* My::Rendering::Camera::m_current = nullptr;
+
 My::Rendering::Camera::Camera()
 	: SceneNode(),
 	m_projectionMatrix(Matrix4::orthographicProjection(-1, 1, -1, 1, -1, 1))
@@ -69,6 +71,16 @@ My::Rendering::Camera& My::Rendering::Camera::setProjectionMatrix(const Matrix4&
 	return *this;
 }
 
+My::Rendering::Camera& My::Rendering::Camera::getCurrent()
+{
+	return *m_current;
+}
+
+void My::Rendering::Camera::setCurrent(Camera& cam)
+{
+	m_current = &cam;
+}
+
 void My::Rendering::Camera::onChange()
 {
 	SceneNode::onChange();
@@ -77,7 +89,7 @@ void My::Rendering::Camera::onChange()
 
 void My::Rendering::Camera::updateMatrices()
 {
-	const auto camCenter = getPosition() + forward();
-	m_viewMatrix = Matrix4::lookAt(getPosition(), camCenter, Vector3::up());
+	const auto camCenter = getGlobalTransform().getPosition() + getGlobalTransform().forward();
+	m_viewMatrix = Matrix4::lookAt(getGlobalTransform().getPosition(), camCenter, Vector3::up());
 	m_viewProjectionMatrix = m_projectionMatrix * m_viewMatrix;
 }

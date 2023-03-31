@@ -52,6 +52,11 @@ namespace My::Resources
 		void use() const;
 
 		/**
+		 * \brief Unbinds the current shader from the OpenGL context
+		 */
+		static void unbind();
+
+		/**
 		 * \brief Gets the location of a given uniform variable
 		 * in the current shader program
 		 * \param uniformName The searched uniform variable's name

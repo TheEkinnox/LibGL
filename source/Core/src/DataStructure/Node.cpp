@@ -22,24 +22,24 @@ namespace My::DataStructure
 		return m_children;
 	}
 
-	void Node::addChild(Node* child)
+	void Node::addChild(Node& child)
 	{
 		for (const Node* childNode : m_children)
-			if (childNode == child)
+			if (childNode == &child)
 				return;
 
-		m_children.push_back(child);
-		child->m_parent = this;
+		m_children.push_back(&child);
+		child.m_parent = this;
 	}
 
-	void Node::removeChild(Node* child)
+	void Node::removeChild(Node& child)
 	{
-		const auto childIter = std::find(m_children.begin(), m_children.end(), child);
+		const auto childIter = std::find(m_children.begin(), m_children.end(), &child);
 
 		if (childIter != m_children.end())
 		{
 			m_children.erase(childIter);
-			child->m_parent = nullptr;
+			child.m_parent = nullptr;
 		}
 	}
 }

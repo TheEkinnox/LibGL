@@ -217,6 +217,11 @@ namespace My::Resources
 		glUseProgram(m_program);
 	}
 
+	void Shader::unbind()
+	{
+		glUseProgram(0);
+	}
+
 	GLint Shader::getUniformLocation(const std::string& uniformName) const
 	{
 		return glGetUniformLocation(m_program, uniformName.c_str());

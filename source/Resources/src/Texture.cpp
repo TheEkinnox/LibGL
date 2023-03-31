@@ -96,6 +96,11 @@ void My::Resources::Texture::use() const
 	glBindTexture(GL_TEXTURE_2D, m_id);
 }
 
+void My::Resources::Texture::unbind()
+{
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 GLenum My::Resources::Texture::getGLFormat() const
 {
 	switch (m_channels)

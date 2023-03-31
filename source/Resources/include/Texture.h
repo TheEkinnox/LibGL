@@ -31,6 +31,11 @@ namespace My::Resources
 		 */
 		void use() const;
 
+		/**
+		 * \brief Unbinds the current texture from the OpenGL context
+		 */
+		static void unbind();
+
 	private:
 		GLuint		m_id = 0;
 		int			m_width = 0;

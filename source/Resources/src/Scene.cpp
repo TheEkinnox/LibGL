@@ -12,16 +12,22 @@ namespace My::Resources
 		return m_globalTransform;
 	}
 
-	void SceneNode::addChild(Node* child)
+	void SceneNode::addChild(Node& child)
 	{
 		Node::addChild(child);
-		reinterpret_cast<SceneNode*>(child)->updateGlobalTransform();
+		reinterpret_cast<SceneNode&>(child).updateGlobalTransform();
 	}
 
-	void SceneNode::removeChild(Node* child)
+	void SceneNode::removeChild(Node& child)
 	{
 		Node::removeChild(child);
-		reinterpret_cast<SceneNode*>(child)->updateGlobalTransform();
+		reinterpret_cast<SceneNode&>(child).updateGlobalTransform();
+	}
+
+	void SceneNode::update()
+	{
+		for (Node* child : getChildren())
+			reinterpret_cast<SceneNode*>(child)->update();
 	}
 
 	void SceneNode::onChange()
@@ -48,5 +54,11 @@ namespace My::Resources
 			m_globalTransform.rotate(parentTransform.getRotation());
 			m_globalTransform.scale(parentTransform.getScale());
 		}
+	}
+
+	void Scene::update()
+	{
+		for (auto* node : getNodes())
+			node->update();
 	}
 }

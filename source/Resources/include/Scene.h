@@ -30,13 +30,18 @@ namespace My::Resources
 		 * \brief Adds the given node as a child of the current node
 		 * \param child A pointer to the child to add to the current node
 		 */
-		void addChild(Node* child) override;
+		void addChild(Node& child) override;
 
 		/**
 		 * \brief Removes the given node from this node's children
 		 * \param child A pointer to the child to remove from the node's children
 		 */
-		void removeChild(Node* child) override;
+		void removeChild(Node& child) override;
+
+		/**
+		 * \brief Updates the scene node (does nothing by default)
+		 */
+		virtual void update();
 
 	protected:
 		/**
@@ -50,5 +55,9 @@ namespace My::Resources
 		void updateGlobalTransform();
 	};
 
-	typedef Graph<SceneNode> Scene;
+	class Scene : public Graph<SceneNode>
+	{
+	public:
+		void update();
+	};
 }
