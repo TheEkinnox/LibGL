@@ -11,9 +11,12 @@
 #include "Trigonometry.h"
 #include "Utility/utility.h"
 
+#define CAM_NEAR .1f
+#define CAM_FAR 14.f
+
 #define MOVE_SPEED .5f
 #define ROTATION_SPEED 30
-#define MOUSE_SENSITIVITY 5.f
+#define MOUSE_SENSITIVITY .8f
 
 namespace My
 {
@@ -26,7 +29,7 @@ namespace My
 		: m_camera(nullptr, Transform(),
 			Matrix4::perspectiveProjection(90_deg,
 				static_cast<float>(windowWidth) / static_cast<float>(windowHeight),
-				0.1f, 8.f)), m_isFirstMouse(true)
+				CAM_NEAR, CAM_FAR)), m_isFirstMouse(true)
 	{
 		Camera::setCurrent(m_camera);
 
@@ -171,18 +174,18 @@ namespace My
 		m_dirLight =
 		{
 			{
-				Vector4(.11f, .16f, .18f, 1),
-				Vector4(.22f, .32f, .36f, 1),
-				Vector4(.22f, .32f, .36f, 1),
+				Vector4(.05f, .05f, .05f, 1),
+				Vector4(.1f, .1f, .1f, 1),
+				Vector4(.1f, .1f, .1f, 1),
 			},
 			Vector3(0, -1, 0)
 		};
 
 		const Light pointLightBase
 		{
-				Vector4(0.f, 0.f, .1f, 1),
-				Vector4(0.f, 0.f, .4f, 1),
-				Vector4(0.f, 0.f, .5f, 1),
+				Vector4(.1f, 0.f, .1f, 1),
+				Vector4(0.4f, 0.f, .4f, 1),
+				Vector4(0.5f, 0.f, .5f, 1),
 		};
 
 		m_pointLights[0] =
@@ -209,15 +212,15 @@ namespace My
 		m_spotLight =
 		{
 			{
-				Vector4(.1f, .1f, .1f, 1),
-				Vector4(.4f, .4f, .4f, 1),
-				Vector4(.5f, .5f, .5f, 1),
+				Vector4(.15f, .15f, .15f, 1),
+				Vector4(.6f, .6f, .6f, 1),
+				Vector4(.75f, .75f, .75f, 1),
 			},
 			m_camera.getPosition(),
 			m_camera.forward(),
-			{ 1.f, .7f, 1.8f },
-			cos(12_deg),
-			cos(15_deg),
+			{ 1.f, .35f, .44f },
+			cos(25_deg),
+			cos(30_deg),
 		};
 	}
 
@@ -352,9 +355,12 @@ namespace My
 		m_lastMousePos = m_mousePos;
 
 		//update camera rotation
+		const float rotationSpeed = ROTATION_SPEED * MOUSE_SENSITIVITY
+			* m_timer.getDeltaTime();
+
 		Vector3 camRotation = m_camera.getRotation();
-		camRotation.m_x += -m_mouseDelta.m_y * MOUSE_SENSITIVITY * m_timer.getDeltaTime();
-		camRotation.m_y += m_mouseDelta.m_x * MOUSE_SENSITIVITY * m_timer.getDeltaTime();
+		camRotation.m_x += -m_mouseDelta.m_y * rotationSpeed;
+		camRotation.m_y += m_mouseDelta.m_x * rotationSpeed;
 
 		camRotation.m_x = clamp(camRotation.m_x, -80.f, 80.f);
 		camRotation.m_y = wrap(camRotation.m_y, 0.f, 360.f);
@@ -406,6 +412,13 @@ namespace My
 	{
 		// make sure the viewport matches the new window dimensions
 		glViewport(0, 0, width, height);
+
+		// Update the camera's projection matrix to use the new aspect ratio
+		const float aspect = static_cast<float>(width) / static_cast<float>(height);
+		const Matrix4 projMat = Matrix4::perspectiveProjection(90_deg, aspect,
+			CAM_NEAR, CAM_FAR);
+
+		Camera::getCurrent().setProjectionMatrix(projMat);
 	}
 
 	void APIENTRY Application::glDebugOutput(const GLenum source, const GLenum type,
