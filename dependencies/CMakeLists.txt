@@ -12,6 +12,8 @@ set(GLFW_BUILD_EXAMPLES OFF)
 set(GLFW_BUILD_TESTS OFF)
 set(GLFW_BUILD_DOCS OFF)
 
+FetchContent_MakeAvailable(GLFW)
+
 # Download LibMath
 FetchContent_Declare(
 	LibMath 
@@ -22,7 +24,7 @@ FetchContent_Declare(
 set(BUILD_SHARED_LIBS OFF)
 set(LIBMATH_BUILD_TESTS OFF)
 
-FetchContent_MakeAvailable(GLFW LibMath)
+FetchContent_MakeAvailable(LibMath)
 
 # Set shared variables
 set(GLAD_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/GLAD/src/glad.cpp PARENT_SCOPE)
