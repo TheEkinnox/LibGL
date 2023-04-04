@@ -6,13 +6,18 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(ASSETS_DIR_NAME assets)
 set(ASSETS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/${ASSETS_DIR_NAME})
 
-project(Modern_OpenGL_Loick)
+project(ModernOpenGL)
 
-option(BUILD_AS_LIBRARY "Build App as lib when set, build as exe when not set" ON)
+option(LIBGL_BUILD_EXE "Build App executable when on, don't when off" ON)
+
+if (NOT ${LIBGL_BUILD_EXE})
+  set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+  set(CMAKE_FOLDER LibGL)
+endif()
 
 add_subdirectory(dependencies)
 add_subdirectory(source)
 
-if (MSVC AND NOT ${BUILD_AS_LIBRARY})
+if (MSVC AND ${LIBGL_BUILD_EXE})
   set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT ${APP_NAME})
 endif()

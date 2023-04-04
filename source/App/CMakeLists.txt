@@ -42,11 +42,7 @@ set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ${ASSETS_FILES})
 #                             #
 ###############################
 
-if (${BUILD_AS_LIBRARY})
-  add_library(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES} ${ASSETS_FILES})
-else()
-  add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES} ${ASSETS_FILES})
-endif()
+add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES} ${ASSETS_FILES})
 
 include_directories(${PROJECT_INCLUDE_DIR}
     ${GLAD_INCLUDE_DIR} ${GLFW_INCLUDE_DIR} ${LIBMATH_INCLUDE_DIR}
@@ -69,13 +65,11 @@ else()
   target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic -Werror)
 endif()
 
-if (NOT ${BUILD_AS_LIBRARY})
-  # copy the necessary dlls in the build directory
-  add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_RUNTIME_DLLS:${PROJECT_NAME}> $<TARGET_FILE_DIR:${PROJECT_NAME}>
-    COMMAND_EXPAND_LISTS
-  )
-endif()
+# copy the necessary dlls in the build directory
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_RUNTIME_DLLS:${PROJECT_NAME}> $<TARGET_FILE_DIR:${PROJECT_NAME}>
+  COMMAND_EXPAND_LISTS
+)
 
 # remove the existing assets folder from the build directory (ensures removes are also replicated)
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
