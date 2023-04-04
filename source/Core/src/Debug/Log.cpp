@@ -13,10 +13,15 @@ namespace My::Debug
 
 	void Log::openFile(std::filesystem::path const& filePath)
 	{
-		if (getInstance().m_file.is_open())
-			getInstance().m_file.close();
+		closeFile();
 
 		getInstance().m_file.open(filePath);
+	}
+
+	void Log::closeFile()
+	{
+		if (getInstance().m_file.is_open())
+			getInstance().m_file.close();
 	}
 
 	Log& Log::getInstance()
@@ -33,5 +38,6 @@ namespace My::Debug
 	void Log::removeInstance()
 	{
 		delete m_instance;
+		m_instance = nullptr;
 	}
 }

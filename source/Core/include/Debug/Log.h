@@ -18,16 +18,42 @@ namespace My::Debug
 		 */
 		static void			openFile(std::filesystem::path const& filePath);
 
+		/**
+		 * \brief Closes the current log output file.
+		 */
+		static void			closeFile();
+
+		/**
+		 * \brief Logs a message with the given format following printf's syntax.
+		 * \param format The format of the message
+		 * \param args Additional arguments to insert into the message
+		 */
 		template <typename ... Args>
 		static void			print(const char* format, Args ... args);
 
+		/**
+		 * \brief Logs a message with the given format following printf's syntax.
+		 * Appends the given file path and line at the beginning of the message
+		 * \param file The file for which the function was called
+		 * \param line The line for which the function was called
+		 * \param format The format of the message
+		 * \param args Additional arguments to insert into the message
+		 */
 		template			<typename ... Args>
 		static void			debugLog(const char* file, size_t line, const char* format, Args ... args);
 
 	private:
 		Log() = default;
 
+		/**
+		 * \brief Accessor to a Logger singleton
+		 * \return A reference to the current Logger instance
+		 */
 		static Log&			getInstance();
+
+		/**
+		 * \brief Deletes the Logger singleton
+		 */
 		static void			removeInstance();
 
 		std::ofstream		m_file;
