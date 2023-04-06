@@ -3,9 +3,9 @@
 #include <filesystem>
 #include <fstream>
 
-#define DEBUG_LOG(format, ...) My::Debug::Log::debugLog(__FILE__, __LINE__, format, ##__VA_ARGS__)
+#define DEBUG_LOG(format, ...) LibGL::Debug::Log::debugLog(__FILE__, __LINE__, format, ##__VA_ARGS__)
 
-namespace My::Debug
+namespace LibGL::Debug
 {
 	class Log
 	{

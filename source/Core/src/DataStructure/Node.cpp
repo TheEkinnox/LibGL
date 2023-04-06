@@ -1,6 +1,6 @@
 #include "DataStructure/Graph.h"
 
-namespace My::DataStructure
+namespace LibGL::DataStructure
 {
 	Node::Node(Node* parent)
 		: m_parent(parent)

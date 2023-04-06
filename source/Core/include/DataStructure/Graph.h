@@ -1,9 +1,10 @@
 #pragma once
+#include <memory>
 #include <vector>
 
 #include "Node.h"
 
-namespace My::DataStructure
+namespace LibGL::DataStructure
 {
 	template <class NodeT>
 	class Graph
@@ -14,7 +15,7 @@ namespace My::DataStructure
 		Graph() = default;
 		Graph(const Graph& other) = default;
 		Graph(Graph&& other) noexcept = default;
-		virtual ~Graph();
+		virtual ~Graph() = default;
 
 		Graph& operator=(const Graph& other) = default;
 		Graph& operator=(Graph&& other) noexcept = default;
@@ -23,8 +24,8 @@ namespace My::DataStructure
 		 * \brief Adds the given node to the graph
 		 * \param node The node to add to the graph
 		 */
-		template <typename DataType>
-		void addNode(DataType& node);
+		template <typename DataT>
+		void addNode(DataT& node);
 
 		/**
 		 * \brief Removes the given node from the graph
@@ -36,10 +37,15 @@ namespace My::DataStructure
 		 * \brief Gets the graph's root nodes list
 		 * \return A reference to the graph's root nodes list
 		 */
-		std::vector<NodeT*> getNodes();
+		std::vector<std::shared_ptr<NodeT>> getNodes();
+
+		/**
+		 * \brief Removes all nodes from the graph
+		 */
+		void clear();
 
 	private:
-		std::vector<NodeT*>	m_nodes;
+		std::vector<std::shared_ptr<NodeT>>	m_nodes;
 	};
 }
 

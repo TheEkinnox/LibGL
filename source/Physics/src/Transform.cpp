@@ -3,7 +3,9 @@
 #include "Trigonometry.h"
 #include "Angle/Degree.h"
 
-namespace My::Physics
+using namespace LibMath;
+
+namespace LibGL::Physics
 {
 	Transform::Transform()
 		: m_position(Vector3::zero()), m_rotation(Vector3::zero()),

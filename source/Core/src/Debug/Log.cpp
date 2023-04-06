@@ -3,7 +3,7 @@
 
 #include "Debug/Assertion.h"
 
-namespace My::Debug
+namespace LibGL::Debug
 {
 	Log::~Log()
 	{

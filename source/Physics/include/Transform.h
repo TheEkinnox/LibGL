@@ -2,10 +2,8 @@
 #include "Matrix/Matrix4.h"
 #include "Vector/Vector3.h"
 
-namespace My::Physics
+namespace LibGL::Physics
 {
-	using namespace LibMath;
-
 	class Transform
 	{
 	public:
@@ -22,7 +20,7 @@ namespace My::Physics
 		 * \param rotation The transform's initial rotation
 		 * \param scale The transform's initial scale
 		 */
-		Transform(const Vector3& position, const Vector3& rotation, const Vector3& scale);
+		Transform(const LibMath::Vector3& position, const LibMath::Vector3& rotation, const LibMath::Vector3& scale);
 
 		/**
 		 * \brief Creates a copy of the given transform
@@ -59,114 +57,114 @@ namespace My::Physics
 		 * \brief Computes the transform's forward vector
 		 * \return The transform's forward vector
 		 */
-		Vector3 forward() const;
+		LibMath::Vector3 forward() const;
 
 		/**
 		 * \brief Computes the transform's right vector
 		 * \return The transform's right vector
 		 */
-		Vector3 right() const;
+		LibMath::Vector3 right() const;
 
 		/**
 		 * \brief Computes the transform's up vector
 		 * \return The transform's up vector
 		 */
-		Vector3 up() const;
+		LibMath::Vector3 up() const;
 
 		/**
 		 * \brief Computes the transform's back vector
 		 * \return The transform's back vector
 		 */
-		Vector3 back() const;
+		LibMath::Vector3 back() const;
 
 		/**
 		 * \brief Computes the transform's left vector
 		 * \return The transform's left vector
 		 */
-		Vector3 left() const;
+		LibMath::Vector3 left() const;
 
 		/**
 		 * \brief Computes the transform's down vector
 		 * \return The transform's down vector
 		 */
-		Vector3 down() const;
+		LibMath::Vector3 down() const;
 
 		/**
 		 * \brief Gets the transform's current position
 		 * \return The transform's position
 		 */
-		Vector3 getPosition() const;
+		LibMath::Vector3 getPosition() const;
 
 		/**
 		 * \brief Gets the transform's current rotation
 		 * \return The transform's rotation
 		 */
-		Vector3 getRotation() const;
+		LibMath::Vector3 getRotation() const;
 
 		/**
 		 * \brief Gets the transform's current scale
 		 * \return The transform's scale
 		 */
-		Vector3 getScale() const;
+		LibMath::Vector3 getScale() const;
 
 		/**
 		 * \brief Gets the transform's current transformation matrix
 		 * \return The transform's transformation matrix
 		 */
-		Matrix4x4 getMatrix() const;
+		LibMath::Matrix4x4 getMatrix() const;
 
 		/**
 		 * \brief Sets the transform's current position
 		 * \param position The transform's new position
 		 * \return A reference to the current transform
 		 */
-		Transform& setPosition(const Vector3& position);
+		Transform& setPosition(const LibMath::Vector3& position);
 
 		/**
 		 * \brief Sets the transform's current rotation
 		 * \param rotation The transform's new rotation
 		 * \return A reference to the current transform
 		 */
-		Transform& setRotation(const Vector3& rotation);
+		Transform& setRotation(const LibMath::Vector3& rotation);
 
 		/**
 		 * \brief Sets the transform's current rotation
 		 * \param scale The transform's new scale
 		 * \return A reference to the current transform
 		 */
-		Transform& setScale(const Vector3& scale);
+		Transform& setScale(const LibMath::Vector3& scale);
 
 		/**
 		 * \brief Adds the given vector to the transform's current position
 		 * \param translation The translation vector to apply
 		 * \return A reference to the current transform
 		 */
-		Transform& translate(const Vector3& translation);
+		Transform& translate(const LibMath::Vector3& translation);
 
 		/**
 		 * \brief Adds the given vector to the transform's current rotation
 		 * \param rotation The rotation vector to apply
 		 * \return A reference to the current transform
 		 */
-		Transform& rotate(const Vector3& rotation);
+		Transform& rotate(const LibMath::Vector3& rotation);
 
 		/**
 		 * \brief Multiplies the transform's current scale by the given vector
 		 * \param scale The scaling vector to apply
 		 * \return A reference to the current transform
 		 */
-		Transform& scale(const Vector3& scale);
+		Transform& scale(const LibMath::Vector3& scale);
 
 	protected:
 		/**
 		 * \brief Updates the transform's matrix
 		 */
-		virtual void	onChange();
+		virtual void onChange();
 
 	private:
-		Vector3			m_position;
-		Vector3			m_rotation;
-		Vector3			m_scale;
-		Matrix4			m_matrix;
+		LibMath::Vector3	m_position;
+		LibMath::Vector3	m_rotation;
+		LibMath::Vector3	m_scale;
+		LibMath::Matrix4	m_matrix;
 	};;
 }

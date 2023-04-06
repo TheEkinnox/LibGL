@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 
-namespace My::Utility
+namespace LibGL::Utility
 {
 
 	/**

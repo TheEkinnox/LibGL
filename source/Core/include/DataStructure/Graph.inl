@@ -1,40 +1,34 @@
 #pragma once
 #include "Graph.h"
 
-namespace My::DataStructure
+namespace LibGL::DataStructure
 {
 	template <class NodeT>
-	Graph<NodeT>::~Graph()
+	template <typename DataT>
+	void Graph<NodeT>::addNode(DataT& node)
 	{
-		for (const auto node : m_nodes)
-			delete node;
-
-		m_nodes.clear();
-	}
-
-	template <class NodeT>
-	template <typename DataType>
-	void Graph<NodeT>::addNode(DataType& node)
-	{
-		static_assert(std::is_same_v<NodeT, DataType> || std::is_base_of_v<NodeT, DataType>);
-		m_nodes.push_back(new DataType(node));
+		static_assert(std::is_same_v<NodeT, DataT> || std::is_base_of_v<NodeT, DataT>);
+		m_nodes.push_back(std::make_shared<DataT>(node));
 	}
 
 	template <class NodeT>
 	void Graph<NodeT>::removeNode(const NodeT& node)
 	{
-		const auto nodeIter = std::find(m_nodes.begin(), m_nodes.end(), &node);
+		const auto nodeIter = std::find(m_nodes.begin(), m_nodes.end(), std::make_shared<NodeT>(&node));
 
 		if (nodeIter != m_nodes.end())
-		{
 			m_nodes.erase(nodeIter);
-			delete* nodeIter;
-		}
 	}
 
 	template <class NodeT>
-	std::vector<NodeT*> Graph<NodeT>::getNodes()
+	std::vector<std::shared_ptr<NodeT>> Graph<NodeT>::getNodes()
 	{
 		return m_nodes;
+	}
+
+	template <class NodeT>
+	void Graph<NodeT>::clear()
+	{
+		m_nodes.clear();
 	}
 }

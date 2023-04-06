@@ -1,7 +1,7 @@
 #pragma once
 #include <chrono>
 
-namespace My::Utility
+namespace LibGL::Utility
 {
 	class Timer
 	{
@@ -72,5 +72,7 @@ namespace My::Utility
 		float	m_unscaledTime = 0;
 		float	m_deltaTime = 0;
 		float	m_timeScale = 1;
+
+		bool	m_isFirstUpdate = true;
 	};
 }

@@ -1,8 +1,9 @@
 #pragma once
 
 #include "Utility/utility.h"
+#include <stdexcept>
 
-namespace My::Utility
+namespace LibGL::Utility
 {
 	template<typename ... Args>
 	std::string formatString(const char* const format, Args ... args)

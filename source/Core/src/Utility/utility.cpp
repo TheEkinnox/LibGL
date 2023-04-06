@@ -1,6 +1,6 @@
 #include "Utility/utility.h"
 
-namespace My::Utility
+namespace LibGL::Utility
 {
 	std::vector<std::string> splitString(const std::string& str, char const* delimiter,
 		const bool includeEmpty)

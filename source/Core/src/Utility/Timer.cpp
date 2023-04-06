@@ -2,7 +2,7 @@
 
 #include <chrono>
 
-namespace My::Utility
+namespace LibGL::Utility
 {
 	Timer::Timer(const float timeScale)
 		: m_timeScale(timeScale)
@@ -11,13 +11,22 @@ namespace My::Utility
 
 	void Timer::update()
 	{
+		if (m_isFirstUpdate)
+		{
+			m_currentTime = clock::now();
+			m_lastUpdate = m_currentTime;
+			m_deltaTime = 0;
 
-		m_lastUpdate = m_currentTime;
-		m_currentTime = clock::now();
-		m_deltaTime = std::chrono::duration<float>(m_currentTime - m_lastUpdate).count();
-
-		m_unscaledTime += m_deltaTime;
-		m_time += m_deltaTime * m_timeScale;
+			m_isFirstUpdate = false;
+		}
+		else
+		{
+			m_lastUpdate = m_currentTime;
+			m_currentTime = clock::now();
+			m_deltaTime = std::chrono::duration<float>(m_currentTime - m_lastUpdate).count();
+			m_unscaledTime += m_deltaTime;
+			m_time += m_deltaTime * m_timeScale;
+		}
 	}
 
 	float Timer::getTime() const

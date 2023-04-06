@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 
-namespace My::DataStructure
+namespace LibGL::DataStructure
 {
 	class Node
 	{
