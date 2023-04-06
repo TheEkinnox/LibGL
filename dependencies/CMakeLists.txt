@@ -17,7 +17,7 @@ FetchContent_MakeAvailable(GLFW)
 # Download LibMath
 FetchContent_Declare(
 	LibMath
-	GIT_REPOSITORY ssh://git@git.isartintra.com:2424/2022/Lib_De_Math/Loick.git
+	GIT_REPOSITORY https://github.com/TheEkinnox/LibMath.git
 	GIT_TAG origin/main
 	GIT_SHALLOW ON
 )
