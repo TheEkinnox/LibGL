@@ -1,4 +1,5 @@
 #include "DemoApp.h"
+#include "Debug/Log.h"
 
 // settings
 constexpr unsigned int SCR_WIDTH = 800;
@@ -16,6 +17,7 @@ int main()
 	}
 
 #ifdef _DEBUG
+	LibGL::Debug::Log::removeInstance();
 	_CrtDumpMemoryLeaks();
 #endif
 

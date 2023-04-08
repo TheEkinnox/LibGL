@@ -176,7 +176,7 @@ namespace LibGL::Application
 		void setShouldClose(bool shouldClose) const;
 
 	private:
-		inline static std::unordered_map<GLFWwindow*, Window*> windowsMap;
+		inline static std::unordered_map<GLFWwindow*, Window*> s_windowsMap;
 
 		std::unordered_map<uint64_t, key_callback_t>	m_keyCallbacks;
 		std::unordered_map<uint64_t, mouse_callback_t>	m_mouseCallbacks;

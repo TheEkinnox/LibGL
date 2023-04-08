@@ -26,18 +26,18 @@ namespace LibGL::Debug
 
 	Log& Log::getInstance()
 	{
-		if (m_instance == nullptr)
+		if (s_instance == nullptr)
 		{
-			m_instance = new Log();
+			s_instance = new Log();
 			ASSERT(atexit(removeInstance) == 0);
 		}
 
-		return *m_instance;
+		return *s_instance;
 	}
 
 	void Log::removeInstance()
 	{
-		delete m_instance;
-		m_instance = nullptr;
+		delete s_instance;
+		s_instance = nullptr;
 	}
 }

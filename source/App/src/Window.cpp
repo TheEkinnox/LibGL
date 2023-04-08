@@ -35,7 +35,7 @@ namespace LibGL::Application
 
 		glfwGetWindowPos(m_glfwWindow, &m_pos.first, &m_pos.second);
 
-		windowsMap[m_glfwWindow] = this;
+		s_windowsMap[m_glfwWindow] = this;
 
 		glfwSetFramebufferSizeCallback(m_glfwWindow, onFrameBufferResize);
 		glfwSetKeyCallback(m_glfwWindow, onKey);
@@ -145,7 +145,7 @@ namespace LibGL::Application
 
 	Window* Window::getInstance(GLFWwindow* window)
 	{
-		return windowsMap.contains(window) ? windowsMap[window] : nullptr;
+		return s_windowsMap.contains(window) ? s_windowsMap[window] : nullptr;
 	}
 
 	void Window::onFrameBufferResize(GLFWwindow* glfwWindow,
