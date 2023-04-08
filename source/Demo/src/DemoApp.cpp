@@ -81,7 +81,9 @@ namespace LibGL::Demo
 	{
 		auto& resourceManager = LGL_SERVICE(ResourceManager);
 
-		//const Shader* shader = setupUnlitShader("shaders/Default.glsl");
+		//const Shader* shader = setupUnlitShader("shaders/Unlit.glsl");
+		//const Shader* shader = setupUnlitShader("shaders/Normal.glsl");
+		//const Shader* shader = setupUnlitShader("shaders/Basic.glsl");
 		const Shader* shader = setupLitShader("shaders/Lit.glsl");
 		ASSERT(shader != nullptr);
 
