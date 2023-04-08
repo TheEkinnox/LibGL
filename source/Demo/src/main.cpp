@@ -1,5 +1,6 @@
 #include "DemoApp.h"
-#include "Debug/Log.h"
+
+#include <crtdbg.h>
 
 // settings
 constexpr unsigned int SCR_WIDTH = 800;
@@ -10,16 +11,9 @@ int main()
 #ifdef _DEBUG
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 #endif
-
-	{
-		LibGL::Demo::DemoApp app(SCR_WIDTH, SCR_HEIGHT, "Modern OpenGL Project - Loick");
-		app.run();
-	}
-
-#ifdef _DEBUG
-	LibGL::Debug::Log::removeInstance();
-	_CrtDumpMemoryLeaks();
-#endif
+	
+	LibGL::Demo::DemoApp app(SCR_WIDTH, SCR_HEIGHT, "Modern OpenGL Project - Loick");
+	app.run();
 
 	return 0;
 }
