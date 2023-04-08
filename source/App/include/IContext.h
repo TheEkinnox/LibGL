@@ -1,6 +1,5 @@
 #pragma once
 #include <stdexcept>
-#include <glad/glad.h>
 
 #include "Window.h"
 #include "Utility/Timer.h"
@@ -69,21 +68,5 @@ namespace LibGL::Application
 
 	protected:
 		static void bindDebugCallback();
-
-	private:
-
-		/**
-		 * \brief OpenGL debug output callback
-		 * \param source The debug message's source
-		 * \param type The debug message's type
-		 * \param id The debug message's id (error/warning code, etc...)
-		 * \param severity The debug message's severity
-		 * \param length The debug message's length
-		 * \param message The debug message
-		 * \param userParam Addition user parameters
-		 */
-		static void APIENTRY glDebugOutput(uint32_t source, uint32_t type, uint32_t id,
-		                                   uint32_t severity, int length, const char* message,
-		                                   const void* userParam);
 	};
 }

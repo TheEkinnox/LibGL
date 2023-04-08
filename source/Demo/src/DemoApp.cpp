@@ -1,4 +1,5 @@
 #include "DemoApp.h"
+#include <glad/glad.h>
 
 #include "Resources/Model.h"
 #include "Resources/Shader.h"

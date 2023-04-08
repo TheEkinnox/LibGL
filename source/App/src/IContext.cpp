@@ -11,6 +11,21 @@ using namespace LibGL::Application::Exceptions;
 
 namespace LibGL::Application
 {
+	/**
+	 * \brief OpenGL debug output callback
+	 * (in the cpp to avoid an unnecessary include of glad.h in the header)
+	 * \param source The debug message's source
+	 * \param type The debug message's type
+	 * \param id The debug message's id (error/warning code, etc...)
+	 * \param severity The debug message's severity
+	 * \param length The debug message's length
+	 * \param message The debug message
+	 * \param userParam Addition user parameters
+	 */
+	void APIENTRY glDebugOutput(uint32_t source, uint32_t type, uint32_t id,
+		uint32_t severity, int length, const char* message,
+		const void* userParam);
+
 	IContext::IContext(const int windowWidth, const int windowHeight, const char* title) :
 		m_window(std::make_unique<Window>(Window::dimensions_t(windowWidth, windowHeight), title)),
 		m_timer(std::make_unique<Timer>())
@@ -57,7 +72,7 @@ namespace LibGL::Application
 		}
 	}
 
-	void APIENTRY IContext::glDebugOutput(const uint32_t source, const uint32_t type,
+	void APIENTRY glDebugOutput(const uint32_t source, const uint32_t type,
 	                                      const uint32_t id, const uint32_t severity, const int,
 	                                      const char* message, const void*)
 	{
