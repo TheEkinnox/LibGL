@@ -12,9 +12,9 @@ else()
   # Merge and cache the externally accessible include directories
   option(LIBGL_USE_APP "Add the App library to the merged target" ON)
   option(LIBGL_USE_PHYSICS "Add the Physics library to the merged target" ON)
-  option(LIBGL_USE_RENDERER "Add the Rendering library to the merged target (having this forces LIBGL_USE_PHYSICS)" ON)
+  option(LIBGL_USE_RENDERING "Add the Rendering library to the merged target (having this forces LIBGL_USE_PHYSICS)" ON)
 
-  set(LIBGL_USE_PHYSICS ${LIBGL_USE_PHYSICS} OR ${LIBGL_USE_RENDERER})
+  set(LIBGL_USE_PHYSICS ${LIBGL_USE_PHYSICS} OR ${LIBGL_USE_RENDERING})
 
   add_subdirectory(Core)
   set(LIBGL_TARGETS ${CORE_NAME})
@@ -28,10 +28,10 @@ else()
   endif()
 
   # Renderer
-  if (${LIBGL_USE_RENDERER})
+  if (${LIBGL_USE_RENDERING})
     add_subdirectory(Rendering)
-    list(APPEND LIBGL_TARGETS ${RENDERER_NAME})
-    list(APPEND LIBGL_INCLUDE_DIRS ${RENDERER_INCLUDE_DIR})
+    list(APPEND LIBGL_TARGETS ${RENDERING_NAME})
+    list(APPEND LIBGL_INCLUDE_DIRS ${RENDERING_INCLUDE_DIR})
   endif()
 
   # APP
