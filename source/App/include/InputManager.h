@@ -56,32 +56,32 @@ namespace LibGL::Application
 		static int getScanCode(EKey key);
 
 		/**
-		 * \brief Checks whether a given key is pressed
+		 * \brief Checks whether a given key is down
 		 * \param key The key to check
-		 * \return True if the key is pressed. False otherwise.
+		 * \return True if the key is down. False otherwise.
 		 */
-		bool isKeyPressed(EKey key) const;
+		bool isKeyDown(EKey key) const;
 
 		/**
-		 * \brief Checks whether a given key is released
+		 * \brief Checks whether a given key is up
 		 * \param key The key to check
 		 * \return True if the key is up. False otherwise
 		 */
-		bool isKeyReleased(EKey key) const;
+		bool isKeyUp(EKey key) const;
 
 		/**
-		 * \brief Checks whether the key with a given scan code is pressed
+		 * \brief Checks whether the key with a given scan code is down
 		 * \param scanCode The scan code of the key to check
-		 * \return True if the key is pressed. False otherwise.
+		 * \return True if the key is down. False otherwise.
 		 */
-		bool isKeyPressed(int scanCode) const;
+		bool isKeyDown(int scanCode) const;
 
 		/**
-		 * \brief Checks whether the key with a given scan code is released
+		 * \brief Checks whether the key with a given scan code is up
 		 * \param scanCode The scan code of the key to check
-		 * \return True if the key is released. False otherwise.
+		 * \return True if the key is up. False otherwise.
 		 */
-		bool isKeyReleased(int scanCode) const;
+		bool isKeyUp(int scanCode) const;
 
 		/**
 		 * \brief Checks whether a given mouse button is pressed

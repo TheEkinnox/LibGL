@@ -25,25 +25,27 @@ namespace LibGL::Application
 		m_window.removeKeyCallback(m_mouseButtonCallbackId);
 	}
 
-	bool InputManager::isKeyPressed(const EKey key) const
+	bool InputManager::isKeyDown(const EKey key) const
 	{
 		return m_keyStates.contains(key)
-			&& m_keyStates.at(key) == EKeyState::KEY_PRESSED;
+			&& (m_keyStates.at(key) == EKeyState::KEY_PRESSED
+				|| m_keyStates.at(key) == EKeyState::KEY_REPEATED);
 	}
 
-	bool InputManager::isKeyPressed(const int scanCode) const
+	bool InputManager::isKeyDown(const int scanCode) const
 	{
 		return m_scanCodeStates.contains(scanCode)
-			&& m_scanCodeStates.at(scanCode) == EKeyState::KEY_PRESSED;
+			&& (m_scanCodeStates.at(scanCode) == EKeyState::KEY_PRESSED
+				|| m_scanCodeStates.at(scanCode) == EKeyState::KEY_REPEATED);
 	}
 
-	bool InputManager::isKeyReleased(const EKey key) const
+	bool InputManager::isKeyUp(const EKey key) const
 	{
 		return m_keyStates.contains(key)
 			&& m_keyStates.at(key) == EKeyState::KEY_RELEASED;
 	}
 
-	bool InputManager::isKeyReleased(const int scanCode) const
+	bool InputManager::isKeyUp(const int scanCode) const
 	{
 		return m_scanCodeStates.contains(scanCode)
 			&& m_scanCodeStates.at(scanCode) == EKeyState::KEY_RELEASED;

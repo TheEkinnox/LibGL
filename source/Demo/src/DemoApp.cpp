@@ -220,10 +220,10 @@ namespace LibGL::Demo
 	{
 		const auto& inputManager = LGL_SERVICE(InputManager);
 
-		if (inputManager.isKeyPressed(EKey::KEY_ESCAPE))
+		if (inputManager.isKeyDown(EKey::KEY_ESCAPE))
 			LGL_SERVICE(Window).setShouldClose(true);
 
-		if (inputManager.isKeyPressed(EKey::KEY_R))
+		if (inputManager.isKeyDown(EKey::KEY_R))
 		{
 			m_camera.setPosition(Vector3::zero());
 			m_camera.setRotation(Vector3::zero());
@@ -232,57 +232,57 @@ namespace LibGL::Demo
 		const float deltaTime = LGL_SERVICE(Timer).getDeltaTime();
 
 		// Dir light rotation
-		if (inputManager.isKeyPressed(EKey::KEY_I))
+		if (inputManager.isKeyDown(EKey::KEY_I))
 			m_dirLight.m_direction.rotate(Degree(ROTATION_SPEED * deltaTime), Vector3::right());
 
-		if (inputManager.isKeyPressed(EKey::KEY_J))
+		if (inputManager.isKeyDown(EKey::KEY_J))
 			m_dirLight.m_direction.rotate(Degree(-ROTATION_SPEED * deltaTime), Vector3::up());
 
-		if (inputManager.isKeyPressed(EKey::KEY_K))
+		if (inputManager.isKeyDown(EKey::KEY_K))
 			m_dirLight.m_direction.rotate(Degree(-ROTATION_SPEED * deltaTime), Vector3::right());
 
-		if (inputManager.isKeyPressed(EKey::KEY_L))
+		if (inputManager.isKeyDown(EKey::KEY_L))
 			m_dirLight.m_direction.rotate(Degree(ROTATION_SPEED * deltaTime), Vector3::up());
 
 		// Movement
 		float moveSpeed = MOVE_SPEED * deltaTime;
 
-		if (inputManager.isKeyPressed(EKey::KEY_LEFT_CONTROL)
-			|| inputManager.isKeyPressed(EKey::KEY_RIGHT_CONTROL))
+		if (inputManager.isKeyDown(EKey::KEY_LEFT_CONTROL)
+			|| inputManager.isKeyDown(EKey::KEY_RIGHT_CONTROL))
 			moveSpeed *= 1.5f;
 
-		if (inputManager.isKeyPressed(EKey::KEY_W))
+		if (inputManager.isKeyDown(EKey::KEY_W))
 			m_camera.translate(m_camera.forward() * moveSpeed);
 
-		if (inputManager.isKeyPressed(EKey::KEY_S))
+		if (inputManager.isKeyDown(EKey::KEY_S))
 			m_camera.translate(m_camera.back() * moveSpeed);
 
-		if (inputManager.isKeyPressed(EKey::KEY_A))
+		if (inputManager.isKeyDown(EKey::KEY_A))
 			m_camera.translate(m_camera.left() * moveSpeed);
 
-		if (inputManager.isKeyPressed(EKey::KEY_D))
+		if (inputManager.isKeyDown(EKey::KEY_D))
 			m_camera.translate(m_camera.right() * moveSpeed);
 
-		if (inputManager.isKeyPressed(EKey::KEY_SPACE))
+		if (inputManager.isKeyDown(EKey::KEY_SPACE))
 			m_camera.translate(Vector3::up() * moveSpeed);
 
-		if (inputManager.isKeyPressed(EKey::KEY_LEFT_SHIFT)
-			|| inputManager.isKeyPressed(EKey::KEY_RIGHT_SHIFT))
+		if (inputManager.isKeyDown(EKey::KEY_LEFT_SHIFT)
+			|| inputManager.isKeyDown(EKey::KEY_RIGHT_SHIFT))
 			m_camera.translate(Vector3::down() * moveSpeed);
 
 		// Rotation
-		if (inputManager.isKeyPressed(EKey::KEY_UP))
+		if (inputManager.isKeyDown(EKey::KEY_UP))
 			m_camera.rotate(ROTATION_SPEED * Vector3::right() * deltaTime);
 
-		if (inputManager.isKeyPressed(EKey::KEY_DOWN))
+		if (inputManager.isKeyDown(EKey::KEY_DOWN))
 			m_camera.rotate(-ROTATION_SPEED * Vector3::right() * deltaTime);
 
-		if (inputManager.isKeyPressed(EKey::KEY_Q) ||
-			inputManager.isKeyPressed(EKey::KEY_LEFT))
+		if (inputManager.isKeyDown(EKey::KEY_Q) ||
+			inputManager.isKeyDown(EKey::KEY_LEFT))
 			m_camera.rotate(-ROTATION_SPEED * Vector3::up() * deltaTime);
 
-		if (inputManager.isKeyPressed(EKey::KEY_E) ||
-			inputManager.isKeyPressed(EKey::KEY_RIGHT))
+		if (inputManager.isKeyDown(EKey::KEY_E) ||
+			inputManager.isKeyDown(EKey::KEY_RIGHT))
 			m_camera.rotate(ROTATION_SPEED * Vector3::up() * deltaTime);
 
 		m_spotLight.m_position = m_camera.getPosition();
