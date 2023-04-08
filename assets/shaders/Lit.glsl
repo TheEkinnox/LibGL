@@ -103,7 +103,8 @@ void main()
 
 	litColor += calculateSpotLight(spotLight, normal, fragPos, viewDir, _material);
 
-	FragColor = litColor;
+	vec4 texColor = texture(_material.diffuse, TexCoord);
+	FragColor = vec4(vec3(litColor), texColor.w);
 }
 
 vec4 calculateDirLight(DirLight light, vec3 normal, vec3 viewDir, Material material)
