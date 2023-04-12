@@ -10,92 +10,10 @@
 #include "Utility/utility.h"
 
 using namespace LibMath;
+using namespace LibGL::Rendering;
 
 namespace LibGL::Resources
 {
-	Model::VertexBuffer::VertexBuffer(const Vertex* vertices, const intptr_t verticesCount)
-	{
-		glGenBuffers(1, &m_bufferIndex);
-		glBindBuffer(GL_ARRAY_BUFFER, m_bufferIndex);
-		glBufferData(GL_ARRAY_BUFFER, verticesCount * static_cast<GLsizeiptr>(sizeof(Vertex)),
-			vertices, GL_STATIC_DRAW);
-	}
-
-	Model::VertexBuffer::VertexBuffer(const std::vector<Vertex>& vertices)
-	{
-		const Vertex* verticesArray = vertices.data();
-
-		glGenBuffers(1, &m_bufferIndex);
-		glBindBuffer(GL_ARRAY_BUFFER, m_bufferIndex);
-		glBufferData(GL_ARRAY_BUFFER,
-			static_cast<GLsizeiptr>(vertices.size()) * static_cast<GLsizeiptr>(sizeof(Vertex)),
-			verticesArray, GL_STATIC_DRAW);
-	}
-
-	Model::IndexBuffer::IndexBuffer(const uint32_t* indices, const intptr_t indexCount)
-	{
-		glGenBuffers(1, &m_bufferIndex);
-		glBindBuffer(GL_ARRAY_BUFFER, m_bufferIndex);
-		glBufferData(GL_ARRAY_BUFFER, indexCount * static_cast<GLsizeiptr>(sizeof(Vertex)),
-			indices, GL_STATIC_DRAW);
-	}
-
-	Model::IndexBuffer::IndexBuffer(const std::vector<uint32_t>& indices)
-	{
-		const uint32_t* idsArray = indices.data();
-
-		glGenBuffers(1, &m_bufferIndex);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_bufferIndex);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER,
-			static_cast<GLsizeiptr>(indices.size()) * static_cast<GLsizeiptr>(sizeof(uint32_t)),
-			idsArray, GL_STATIC_DRAW);
-	}
-
-	Model::Buffer::Buffer(Buffer&& other) noexcept
-		: m_bufferIndex(other.m_bufferIndex)
-	{
-		other.m_bufferIndex = 0;
-	}
-
-	Model::Buffer::~Buffer()
-	{
-		glDeleteBuffers(1, &m_bufferIndex);
-	}
-
-	Model::Buffer& Model::Buffer::operator=(Buffer&& other) noexcept
-	{
-		if (&other == this)
-			return *this;
-
-		glDeleteBuffers(1, &m_bufferIndex);
-
-		m_bufferIndex = other.m_bufferIndex;
-
-		other.m_bufferIndex = 0;
-
-		return *this;
-	}
-
-	void Model::VertexBuffer::bind() const
-	{
-		glBindBuffer(GL_ARRAY_BUFFER, m_bufferIndex);
-	}
-
-	void Model::VertexBuffer::unbind()
-	{
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
-	}
-
-	void Model::IndexBuffer::bind() const
-	{
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_bufferIndex);
-	}
-
-	void Model::IndexBuffer::unbind()
-	{
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	}
-
 	Model::VertexAttributes::VertexAttributes(const VertexBuffer& vbo, const IndexBuffer& ebo)
 	{
 		glGenVertexArrays(1, &m_vao);

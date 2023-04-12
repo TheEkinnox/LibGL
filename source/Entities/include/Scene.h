@@ -4,7 +4,7 @@
 
 namespace LibGL::Resources
 {
-	class SceneNode : public DataStructure::Node, public Physics::Transform
+	class SceneNode : public DataStructure::Node, public LibMath::Transform
 	{
 	public:
 		SceneNode() = default;

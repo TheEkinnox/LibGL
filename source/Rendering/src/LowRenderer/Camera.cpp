@@ -2,7 +2,6 @@
 
 using namespace LibMath;
 using namespace LibGL::Resources;
-using namespace LibGL::Physics;
 
 namespace LibGL::Rendering
 {
@@ -58,12 +57,12 @@ namespace LibGL::Rendering
 		return *this;
 	}
 
-	LibMath::Matrix4 Camera::getViewMatrix() const
+	Matrix4 Camera::getViewMatrix() const
 	{
 		return m_viewMatrix;
 	}
 
-	LibMath::Matrix4 Camera::getViewProjectionMatrix() const
+	Matrix4 Camera::getViewProjectionMatrix() const
 	{
 		return m_viewProjectionMatrix;
 	}
@@ -75,6 +74,56 @@ namespace LibGL::Rendering
 		updateMatrices();
 
 		return *this;
+	}
+
+	Camera& Camera::setClearColor(const Color& color)
+	{
+		m_clearColor = color;
+		return *this;
+	}
+
+	Camera& Camera::setClearColor(const float r, const float g, const float b, const float a)
+	{
+		setClearColor({ r, g, b, a });
+		return *this;
+	}
+
+	Color Camera::getClearColor() const
+	{
+		return m_clearColor;
+	}
+
+	Camera& Camera::setClearColorBuffer(const bool enable)
+	{
+		m_clearColorBuffer = enable;
+		return *this;
+	}
+
+	bool Camera::getClearColorBuffer() const
+	{
+		return m_clearColorBuffer;
+	}
+
+	Camera& Camera::setClearDepthBuffer(const bool enable)
+	{
+		m_clearDepthBuffer = enable;
+		return *this;
+	}
+
+	bool Camera::getClearDepthBuffer() const
+	{
+		return m_clearDepthBuffer;
+	}
+
+	Camera& Camera::setClearStencilBuffer(const bool enable)
+	{
+		m_clearStencilBuffer = enable;
+		return *this;
+	}
+
+	bool Camera::getClearStencilBuffer() const
+	{
+		return m_clearStencilBuffer;
 	}
 
 	Camera& Camera::getCurrent()

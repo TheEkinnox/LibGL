@@ -1,5 +1,8 @@
 #pragma once
-#include "Resources/Scene.h"
+#include "Scene.h"
+#include "Core/Color.h"
+#include "Matrix/Matrix4.h"
+#include "Transform.h"
 
 namespace LibGL::Rendering
 {
@@ -17,7 +20,7 @@ namespace LibGL::Rendering
 		 * \param transform The camera's initial transform
 		 * \param projectionMatrix The camera's projection matrix
 		 */
-		explicit Camera(SceneNode* parent, const Transform& transform, LibMath::Matrix4 projectionMatrix);
+		explicit Camera(SceneNode* parent, const LibMath::Transform& transform, LibMath::Matrix4 projectionMatrix);
 
 		/**
 		 * \brief Creates a copy of a given camera
@@ -70,6 +73,68 @@ namespace LibGL::Rendering
 		Camera& setProjectionMatrix(const LibMath::Matrix4& projectionMatrix);
 
 		/**
+		 * \brief Sets the camera's clear color
+		 * \param color The new clear color
+		 * \return A reference to the current camera
+		 */
+		Camera& setClearColor(const Color& color);
+
+		/**
+		 * \brief Sets the camera's clear color
+		 * \param r The clear color's red component
+		 * \param g The clear color's green component
+		 * \param b The clear color's blue component
+		 * \param a The clear color's alpha component
+		 * \return A reference to the current camera
+		 */
+		Camera& setClearColor(float r, float g, float b, float a = 1.f);
+
+		/**
+		 * \brief Gets the camera's current clear color
+		 * \return The camera's current clear color
+		 */
+		Color getClearColor() const;
+
+		/**
+		 * \brief  Sets whether the color buffer should be cleared
+		 * \param enable Whether the color buffer should be cleared
+		 * \return A reference to the current camera
+		 */
+		Camera& setClearColorBuffer(bool enable);
+
+		/**
+		 * \brief Checks if the color buffer should be cleared
+		 * \return True if the color buffer should be cleared. False otherwise.
+		 */
+		bool getClearColorBuffer() const;
+
+		/**
+		 * \brief  Sets whether the depth buffer should be cleared
+		 * \param enable Whether the depth buffer should be cleared
+		 * \return A reference to the current camera
+		 */
+		Camera& setClearDepthBuffer(bool enable);
+
+		/**
+		 * \brief Checks if the depth buffer should be cleared
+		 * \return True if the depth buffer should be cleared. False otherwise.
+		 */
+		bool getClearDepthBuffer() const;
+
+		/**
+		 * \brief Sets whether the stencil buffer should be cleared
+		 * \param enable Whether the stencil buffer should be cleared
+		 * \return A reference to the current camera
+		 */
+		Camera& setClearStencilBuffer(bool enable);
+
+		/**
+		 * \brief Checks if the stencil buffer should be cleared
+		 * \return True if the stencil buffer should be cleared. False otherwise.
+		 */
+		bool getClearStencilBuffer() const;
+
+		/**
 		 * \brief Gets a reference to the currently rendering camera
 		 * \return A reference to the current camera
 		 */
@@ -87,6 +152,10 @@ namespace LibGL::Rendering
 		LibMath::Matrix4	m_viewMatrix;
 		LibMath::Matrix4	m_projectionMatrix;
 		LibMath::Matrix4	m_viewProjectionMatrix;
+		Color				m_clearColor = Color::black;
+		bool				m_clearColorBuffer = true;
+		bool				m_clearDepthBuffer = true;
+		bool				m_clearStencilBuffer = true;
 
 		/**
 		 * \brief Updates the camera's matrices and other cached information

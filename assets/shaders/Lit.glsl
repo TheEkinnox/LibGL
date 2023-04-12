@@ -3,22 +3,26 @@
 
 layout(location = 0) in vec3 _pos;
 layout(location = 1) in vec3 _normal;
-layout(location = 2) in vec2 _texCoord;
+layout(location = 2) in vec2 _texCoords;
 
-out vec3 FragPos;
-out vec3 Normal;
-out vec2 TexCoord;
+out VS_OUT
+{
+	vec3	FragPos;
+	vec3	Normal;
+	vec2	TexCoords;
+} vs_out;
 
-uniform mat4 mvp;
-uniform mat4 modelMat;
-uniform mat4 normalMat;
+uniform mat4 u_mvp;
+uniform mat4 u_modelMat;
+uniform mat4 u_normalMat;
 
 void main()
 {
-	gl_Position = mvp * vec4(_pos, 1.0);
-	FragPos = (modelMat * vec4(_pos, 1.0)).xyz;
-	Normal = (normalMat * vec4(_normal, 0)).xyz;
-	TexCoord = _texCoord;
+	gl_Position = u_mvp * vec4(_pos, 1.0);
+	
+	vs_out.FragPos = (u_modelMat * vec4(_pos, 1.0)).xyz;
+	vs_out.Normal = (u_normalMat * vec4(_normal, 0)).xyz;
+	vs_out.TexCoords = _texCoords;
 }
 
 #shader fragment
@@ -56,12 +60,13 @@ struct SpotLight
 
 	vec3	position;
 	vec3	direction;
-	float	cutOff;
-	float	outerCutOff;
 
 	float	constant;
 	float	linear;
 	float	quadratic;
+
+	float	cutOff;
+	float	outerCutOff;
 };
 
 struct Material
@@ -70,6 +75,13 @@ struct Material
 	sampler2D	specular;
 	float		shininess;
 };
+
+in VS_OUT
+{
+	vec3	FragPos;
+	vec3	Normal;
+	vec2	TexCoords;
+} fs_in;
 
 out vec4 FragColor;
 
@@ -84,117 +96,96 @@ uniform SpotLight spotLight;
 
 uniform Material _material;
 
-vec4 calculateDirLight(DirLight light, vec3 normal, vec3 viewDir, Material material);
-vec4 calculatePointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir, Material material);
-vec4 calculateSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, Material material);
+uniform vec3 u_viewPos;
+
+uniform Material u_material;
+
+vec3 g_normal;
+vec3 g_viewDir;
+vec4 g_diffColor;
+vec4 g_specColor;
+
+vec3 calculateBlinnPhong(vec3 lightDir, vec4 ambient, vec4 diffuse, vec4 specular);
+vec3 calculateDirLight(DirLight light);
+vec3 calculatePointLight(PointLight light);
+vec3 calculateSpotLight(SpotLight light);
 
 void main()
 {
-	vec3 fragPos = FragPos;
-	vec3 normal = normalize(Normal);
-	vec3 viewDir = normalize(viewPos - fragPos);
+	g_normal = normalize(fs_in.Normal);
+	g_viewDir = normalize(u_viewPos - fs_in.FragPos);
+	g_diffColor = texture(u_material.diffuse, fs_in.TexCoords);
+	g_specColor = texture(u_material.specular, fs_in.TexCoords);
 
-	vec4 litColor = vec4(0);
+	vec3 litColor = vec3(0);
 
-	litColor += calculateDirLight(dirLight, normal, viewDir, _material);
+	litColor += calculateDirLight(dirLight);
 
 	for (int i = 0; i < NB_POINT_LIGHTS; i++)
-		litColor += calculatePointLight(pointLights[i], normal, fragPos, viewDir, _material);
+		litColor += calculatePointLight(pointLights[i]);
 
-	litColor += calculateSpotLight(spotLight, normal, fragPos, viewDir, _material);
+	litColor += calculateSpotLight(spotLight);
 
-	vec4 texColor = texture(_material.diffuse, TexCoord);
-	FragColor = vec4(vec3(litColor), texColor.w);
+	FragColor = vec4(litColor, g_diffColor.w);
 }
 
-vec4 calculateDirLight(DirLight light, vec3 normal, vec3 viewDir, Material material)
+vec3 calculateBlinnPhong(vec3 lightDir, vec4 ambient, vec4 diffuse, vec4 specular)
+{
+	float lambertian = max(dot(lightDir, g_normal), 0);
+	float specularIntensity = 0;
+
+	if (lambertian > 0)
+	{
+		vec3 halfDir = normalize(lightDir + g_viewDir);
+		float specularAngle = max(dot(halfDir, g_normal), 0);
+
+		specularIntensity = pow(specularAngle, u_material.shininess);
+	}
+
+	vec3 ambientColor = ambient.xyz * g_diffColor.xyz;
+	vec3 diffuseColor = diffuse.xyz * g_diffColor.xyz;
+	vec3 specularColor = specular.xyz * g_specColor.xyz;
+
+	return (ambientColor + diffuseColor * lambertian + specularColor * specularIntensity);
+}
+
+vec3 calculateDirLight(DirLight light)
 {
 	vec3 lightDir = normalize(-light.direction);
 
-	float lambertian = max(dot(lightDir, normal), 0);
-	float specular = 0;
-
-	if (lambertian > 0)
-	{
-		vec3 halfDir = normalize(lightDir + viewDir);
-		float specularAngle = max(dot(halfDir, normal), 0);
-
-		specular = pow(specularAngle, material.shininess);
-	}
-
-	vec4 fragColor = texture(material.diffuse, TexCoord);
-	vec4 specColor = texture(material.specular, TexCoord);
-
-	vec4 ambientColor = light.ambient * fragColor;
-	vec4 diffuseColor = light.diffuse * fragColor;
-	vec4 specularColor = light.specular * specColor;
-
-	return (ambientColor + diffuseColor * lambertian + specularColor * specular);
+	return calculateBlinnPhong(lightDir, light.ambient, light.diffuse, light.specular);
 }
 
-vec4 calculatePointLight(PointLight light, vec3 normal, vec3 fragPos, vec3 viewDir, Material material)
-{
-	vec3 lightDir = normalize(light.position - fragPos);
-
-	float lambertian = max(dot(lightDir, normal), 0);
-	float specular = 0;
-
-	if (lambertian > 0)
+vec3 calculatePointLight(PointLight light)
 	{
-		vec3 halfDir = normalize(lightDir + viewDir);
-		float specularAngle = max(dot(halfDir, normal), 0);
+	vec3 lightDir = normalize(light.position - fs_in.FragPos);
 
-		specular = pow(specularAngle, material.shininess);
-	}
-
-	float distance = length(light.position - fragPos);
+	float distance = length(light.position - fs_in.FragPos);
 	float attenuation = 1.0 / (light.constant + light.linear * distance +
 				 light.quadratic * (distance * distance));
 
-	vec4 fragColor = texture(material.diffuse, TexCoord);
-	vec4 specColor = texture(material.specular, TexCoord);
-
-	vec4 ambientColor = light.ambient * fragColor;
-	vec4 diffuseColor = light.diffuse * fragColor;
-	vec4 specularColor = light.specular * specColor;
-
-	return (ambientColor + diffuseColor * lambertian + specularColor * specular) * attenuation;
+	return calculateBlinnPhong(lightDir, light.ambient, light.diffuse, light.specular) * attenuation;
 }
 
-vec4 calculateSpotLight(SpotLight light, vec3 normal, vec3 fragPos, vec3 viewDir, Material material)
+vec3 calculateSpotLight(SpotLight light)
 {
-	vec3 lightDir = normalize(light.position - fragPos);
+	vec3 lightDir = normalize(light.position - fs_in.FragPos);
 	vec3 spotDir = normalize(-light.direction);
 
 	float spotAngle = dot(lightDir, spotDir);
 
 	if (spotAngle < light.outerCutOff)
-		return vec4(0);
+		return vec3(0);
 
 	float epsilon = light.cutOff - light.outerCutOff;
 	float intensity = clamp((spotAngle - light.outerCutOff) / epsilon, 0.0, 1.0);
 
-	float lambertian = max(dot(lightDir, normal), 0);
-	float specular = 0;
+	if (epsilon == 0.0)
+		return vec3(0);
 
-	if (lambertian > 0)
-	{
-		vec3 halfDir = normalize(lightDir + viewDir);
-		float specularAngle = max(dot(halfDir, normal), 0);
-
-		specular = pow(specularAngle, material.shininess);
-	}
-
-	float distance = length(light.position - fragPos);
+	float distance = length(light.position - fs_in.FragPos);
 	float attenuation = 1.0 / (light.constant + light.linear * distance +
 				light.quadratic * (distance * distance));
 
-	vec4 fragColor = texture(material.diffuse, TexCoord);
-	vec4 specColor = texture(material.specular, TexCoord);
-
-	vec4 ambientColor = light.ambient * fragColor;
-	vec4 diffuseColor = light.diffuse * fragColor;
-	vec4 specularColor = light.specular * specColor;
-
-	return (ambientColor + diffuseColor * lambertian + specularColor * specular) * attenuation * intensity;
+	return calculateBlinnPhong(lightDir, light.ambient, light.diffuse, light.specular) * attenuation * intensity;
 }

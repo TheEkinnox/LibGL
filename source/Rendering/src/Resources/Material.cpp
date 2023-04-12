@@ -50,12 +50,8 @@ namespace LibGL::Rendering
 		else
 			Texture::unbind();
 
-		const GLint shininessUniformLoc = m_shader->getUniformLocation("_material.shininess");
-		const GLint diffuseUniformLoc = m_shader->getUniformLocation("_material.diffuse");
-		const GLint specularUniformLoc = m_shader->getUniformLocation("_material.specular");
-
-		glUniform1i(diffuseUniformLoc, 0);
-		glUniform1i(specularUniformLoc, 1);
-		glUniform1f(shininessUniformLoc, m_shininess);
+		m_shader->setUniformFloat("u_material.shininess", m_shininess);
+		m_shader->setUniformInt("u_material.diffuse", 0);
+		m_shader->setUniformInt("u_material.specular", 1);
 	}
 }

@@ -1,24 +1,22 @@
 #pragma once
-#include "Vector/Vector4.h"
+#include "Core/Color.h"
+#include "Vector/Vector3.h"
 
-namespace LibGL
+namespace LibGL::Resources
 {
-	namespace Resources
-	{
-		class Shader;
-	}
+	class Shader;
 }
 
 namespace LibGL::Rendering
 {
 	struct Light
 	{
-		LibMath::Vector4	m_ambient;
-		LibMath::Vector4	m_diffuse;
-		LibMath::Vector4	m_specular;
+		Color	m_ambient	= Color::black;
+		Color	m_diffuse	= Color::black;
+		Color	m_specular	= Color::black;
 
 		Light() = default;
-		Light(const LibMath::Vector4& ambient, const LibMath::Vector4& diffuse, const LibMath::Vector4& specular);
+		Light(const Color& ambient, const Color& diffuse, const Color& specular);
 		Light(const Light&) = default;
 		Light(Light&&) = default;
 		virtual ~Light() = default;

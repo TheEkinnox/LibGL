@@ -1,25 +1,18 @@
 #include "LowRenderer/Light.h"
 #include "Resources/Shader.h"
 
-#include <glad/glad.h>
-
 namespace LibGL::Rendering
 {
-	Light::Light(const LibMath::Vector4& ambient, const LibMath::Vector4& diffuse, const LibMath::Vector4& specular)
+	Light::Light(const Color& ambient, const Color& diffuse, const Color& specular)
 		: m_ambient(ambient), m_diffuse(diffuse), m_specular(specular)
 	{
 	}
 
 	void Light::setupUniform(const std::string& uniformName, const Resources::Shader& shader) const
 	{
-		GLint uniformLoc = shader.getUniformLocation(uniformName + ".ambient");
-		glUniform4fv(uniformLoc, 1, m_ambient.getArray());
-
-		uniformLoc = shader.getUniformLocation(uniformName + ".diffuse");
-		glUniform4fv(uniformLoc, 1, m_diffuse.getArray());
-
-		uniformLoc = shader.getUniformLocation(uniformName + ".specular");
-		glUniform4fv(uniformLoc, 1, m_specular.getArray());
+		shader.setUniformVec4(uniformName + ".ambient", m_ambient.rgba());
+		shader.setUniformVec4(uniformName + ".diffuse", m_diffuse.rgba());
+		shader.setUniformVec4(uniformName + ".specular", m_specular.rgba());
 	}
 
 	DirectionalLight::DirectionalLight(const Light& light, const LibMath::Vector3& direction)
@@ -31,8 +24,7 @@ namespace LibGL::Rendering
 	{
 		Light::setupUniform(uniformName, shader);
 
-		const GLint uniformLoc = shader.getUniformLocation(uniformName + ".direction");
-		glUniform3fv(uniformLoc, 1, m_direction.getArray());
+		shader.setUniformVec3(uniformName + ".direction", m_direction);
 	}
 
 	PointLight::PointLight(const Light& light, const LibMath::Vector3& position,
@@ -45,17 +37,11 @@ namespace LibGL::Rendering
 	{
 		Light::setupUniform(uniformName, shader);
 
-		GLint uniformLoc = shader.getUniformLocation(uniformName + ".position");
-		glUniform3fv(uniformLoc, 1, m_position.getArray());
+		shader.setUniformVec3(uniformName + ".position", m_position);
 
-		uniformLoc = shader.getUniformLocation(uniformName + ".constant");
-		glUniform1f(uniformLoc, m_attenuationData.m_constant);
-
-		uniformLoc = shader.getUniformLocation(uniformName + ".linear");
-		glUniform1f(uniformLoc, m_attenuationData.m_linear);
-
-		uniformLoc = shader.getUniformLocation(uniformName + ".quadratic");
-		glUniform1f(uniformLoc, m_attenuationData.m_quadratic);
+		shader.setUniformFloat(uniformName + ".constant", m_attenuationData.m_constant);
+		shader.setUniformFloat(uniformName + ".linear", m_attenuationData.m_linear);
+		shader.setUniformFloat(uniformName + ".quadratic", m_attenuationData.m_quadratic);
 	}
 
 	SpotLight::SpotLight(const Light& light, const LibMath::Vector3& position,
@@ -70,25 +56,14 @@ namespace LibGL::Rendering
 	{
 		Light::setupUniform(uniformName, shader);
 
-		GLint uniformLoc = shader.getUniformLocation(uniformName + ".position");
-		glUniform3fv(uniformLoc, 1, m_position.getArray());
+		shader.setUniformVec3(uniformName + ".position", m_position);
+		shader.setUniformVec3(uniformName + ".direction", m_direction);
 
-		uniformLoc = shader.getUniformLocation(uniformName + ".direction");
-		glUniform3fv(uniformLoc, 1, m_direction.getArray());
+		shader.setUniformFloat(uniformName + ".cutOff", m_cutOff);
+		shader.setUniformFloat(uniformName + ".outerCutOff", m_outerCutoff);
 
-		uniformLoc = shader.getUniformLocation(uniformName + ".cutOff");
-		glUniform1f(uniformLoc, m_cutOff);
-
-		uniformLoc = shader.getUniformLocation(uniformName + ".outerCutOff");
-		glUniform1f(uniformLoc, m_outerCutoff);
-
-		uniformLoc = shader.getUniformLocation(uniformName + ".constant");
-		glUniform1f(uniformLoc, m_attenuationData.m_constant);
-
-		uniformLoc = shader.getUniformLocation(uniformName + ".linear");
-		glUniform1f(uniformLoc, m_attenuationData.m_linear);
-
-		uniformLoc = shader.getUniformLocation(uniformName + ".quadratic");
-		glUniform1f(uniformLoc, m_attenuationData.m_quadratic);
+		shader.setUniformFloat(uniformName + ".constant", m_attenuationData.m_constant);
+		shader.setUniformFloat(uniformName + ".linear", m_attenuationData.m_linear);
+		shader.setUniformFloat(uniformName + ".quadratic", m_attenuationData.m_quadratic);
 	}
 }

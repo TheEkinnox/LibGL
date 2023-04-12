@@ -1,15 +1,16 @@
 #include "DemoApp.h"
-#include <glad/glad.h>
 
 #include "Resources/Model.h"
 #include "Resources/Shader.h"
 #include "Resources/Texture.h"
+#include "LowRenderer/Mesh.h"
 #include "Debug/Log.h"
 #include "Debug/Assertion.h"
 #include "Angle.h"
 #include "Arithmetic.h"
 #include "DemoContext.h"
 #include "InputManager.h"
+#include "Transform.h"
 #include "Trigonometry.h"
 #include "Utility/ServiceLocator.h"
 #include "Utility/utility.h"
@@ -25,7 +26,6 @@ using namespace LibMath;
 using namespace LibMath::Exceptions;
 using namespace LibMath::Literal;
 using namespace LibGL::Utility;
-using namespace LibGL::Physics;
 using namespace LibGL::Resources;
 using namespace LibGL::Rendering;
 using namespace LibGL::Application;
@@ -36,27 +36,15 @@ namespace LibGL::Demo
 
 	DemoApp::DemoApp(const int windowWidth, const int windowHeight, const char* title)
 		: IApplication(std::make_unique<DemoContext>(windowWidth, windowHeight, title)), m_camera(
-			  nullptr, Transform(),
-			  Matrix4::perspectiveProjection(90_deg,
+			  nullptr, Transform(), Matrix4::perspectiveProjection(90_deg,
 			                                 static_cast<float>(windowWidth) / static_cast<float>(windowHeight),
 			                                 CAM_NEAR, CAM_FAR))
 	{
+		m_camera.setClearColor(Color::blue).setClearColorBuffer(true).setClearDepthBuffer(true);
 		Camera::setCurrent(m_camera);
 
 		// Initialize debugger
 		Debug::Log::openFile("debug.log");
-
-		// Enable back-face culling
-		glFrontFace(GL_CCW);
-		glEnable(GL_CULL_FACE);
-		glCullFace(GL_BACK);
-
-		// Enable depth-test
-		glEnable(GL_DEPTH_TEST);
-
-		// Enable alpha-blending
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 
 	void DemoApp::onStart()
@@ -331,8 +319,8 @@ namespace LibGL::Demo
 
 	void DemoApp::render()
 	{
-		glClearColor(0.f, 0.f, 1.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		const auto& renderer = LGL_SERVICE(Renderer);
+		renderer.clear(m_camera);
 
 		updateLitShader("shaders/Lit.glsl");
 
@@ -349,8 +337,7 @@ namespace LibGL::Demo
 		shader->use();
 
 		// Setup camera
-		const GLint uniformLoc = shader->getUniformLocation("viewPos");
-		glUniform3fv(uniformLoc, 1, m_camera.getGlobalTransform().getPosition().getArray());
+		shader->setUniformVec3("u_viewPos", m_camera.getGlobalTransform().getPosition());
 
 		// Setup directional light
 		m_dirLight.setupUniform("dirLight", *shader);

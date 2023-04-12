@@ -2,6 +2,7 @@
 #include "IContext.h"
 #include "InputManager.h"
 #include "Resources/ResourcesManager.h"
+#include "Core/Renderer.h"
 
 namespace LibGL::Demo
 {
@@ -14,5 +15,6 @@ namespace LibGL::Demo
 
 		std::unique_ptr<Application::InputManager>	m_inputManager;
 		std::unique_ptr<Resources::ResourceManager>	m_resourceManager;
+		std::unique_ptr<Rendering::Renderer>		m_renderer;
 	};
 }

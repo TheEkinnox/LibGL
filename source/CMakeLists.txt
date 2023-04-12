@@ -1,6 +1,7 @@
 # Include sub directories
 if (${LIBGL_BUILD_DEMO})
   add_subdirectory(Core)
+  add_subdirectory(Entities)
   add_subdirectory(Physics)
   add_subdirectory(Rendering)
   add_subdirectory(App)
@@ -11,14 +12,24 @@ if (${LIBGL_BUILD_DEMO})
 else()
   # Merge and cache the externally accessible include directories
   option(LIBGL_USE_APP "Add the App library to the merged target" ON)
-  option(LIBGL_USE_PHYSICS "Add the Physics library to the merged target" ON)
+  option(LIBGL_USE_ENTITIES "Add the Entities library to the merged target" ON)
+  option(LIBGL_USE_PHYSICS "Add the Physics library to the merged target (having this forces LIBGL_USE_ENTITIES)" ON)
   option(LIBGL_USE_RENDERING "Add the Rendering library to the merged target (having this forces LIBGL_USE_PHYSICS)" ON)
 
   set(LIBGL_USE_PHYSICS ${LIBGL_USE_PHYSICS} OR ${LIBGL_USE_RENDERING})
 
+  set(LIBGL_USE_ENTITIES ${LIBGL_USE_ENTITIES} OR ${LIBGL_USE_PHYSICS})
+
   add_subdirectory(Core)
   set(LIBGL_TARGETS ${CORE_NAME})
   set(LIBGL_INCLUDE_DIRS ${CORE_INCLUDE_DIR})
+
+  # Entities
+  if (${LIBGL_USE_ENTITIES})
+    add_subdirectory(Entities)
+    list(APPEND LIBGL_TARGETS ${ENTITIES_NAME})
+    list(APPEND LIBGL_INCLUDE_DIRS ${ENTITIES_INCLUDE_DIR})
+  endif()
 
   # Physics
   if (${LIBGL_USE_PHYSICS})

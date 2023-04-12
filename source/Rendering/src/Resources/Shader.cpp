@@ -223,6 +223,78 @@ namespace LibGL::Resources
 		glUseProgram(0);
 	}
 
+	void Shader::setUniformInt(const std::string& name, const int value) const
+	{
+		glUniform1i(getUniformLocation(name), value);
+	}
+
+	void Shader::setUniformFloat(const std::string& name, const float value) const
+	{
+		glUniform1f(getUniformLocation(name), value);
+	}
+
+	void Shader::setUniformVec2(const std::string& name, const LibMath::Vector2& value) const
+	{
+		glUniform2fv(getUniformLocation(name), 1, value.getArray());
+	}
+
+	void Shader::setUniformVec3(const std::string& name, const LibMath::Vector3& value) const
+	{
+		glUniform3fv(getUniformLocation(name), 1, value.getArray());
+	}
+
+	void Shader::setUniformVec4(const std::string& name, const LibMath::Vector4& value) const
+	{
+		glUniform4fv(getUniformLocation(name), 1, value.getArray());
+	}
+
+	void Shader::setUniformMat4(const std::string& name, const LibMath::Matrix4& value) const
+	{
+		glUniformMatrix4fv(getUniformLocation(name), 1, GL_TRUE, value.getArray());
+	}
+
+	int Shader::getUniformInt(const std::string& name) const
+	{
+		int value;
+		glGetUniformiv(m_program, getUniformLocation(name), &value);
+		return value;
+	}
+
+	float Shader::getUniformFloat(const std::string& name) const
+	{
+		float value;
+		glGetUniformfv(m_program, getUniformLocation(name), &value);
+		return value;
+	}
+
+	LibMath::Vector2 Shader::getUniformVec2(const std::string& name) const
+	{
+		GLfloat values[16];
+		glGetUniformfv(m_program, getUniformLocation(name), values);
+		return reinterpret_cast<LibMath::Vector2&>(values);
+	}
+
+	LibMath::Vector3 Shader::getUniformVec3(const std::string& name) const
+	{
+		GLfloat values[16];
+		glGetUniformfv(m_program, getUniformLocation(name), values);
+		return reinterpret_cast<LibMath::Vector3&>(values);
+	}
+
+	LibMath::Vector4 Shader::getUniformVec4(const std::string& name) const
+	{
+		GLfloat values[16];
+		glGetUniformfv(m_program, getUniformLocation(name), values);
+		return reinterpret_cast<LibMath::Vector4&>(values);
+	}
+
+	LibMath::Matrix4 Shader::getUniformMat4(const std::string& name) const
+	{
+		GLfloat values[16];
+		glGetUniformfv(m_program, getUniformLocation(name), values);
+		return reinterpret_cast<LibMath::Matrix4&>(values);
+	}
+
 	GLint Shader::getUniformLocation(const std::string& uniformName) const
 	{
 		return glGetUniformLocation(m_program, uniformName.c_str());

@@ -1,6 +1,6 @@
-#include "Resources/Scene.h"
+#include "Scene.h"
 
-using namespace LibGL::Physics;
+using namespace LibMath;
 
 namespace LibGL::Resources
 {

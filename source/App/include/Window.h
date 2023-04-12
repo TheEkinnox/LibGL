@@ -190,9 +190,9 @@ namespace LibGL::Application
 		dimensions_t		m_maxSize;
 		pos_t				m_pos;
 
-		int					m_refreshRate;
-
 		GLFWwindow*			m_glfwWindow;
+
+		int					m_refreshRate;
 		bool				m_isFullScreen;
 
 		/**

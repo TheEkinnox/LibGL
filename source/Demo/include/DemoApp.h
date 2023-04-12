@@ -1,7 +1,6 @@
 #pragma once
 #include "LowRenderer/Camera.h"
 #include "LowRenderer/Light.h"
-#include "LowRenderer/Mesh.h"
 #include "IApplication.h"
 
 namespace LibGL::Demo

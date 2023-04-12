@@ -1,6 +1,6 @@
 #pragma once
 #include "Resources/Material.h"
-#include "Resources/Scene.h"
+#include "Scene.h"
 
 namespace LibGL::Resources
 {
@@ -14,13 +14,13 @@ namespace LibGL::Rendering
 	{
 	public:
 						Mesh() = delete;
-		explicit		Mesh(SceneNode* parent, const Resources::Model& model, const Material& material);
+		explicit	Mesh(SceneNode* parent, const Resources::Model& model, const Material& material);
 						Mesh(const Mesh& other) = default;
 						Mesh(Mesh&& other) noexcept = default;
 						~Mesh() override = default;
 
-		Mesh&			operator=(const Mesh& other) = default;
-		Mesh&			operator=(Mesh&& other) noexcept = default;
+		Mesh&		operator=(const Mesh& other) = default;
+		Mesh&		operator=(Mesh&& other) noexcept = default;
 
 		/**
 		 * \brief Sets the mesh's model

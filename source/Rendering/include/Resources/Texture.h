@@ -1,8 +1,7 @@
 #pragma once
 #include <filesystem>
 #include <string>
-
-#include "IResource.h"
+#include <Resources/IResource.h>
 
 namespace LibGL::Resources
 {
@@ -36,7 +35,7 @@ namespace LibGL::Resources
 		static void unbind();
 
 	private:
-		uint32_t		m_id = 0;
+		uint32_t	m_id = 0;
 		int			m_width = 0;
 		int			m_height = 0;
 		int			m_channels = 0;
