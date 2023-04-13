@@ -1,6 +1,8 @@
 #pragma once
 
 #include "Scene.h"
+#include "Component.h"
+
 #include <memory> // shared_ptr
 #include <vector>
 
