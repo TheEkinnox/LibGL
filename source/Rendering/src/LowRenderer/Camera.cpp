@@ -128,7 +128,9 @@ namespace LibGL::Rendering
 
 	Camera& Camera::getCurrent()
 	{
-		return *m_current;
+		static Camera defaultCam;
+
+		return m_current ? *m_current : defaultCam;
 	}
 
 	void Camera::setCurrent(Camera& cam)
