@@ -4,6 +4,28 @@
 
 namespace LibGL
 {
+	Component& Component::operator=(const Component& other)
+	{
+		if (&other == this)
+			return *this;
+
+		m_owner = other.m_owner;
+		m_isActive = other.m_isActive;
+
+		return *this;
+	}
+
+	Component& Component::operator=(Component&& other) noexcept
+	{
+		if (&other == this)
+			return *this;
+
+		m_owner = std::move(other.m_owner);
+		m_isActive = other.m_isActive;
+
+		return *this;
+	}
+
 	Component::~Component()
 	{
 		m_owner.removeComponent(*this);

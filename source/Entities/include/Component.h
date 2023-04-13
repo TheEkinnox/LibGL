@@ -10,8 +10,8 @@ namespace LibGL
 		Component(const Component& other) = default;
 		Component(Component&& other) = default;
 
-		Component& operator=(const Component& other) = default;
-		Component& operator=(Component&& other) = default;
+		Component& operator=(const Component& other);
+		Component& operator=(Component&& other) noexcept;
 
 		virtual ~Component();
 
