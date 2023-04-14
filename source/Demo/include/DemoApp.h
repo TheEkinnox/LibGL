@@ -5,7 +5,7 @@
 
 namespace LibGL::Demo
 {
-	class DemoApp : public Application::IApplication
+	class DemoApp final : public Application::IApplication
 	{
 	public:
 		/**
@@ -27,6 +27,11 @@ namespace LibGL::Demo
 		DemoApp(DemoApp&&) = delete;
 
 		/**
+		 * \brief Clears the application's allocated data
+		 */
+		~DemoApp() override = default;
+
+		/**
 		 * \brief Disable the Application's copy assignment operator
 		 */
 		DemoApp& operator=(const DemoApp&) = delete;
@@ -39,7 +44,6 @@ namespace LibGL::Demo
 	private:
 		static constexpr int NB_POINT_LIGHTS = 4;
 
-		Rendering::Camera					m_camera;
 		Resources::Scene					m_scene;
 		Rendering::PointLight				m_pointLights[NB_POINT_LIGHTS];
 		Rendering::DirectionalLight			m_dirLight;
@@ -83,7 +87,7 @@ namespace LibGL::Demo
 		/**
 		 * \brief Processes user's mouse input
 		 */
-		void handleMouse();
+		void handleMouse() const;
 
 		/**
 		 * \brief Handles the application's rendering

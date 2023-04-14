@@ -15,11 +15,8 @@
 #include "Utility/ServiceLocator.h"
 #include "Utility/utility.h"
 
-#define CAM_NEAR .1f
-#define CAM_FAR 14.f
-
 #define MOVE_SPEED .5f
-#define ROTATION_SPEED 30
+#define ROTATION_SPEED 30.f
 #define MOUSE_SENSITIVITY .8f
 
 using namespace LibMath;
@@ -35,14 +32,8 @@ namespace LibGL::Demo
 {
 
 	DemoApp::DemoApp(const int windowWidth, const int windowHeight, const char* title)
-		: IApplication(std::make_unique<DemoContext>(windowWidth, windowHeight, title)), m_camera(
-			  nullptr, Transform(), Matrix4::perspectiveProjection(90_deg,
-			                                 static_cast<float>(windowWidth) / static_cast<float>(windowHeight),
-			                                 CAM_NEAR, CAM_FAR))
+		: IApplication(std::make_unique<DemoContext>(windowWidth, windowHeight, title))
 	{
-		m_camera.setClearColor(Color::blue).setClearColorBuffer(true).setClearDepthBuffer(true);
-		Camera::setCurrent(m_camera);
-
 		// Initialize debugger
 		Debug::Log::openFile("debug.log");
 	}
@@ -68,6 +59,7 @@ namespace LibGL::Demo
 	void DemoApp::createScene()
 	{
 		auto& resourceManager = LGL_SERVICE(ResourceManager);
+		const auto& camera = Camera::getCurrent();
 
 		//const Shader* shader = setupUnlitShader("shaders/Unlit.glsl");
 		//const Shader* shader = setupUnlitShader("shaders/Normal.glsl");
@@ -167,8 +159,8 @@ namespace LibGL::Demo
 				Vector4(.6f, .6f, .6f, 1),
 				Vector4(.75f, .75f, .75f, 1),
 			},
-			m_camera.getPosition(),
-			m_camera.forward(),
+			camera.getPosition(),
+			camera.forward(),
 			{ 1.f, .35f, .44f },
 			cos(25_deg),
 			cos(30_deg),
@@ -214,14 +206,15 @@ namespace LibGL::Demo
 	void DemoApp::handleKeyboard()
 	{
 		const auto& inputManager = LGL_SERVICE(InputManager);
+		auto& camera = Camera::getCurrent();
 
 		if (inputManager.isKeyDown(EKey::KEY_ESCAPE))
 			LGL_SERVICE(Window).setShouldClose(true);
 
 		if (inputManager.isKeyDown(EKey::KEY_R))
 		{
-			m_camera.setPosition(Vector3::zero());
-			m_camera.setRotation(Vector3::zero());
+			camera.setPosition(Vector3::zero());
+			camera.setRotation(Vector3::zero());
 		}
 
 		const float deltaTime = LGL_SERVICE(Timer).getDeltaTime();
@@ -247,46 +240,47 @@ namespace LibGL::Demo
 			moveSpeed *= 1.5f;
 
 		if (inputManager.isKeyDown(EKey::KEY_W))
-			m_camera.translate(m_camera.forward() * moveSpeed);
+			camera.translate(camera.forward() * moveSpeed);
 
 		if (inputManager.isKeyDown(EKey::KEY_S))
-			m_camera.translate(m_camera.back() * moveSpeed);
+			camera.translate(camera.back() * moveSpeed);
 
 		if (inputManager.isKeyDown(EKey::KEY_A))
-			m_camera.translate(m_camera.left() * moveSpeed);
+			camera.translate(camera.left() * moveSpeed);
 
 		if (inputManager.isKeyDown(EKey::KEY_D))
-			m_camera.translate(m_camera.right() * moveSpeed);
+			camera.translate(camera.right() * moveSpeed);
 
 		if (inputManager.isKeyDown(EKey::KEY_SPACE))
-			m_camera.translate(Vector3::up() * moveSpeed);
+			camera.translate(Vector3::up() * moveSpeed);
 
 		if (inputManager.isKeyDown(EKey::KEY_LEFT_SHIFT)
 			|| inputManager.isKeyDown(EKey::KEY_RIGHT_SHIFT))
-			m_camera.translate(Vector3::down() * moveSpeed);
+			camera.translate(Vector3::down() * moveSpeed);
 
 		// Rotation
 		if (inputManager.isKeyDown(EKey::KEY_UP))
-			m_camera.rotate(ROTATION_SPEED * Vector3::right() * deltaTime);
+			camera.rotate(ROTATION_SPEED * Vector3::right() * deltaTime);
 
 		if (inputManager.isKeyDown(EKey::KEY_DOWN))
-			m_camera.rotate(-ROTATION_SPEED * Vector3::right() * deltaTime);
+			camera.rotate(-ROTATION_SPEED * Vector3::right() * deltaTime);
 
 		if (inputManager.isKeyDown(EKey::KEY_Q) ||
 			inputManager.isKeyDown(EKey::KEY_LEFT))
-			m_camera.rotate(-ROTATION_SPEED * Vector3::up() * deltaTime);
+			camera.rotate(-ROTATION_SPEED * Vector3::up() * deltaTime);
 
 		if (inputManager.isKeyDown(EKey::KEY_E) ||
 			inputManager.isKeyDown(EKey::KEY_RIGHT))
-			m_camera.rotate(ROTATION_SPEED * Vector3::up() * deltaTime);
+			camera.rotate(ROTATION_SPEED * Vector3::up() * deltaTime);
 
-		m_spotLight.m_position = m_camera.getPosition();
-		m_spotLight.m_direction = m_camera.forward();
+		m_spotLight.m_position = camera.getPosition();
+		m_spotLight.m_direction = camera.forward();
 	}
 
-	void DemoApp::handleMouse()
+	void DemoApp::handleMouse() const
 	{
 		auto& inputManager = LGL_SERVICE(InputManager);
+		auto& camera = Camera::getCurrent();
 
 		if (!inputManager.isMouseButtonPressed(EMouseButton::MOUSE_BUTTON_LEFT) &&
 			!inputManager.isMouseButtonPressed(EMouseButton::MOUSE_BUTTON_RIGHT))
@@ -307,20 +301,20 @@ namespace LibGL::Demo
 		if (mouseDelta == Vector2::zero())
 			return;
 
-		Vector3 camRotation = m_camera.getRotation();
+		Vector3 camRotation = camera.getRotation();
 		camRotation.m_x += -mouseDelta.m_y * rotationSpeed;
 		camRotation.m_y += mouseDelta.m_x * rotationSpeed;
 
 		camRotation.m_x = clamp(camRotation.m_x, -80.f, 80.f);
 		camRotation.m_y = wrap(camRotation.m_y, 0.f, 360.f);
 
-		m_camera.setRotation(camRotation);
+		camera.setRotation(camRotation);
 	}
 
 	void DemoApp::render()
 	{
 		const auto& renderer = LGL_SERVICE(Renderer);
-		renderer.clear(m_camera);
+		renderer.clear(Camera::getCurrent());
 
 		updateLitShader("shaders/Lit.glsl");
 
@@ -337,7 +331,7 @@ namespace LibGL::Demo
 		shader->use();
 
 		// Setup camera
-		shader->setUniformVec3("u_viewPos", m_camera.getGlobalTransform().getPosition());
+		shader->setUniformVec3("u_viewPos", Camera::getCurrent().getGlobalTransform().getPosition());
 
 		// Setup directional light
 		m_dirLight.setupUniform("dirLight", *shader);

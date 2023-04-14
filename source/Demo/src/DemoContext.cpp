@@ -1,10 +1,17 @@
 #include "DemoContext.h"
 
 #include "Utility/ServiceLocator.h"
+#include <Angle.h>
 
 using namespace LibGL::Application;
 using namespace LibGL::Resources;
 using namespace LibGL::Rendering;
+
+using namespace LibMath;
+using namespace Literal;
+
+#define CAM_NEAR .1f
+#define CAM_FAR 14.f
 
 namespace LibGL::Demo
 {
@@ -12,8 +19,16 @@ namespace LibGL::Demo
 		const char* title) : IContext(windowWidth, windowHeight, title),
 		m_inputManager(std::make_unique<InputManager>(*m_window)),
 		m_resourceManager(std::make_unique<ResourceManager>()),
-		m_renderer(std::make_unique<Renderer>())
+		m_renderer(std::make_unique<Renderer>()),
+		m_camera(std::make_unique<Camera>(nullptr, Transform(),
+			Matrix4::perspectiveProjection(90_deg,
+				static_cast<float>(windowWidth) / static_cast<float>(windowHeight),
+				CAM_NEAR, CAM_FAR))
+		)
 	{
+		m_camera->setClearColor(Color::blue).setClearColorBuffer(true).setClearDepthBuffer(true);
+		Camera::setCurrent(*m_camera);
+
 		ServiceLocator::provide<InputManager>(*m_inputManager);
 		ServiceLocator::provide<ResourceManager>(*m_resourceManager);
 		ServiceLocator::provide<Renderer>(*m_renderer);
