@@ -7,6 +7,15 @@ namespace LibGL::DataStructure
 	{
 	}
 
+	Node::~Node()
+	{
+		if (m_parent != nullptr)
+			m_parent->removeChild(*this);
+
+		for (Node* child : m_children)
+			child->m_parent = nullptr;
+	}
+
 	Node* Node::getParent()
 	{
 		return m_parent;

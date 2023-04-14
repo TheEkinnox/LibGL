@@ -10,7 +10,7 @@ namespace LibGL::DataStructure
 		Node(Node* parent);
 		Node(const Node& other) = default;
 		Node(Node&& other) noexcept = default;
-		virtual ~Node() = default;
+		virtual ~Node();
 
 		Node& operator=(const Node& other) = default;
 		Node& operator=(Node&& other) noexcept = default;
