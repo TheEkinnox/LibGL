@@ -5,6 +5,11 @@
 
 namespace LibGL
 {
+	inline Entity::Entity(Entity* parent, const Transform& transform) :
+		SceneNode(parent, transform)
+	{
+	}
+
 	template <typename T, typename ... Args>
 	T& Entity::addComponent(Args&&... args)
 	{
