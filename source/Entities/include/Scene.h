@@ -55,6 +55,6 @@ namespace LibGL::Resources
 	class Scene : public DataStructure::Graph<SceneNode>
 	{
 	public:
-		void update();
+		virtual void update();
 	};
 }
