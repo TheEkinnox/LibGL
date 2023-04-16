@@ -151,19 +151,25 @@ namespace LibGL::Application
 		 */
 		void setShouldClose(bool shouldClose) const;
 
+		/**
+		 * \brief Gets the window's aspect ratio
+		 * \return The window's aspect ratio
+		 */
+		float getAspect() const;
+
 	private:
 		inline static std::unordered_map<GLFWwindow*, Window*> s_windowsMap;
 
-		std::string			m_title;
-		dimensions_t		m_size;
-		dimensions_t		m_minSize;
-		dimensions_t		m_maxSize;
-		pos_t				m_pos;
+		std::string		m_title;
+		dimensions_t	m_size;
+		dimensions_t	m_minSize;
+		dimensions_t	m_maxSize;
+		pos_t			m_pos;
 
-		GLFWwindow*			m_glfwWindow;
+		GLFWwindow*		m_glfwWindow;
 
-		int					m_refreshRate;
-		bool				m_isFullScreen;
+		int				m_refreshRate;
+		bool			m_isFullScreen;
 
 		/**
 		 * \brief Finds the LibGL window linked to the given GLFW window

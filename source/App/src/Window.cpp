@@ -93,6 +93,11 @@ namespace LibGL::Application
 		glfwSetWindowShouldClose(m_glfwWindow, shouldClose);
 	}
 
+	float Window::getAspect() const
+	{
+		return static_cast<float>(m_size.first) / static_cast<float>(m_size.second);
+	}
+
 	void Window::showCursor() const
 	{
 		glfwSetInputMode(m_glfwWindow, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
