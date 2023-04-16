@@ -17,14 +17,24 @@ namespace LibGL::Rendering
 	{
 	}
 
+	const Model* Mesh::getModel() const
+	{
+		return m_model;
+	}
+
 	void Mesh::setModel(const Model& model)
 	{
 		m_model = &model;
 	}
 
-	void Mesh::setMaterial(const Material& material)
+	Material Mesh::getMaterial() const
 	{
-		m_material = material;
+		return m_material;
+	}
+
+	Material& Mesh::getMaterial()
+	{
+		return m_material;
 	}
 
 	void Mesh::draw() const
