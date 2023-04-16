@@ -20,9 +20,15 @@ void main()
 
 struct Material
 {
+	vec4		tint;
+	vec4		specularColor;
+	vec2		uvOffset;
+	vec2		uvScale;
 	sampler2D	diffuse;
 	sampler2D	specular;
+	sampler2D	normal;
 	float		shininess;
+	int			usedMaps;
 };
 
 in vec2 TexCoords;
@@ -33,5 +39,7 @@ uniform Material u_material;
 
 void main()
 {
-	FragColor = texture(u_material.diffuse, TexCoords);
+	vec2 texCoords = TexCoords * u_material.uvScale + u_material.uvOffset;
+
+	FragColor = texture(u_material.diffuse, texCoords) * u_material.tint;
 }

@@ -5,10 +5,12 @@ namespace LibGL::DataStructure
 {
 	template <class NodeT>
 	template <typename DataT>
-	void Graph<NodeT>::addNode(DataT& node)
+	DataT& Graph<NodeT>::addNode(DataT& node)
 	{
 		static_assert(std::is_same_v<NodeT, DataT> || std::is_base_of_v<NodeT, DataT>);
-		m_nodes.push_back(std::make_shared<DataT>(node));
+		const auto addedNode = std::make_shared<DataT>(node);
+		m_nodes.push_back(addedNode);
+		return *addedNode;
 	}
 
 	template <class NodeT>

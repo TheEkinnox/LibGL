@@ -44,10 +44,11 @@ namespace LibGL::Demo
 	private:
 		static constexpr int NB_POINT_LIGHTS = 4;
 
-		Resources::Scene					m_scene;
-		Rendering::PointLight				m_pointLights[NB_POINT_LIGHTS];
-		Rendering::DirectionalLight			m_dirLight;
-		Rendering::SpotLight				m_spotLight;
+		Resources::Scene			m_scene;
+		Rendering::Light			m_ambientLight;
+		Rendering::PointLight		m_pointLights[NB_POINT_LIGHTS];
+		Rendering::DirectionalLight	m_dirLight;
+		Rendering::SpotLight		m_spotLight;
 
 		/**
 		 * \brief Function to call on the application start

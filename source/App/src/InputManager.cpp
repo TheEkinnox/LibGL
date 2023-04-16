@@ -15,14 +15,14 @@ namespace LibGL::Application
 	{
 		using namespace std::placeholders;
 
-		m_keyCallbackId = m_window.addKeyCallback(std::bind(&InputManager::keyCallback, this, _1, _2, _3, _4));
-		m_mouseButtonCallbackId = m_window.addMouseButtonCallback(std::bind(&InputManager::mouseButtonCallback, this, _1, _2, _3));
+		m_keyCallbackId = m_window.m_keyEvent.subscribe(std::bind(&InputManager::keyCallback, this, _1, _2, _3, _4));
+		m_mouseButtonCallbackId = m_window.m_mouseButtonEvent.subscribe(std::bind(&InputManager::mouseButtonCallback, this, _1, _2, _3));
 	}
 
 	InputManager::~InputManager()
 	{
-		m_window.removeKeyCallback(m_keyCallbackId);
-		m_window.removeKeyCallback(m_mouseButtonCallbackId);
+		m_window.m_keyEvent.unsubscribe(m_keyCallbackId);
+		m_window.m_mouseButtonEvent.unsubscribe(m_mouseButtonCallbackId);
 	}
 
 	bool InputManager::isKeyDown(const EKey key) const

@@ -26,14 +26,21 @@ namespace LibGL::Demo
 				CAM_NEAR, CAM_FAR))
 		)
 	{
-		m_camera->setClearColor(Color::blue).setClearColorBuffer(true).setClearDepthBuffer(true);
+		const auto resizeFunc = [&](const Window::dimensions_t size)
+		{
+			m_renderer->setViewPort(0, 0, size.first, size.second);
+			m_camera->setProjectionMatrix(Matrix4::perspectiveProjection(90_deg,
+				static_cast<float>(size.first) / static_cast<float>(size.second),
+				CAM_NEAR, CAM_FAR));
+		};
+
+		m_window->m_resizeEvent.subscribe(resizeFunc);
+		m_camera->setClearColor(Color::skyBlue).setClearColorBuffer(true).setClearDepthBuffer(true);
 		Camera::setCurrent(*m_camera);
 
 		ServiceLocator::provide<InputManager>(*m_inputManager);
 		ServiceLocator::provide<ResourceManager>(*m_resourceManager);
 		ServiceLocator::provide<Renderer>(*m_renderer);
-
-		m_renderer->setClearColor(0.f, 0.f, 1.f);
 
 		// Enable back-face culling
 		m_renderer->setCapability(ERenderingCapability::CULL_FACE, true);

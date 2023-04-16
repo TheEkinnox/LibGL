@@ -11,12 +11,13 @@ namespace LibGL::Rendering
 {
 	struct Light
 	{
-		Color	m_ambient	= Color::black;
-		Color	m_diffuse	= Color::black;
-		Color	m_specular	= Color::black;
+		/**
+		 * \brief The light's color (alpha is intensity)
+		 */
+		Color	m_color	= Color::white;
 
 		Light() = default;
-		Light(const Color& ambient, const Color& diffuse, const Color& specular);
+		Light(const Color& color);
 		Light(const Light&) = default;
 		Light(Light&&) = default;
 		virtual ~Light() = default;
@@ -34,7 +35,7 @@ namespace LibGL::Rendering
 		virtual void setupUniform(const std::string& uniformName, const Resources::Shader& shader) const;
 	};
 
-	struct DirectionalLight : Light
+	struct DirectionalLight final : Light
 	{
 		LibMath::Vector3	m_direction;
 
@@ -62,9 +63,13 @@ namespace LibGL::Rendering
 		float	m_constant = 1;
 		float	m_linear = 0;
 		float	m_quadratic = 0;
+
+		AttenuationData() = default;
+		explicit AttenuationData(float range);
+		AttenuationData(float constant, float linear, float quadratic);
 	};
 
-	struct PointLight : Light
+	struct PointLight final : Light
 	{
 		LibMath::Vector3	m_position;
 		AttenuationData		m_attenuationData;
@@ -90,20 +95,24 @@ namespace LibGL::Rendering
 		void setupUniform(const std::string& uniformName, const Resources::Shader& shader) const override;
 	};
 
-	struct SpotLight : Light
+	struct Cutoff
+	{
+		float m_inner;
+		float m_outer;
+	};
+
+	struct SpotLight final : Light
 	{
 		LibMath::Vector3	m_position;
 		LibMath::Vector3	m_direction;
 
 		AttenuationData		m_attenuationData;
-
-		float				m_cutOff = 0;
-		float				m_outerCutoff = 0;
+		Cutoff				m_cutoff { 0, 0 };
 
 		SpotLight() = default;
 		SpotLight(const Light& light, const LibMath::Vector3& position,
 			const LibMath::Vector3& direction, const AttenuationData& attenuationData,
-			float cutOff, float outerCutOff);
+			const Cutoff& cutoff);
 
 		SpotLight(const SpotLight&) = default;
 		SpotLight(SpotLight&&) = default;

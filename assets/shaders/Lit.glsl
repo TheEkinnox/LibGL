@@ -32,18 +32,14 @@ void main()
 
 struct DirLight
 {
-	vec4	ambient;
-	vec4	diffuse;
-	vec4	specular;
+	vec4	color;
 
 	vec3	direction;
 };
 
 struct PointLight
 {
-	vec4	ambient;
-	vec4	diffuse;
-	vec4	specular;
+	vec4	color;
 
 	vec3	position;
 
@@ -54,9 +50,7 @@ struct PointLight
 
 struct SpotLight
 {
-	vec4	ambient;
-	vec4	diffuse;
-	vec4	specular;
+	vec4	color;
 
 	vec3	position;
 	vec3	direction;
@@ -65,15 +59,21 @@ struct SpotLight
 	float	linear;
 	float	quadratic;
 
-	float	cutOff;
-	float	outerCutOff;
+	float	cutoff;
+	float	outerCutoff;
 };
 
 struct Material
 {
+	vec4		tint;
+	vec4		specularColor;
+	vec2		uvOffset;
+	vec2		uvScale;
 	sampler2D	diffuse;
 	sampler2D	specular;
+	sampler2D	normal;
 	float		shininess;
+	int			usedMaps;
 };
 
 in VS_OUT
@@ -85,51 +85,71 @@ in VS_OUT
 
 out vec4 FragColor;
 
-in vec2 TexCoord;
-in vec3 Normal;
-in vec3 FragPos;
+uniform vec4		u_ambient;
+uniform DirLight	u_dirLight;
+uniform PointLight	u_pointLights[NB_POINT_LIGHTS];
+uniform SpotLight	u_spotLight;
 
-uniform vec3 viewPos;
-uniform DirLight dirLight;
-uniform PointLight pointLights[NB_POINT_LIGHTS];
-uniform SpotLight spotLight;
+uniform vec3		u_viewPos;
 
-uniform Material _material;
-
-uniform vec3 u_viewPos;
-
-uniform Material u_material;
+uniform Material	u_material;
 
 vec3 g_normal;
 vec3 g_viewDir;
 vec4 g_diffColor;
 vec4 g_specColor;
 
-vec3 calculateBlinnPhong(vec3 lightDir, vec4 ambient, vec4 diffuse, vec4 specular);
+int  unpack(int data, int offset, int bitCount);
+vec3 calculateBlinnPhong(vec3 lightDir, vec4 diffuse, vec4 specular);
 vec3 calculateDirLight(DirLight light);
 vec3 calculatePointLight(PointLight light);
 vec3 calculateSpotLight(SpotLight light);
 
 void main()
 {
-	g_normal = normalize(fs_in.Normal);
+	vec2 texCoords = fs_in.TexCoords * u_material.uvScale + u_material.uvOffset;
+
+	bool useNormalMap = unpack(u_material.usedMaps, 0, 1) == 1;
+	bool useSpecMap = unpack(u_material.usedMaps, 1, 1) == 1;
+	bool useDiffuseMap = unpack(u_material.usedMaps, 2, 1) == 1;
+
+	// TODO: Implement normal mapping properly
+	if (useNormalMap)
+		g_normal = normalize(texture(u_material.normal, texCoords).rgb);
+	else
+		g_normal = normalize(fs_in.Normal);
+
+	if (useSpecMap)
+		g_specColor = texture(u_material.specular, texCoords);
+	else
+		g_specColor = u_material.specularColor;
+
+	if (useDiffuseMap)
+		g_diffColor = texture(u_material.diffuse, texCoords) * u_material.tint;
+	else
+		g_diffColor = u_material.tint;
+
 	g_viewDir = normalize(u_viewPos - fs_in.FragPos);
-	g_diffColor = texture(u_material.diffuse, fs_in.TexCoords);
-	g_specColor = texture(u_material.specular, fs_in.TexCoords);
 
-	vec3 litColor = vec3(0);
+	vec3 litColor = u_ambient.rgb * g_diffColor.rgb;
 
-	litColor += calculateDirLight(dirLight);
+	litColor += calculateDirLight(u_dirLight);
 
 	for (int i = 0; i < NB_POINT_LIGHTS; i++)
-		litColor += calculatePointLight(pointLights[i]);
+		litColor += calculatePointLight(u_pointLights[i]);
 
-	litColor += calculateSpotLight(spotLight);
+	litColor += calculateSpotLight(u_spotLight);
 
 	FragColor = vec4(litColor, g_diffColor.w);
 }
 
-vec3 calculateBlinnPhong(vec3 lightDir, vec4 ambient, vec4 diffuse, vec4 specular)
+int unpack(int data, int offset, int bitCount)
+{
+	int mask = (1 << bitCount) - 1;
+	return (data >> offset) & mask;
+}
+
+vec3 calculateBlinnPhong(vec3 lightDir, vec4 lightColor)
 {
 	float lambertian = max(dot(lightDir, g_normal), 0);
 	float specularIntensity = 0;
@@ -142,18 +162,17 @@ vec3 calculateBlinnPhong(vec3 lightDir, vec4 ambient, vec4 diffuse, vec4 specula
 		specularIntensity = pow(specularAngle, u_material.shininess);
 	}
 
-	vec3 ambientColor = ambient.xyz * g_diffColor.xyz;
-	vec3 diffuseColor = diffuse.xyz * g_diffColor.xyz;
-	vec3 specularColor = specular.xyz * g_specColor.xyz;
+	vec3 diffuseColor = lightColor.rgb * g_diffColor.rgb * lambertian;
+	vec3 specColor = lightColor.rgb * g_specColor.rgb * specularIntensity;
 
-	return (ambientColor + diffuseColor * lambertian + specularColor * specularIntensity);
+	return (diffuseColor + specColor) * lightColor.a;
 }
 
 vec3 calculateDirLight(DirLight light)
 {
 	vec3 lightDir = normalize(-light.direction);
 
-	return calculateBlinnPhong(lightDir, light.ambient, light.diffuse, light.specular);
+	return calculateBlinnPhong(lightDir, light.color);
 }
 
 vec3 calculatePointLight(PointLight light)
@@ -164,7 +183,7 @@ vec3 calculatePointLight(PointLight light)
 	float attenuation = 1.0 / (light.constant + light.linear * distance +
 				 light.quadratic * (distance * distance));
 
-	return calculateBlinnPhong(lightDir, light.ambient, light.diffuse, light.specular) * attenuation;
+	return calculateBlinnPhong(lightDir, light.color) * attenuation;
 }
 
 vec3 calculateSpotLight(SpotLight light)
@@ -174,18 +193,15 @@ vec3 calculateSpotLight(SpotLight light)
 
 	float spotAngle = dot(lightDir, spotDir);
 
-	if (spotAngle < light.outerCutOff)
+	if (spotAngle < light.outerCutoff)
 		return vec3(0);
 
-	float epsilon = light.cutOff - light.outerCutOff;
-	float intensity = clamp((spotAngle - light.outerCutOff) / epsilon, 0.0, 1.0);
-
-	if (epsilon == 0.0)
-		return vec3(0);
+	float epsilon = light.cutoff - light.outerCutoff;
+	float intensity = clamp((spotAngle - light.outerCutoff) / epsilon, 0.0, 1.0);
 
 	float distance = length(light.position - fs_in.FragPos);
 	float attenuation = 1.0 / (light.constant + light.linear * distance +
 				light.quadratic * (distance * distance));
 
-	return calculateBlinnPhong(lightDir, light.ambient, light.diffuse, light.specular) * attenuation * intensity;
+	return calculateBlinnPhong(lightDir, light.color) * attenuation * intensity;
 }

@@ -3,16 +3,14 @@
 
 namespace LibGL::Rendering
 {
-	Light::Light(const Color& ambient, const Color& diffuse, const Color& specular)
-		: m_ambient(ambient), m_diffuse(diffuse), m_specular(specular)
+	Light::Light(const Color& color) :
+		m_color(color)
 	{
 	}
 
 	void Light::setupUniform(const std::string& uniformName, const Resources::Shader& shader) const
 	{
-		shader.setUniformVec4(uniformName + ".ambient", m_ambient.rgba());
-		shader.setUniformVec4(uniformName + ".diffuse", m_diffuse.rgba());
-		shader.setUniformVec4(uniformName + ".specular", m_specular.rgba());
+		shader.setUniformVec4(uniformName + ".color", m_color.rgba());
 	}
 
 	DirectionalLight::DirectionalLight(const Light& light, const LibMath::Vector3& direction)
@@ -25,6 +23,16 @@ namespace LibGL::Rendering
 		Light::setupUniform(uniformName, shader);
 
 		shader.setUniformVec3(uniformName + ".direction", m_direction);
+	}
+
+	AttenuationData::AttenuationData(const float range) :
+		AttenuationData(1.f, 4.5f / range, 75.f / (range * range))
+	{
+	}
+
+	AttenuationData::AttenuationData(const float constant, const float linear, const float quadratic) :
+		m_constant(constant), m_linear(linear), m_quadratic(quadratic)
+	{
 	}
 
 	PointLight::PointLight(const Light& light, const LibMath::Vector3& position,
@@ -46,9 +54,9 @@ namespace LibGL::Rendering
 
 	SpotLight::SpotLight(const Light& light, const LibMath::Vector3& position,
 		const LibMath::Vector3& direction, const AttenuationData& attenuationData,
-		const float cutOff, const float outerCutOff)
+		const Cutoff& cutoff)
 		: Light(light), m_position(position),m_direction(direction),
-		m_attenuationData(attenuationData), m_cutOff(cutOff), m_outerCutoff(outerCutOff)
+		m_attenuationData(attenuationData), m_cutoff(cutoff)
 	{
 	}
 
@@ -59,8 +67,8 @@ namespace LibGL::Rendering
 		shader.setUniformVec3(uniformName + ".position", m_position);
 		shader.setUniformVec3(uniformName + ".direction", m_direction);
 
-		shader.setUniformFloat(uniformName + ".cutOff", m_cutOff);
-		shader.setUniformFloat(uniformName + ".outerCutOff", m_outerCutoff);
+		shader.setUniformFloat(uniformName + ".cutoff", m_cutoff.m_inner);
+		shader.setUniformFloat(uniformName + ".outerCutoff", m_cutoff.m_outer);
 
 		shader.setUniformFloat(uniformName + ".constant", m_attenuationData.m_constant);
 		shader.setUniformFloat(uniformName + ".linear", m_attenuationData.m_linear);

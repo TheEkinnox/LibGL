@@ -95,9 +95,29 @@ namespace LibGL::Demo
 		const Texture* diabloSpecular = resourceManager.getOrCreate<Texture>("meshes/diablo3_pose/diablo3_pose_spec.tga");
 		ASSERT(diabloSpecular != nullptr);
 
-		const Material floorMat(*shader, floorDiffuse, floorSpecular, 32.f);
-		const Material headMat(*shader, headDiffuse, headSpecular, 8.f);
-		const Material diabloMat(*shader, diabloDiffuse, diabloSpecular, 16.f);
+		const Material floorMat(
+			*shader,
+			{ floorDiffuse, floorSpecular, nullptr },
+			{ Vector2(.5f), Vector2(2.f)},
+			{ Color(.25f, .6f, .9f)},
+			32.f
+		);
+
+		const Material headMat(
+			*shader,
+			{ headDiffuse, headSpecular, nullptr },
+			{ Vector2::zero(), Vector2::one() },
+			{ { .52f, .32f, .22f } },
+			8.f
+		);
+
+		const Material diabloMat(
+			*shader,
+			{ diabloDiffuse, diabloSpecular, nullptr },
+			{ Vector2::zero(), Vector2::one() },
+			{ Color::white },
+			16.f
+		);
 
 		// Place the meshes
 		Mesh mesh(nullptr, *floorModel, floorMat);
@@ -114,56 +134,45 @@ namespace LibGL::Demo
 		m_scene.addNode(mesh);
 
 		// Setup the lights
+		m_ambientLight = Color(.05f, .05f, .05f, 100.f);
+
 		m_dirLight =
 		{
-			{
-				Vector4(.05f, .05f, .05f, 1),
-				Vector4(.1f, .1f, .1f, 1),
-				Vector4(.1f, .1f, .1f, 1),
-			},
-			Vector3(0, -1, 0)
-		};
-
-		const Light pointLightBase
-		{
-			Vector4(.1f, 0.f, .1f, 1),
-			Vector4(0.4f, 0.f, .4f, 1),
-			Vector4(0.5f, 0.f, .5f, 1),
+			Color::skyBlue,
+			Vector3::down()
 		};
 
 		m_pointLights[0] =
 		{
-			pointLightBase,
+			Color::magenta,
 			{ -1, 0, 1 },
-			{ 1.f, .7f, 1.8f }
+			AttenuationData(16)
 		};
 
 		m_pointLights[1] =
 		{
-			pointLightBase,
+			Color::magenta,
 			{ 1, 0, 1 },
-			{ 1.f, .7f, 1.8f }
+			AttenuationData(16)
 		};
 
 		m_pointLights[2] =
 		{
-			pointLightBase,
+			Color::magenta,
 			{ 0, 0, -1 },
-			{ 1.f, .7f, 1.8f }
+			AttenuationData(16)
 		};
 
 		m_spotLight =
 		{
-			{
-				Vector4(.15f, .15f, .15f, 1),
-				Vector4(.6f, .6f, .6f, 1),
-				Vector4(.75f, .75f, .75f, 1),
-			},
+			Color(1, 1, 1, 8),
 			camera.getPosition(),
 			camera.forward(),
-			{ 1.f, .35f, .44f },
-			cos(25_deg),
-			cos(30_deg),
+			AttenuationData(10),
+			{
+				cos(0_deg),
+				cos(30_deg)
+			}
 		};
 	}
 
@@ -333,18 +342,20 @@ namespace LibGL::Demo
 		// Setup camera
 		shader->setUniformVec3("u_viewPos", Camera::getCurrent().getGlobalTransform().getPosition());
 
+		m_ambientLight.setupUniform("u_ambientLight", *shader);
+
 		// Setup directional light
-		m_dirLight.setupUniform("dirLight", *shader);
+		m_dirLight.setupUniform("u_dirLight", *shader);
 
 		// Setup point lights
 		for (size_t i = 0; i < NB_POINT_LIGHTS; i++)
 		{
-			const std::string prefix = formatString("pointLights[%i]", i);
+			const std::string prefix = formatString("u_pointLights[%i]", i);
 			m_pointLights[i].setupUniform(prefix, *shader);
 		}
 
 		// Setup spot light
-		m_spotLight.setupUniform("spotLight", *shader);
+		m_spotLight.setupUniform("u_spotLight", *shader);
 
 		Shader::unbind();
 	}

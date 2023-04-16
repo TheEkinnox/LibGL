@@ -9,6 +9,10 @@
 #define STBI_ASSERT(x) ASSERT(x)
 #include <stb_image.h>
 
+#include "Vector/Vector4.h"
+
+using namespace LibGL::Rendering;
+
 LibGL::Resources::Texture::Texture(const std::filesystem::path& fileName)
 {
 	if (!Texture::loadFromFile(fileName.string()))
@@ -62,6 +66,32 @@ LibGL::Resources::Texture& LibGL::Resources::Texture::operator=(Texture&& other)
 	return *this;
 }
 
+LibGL::Resources::Texture& LibGL::Resources::Texture::getDefault()
+{
+	static Texture texture;
+
+	if (texture.m_id == 0)
+	{
+		texture.m_width = 1;
+		texture.m_height = 1;
+		texture.m_channels = 4;
+
+		glGenTextures(1, &texture.m_id);
+		glBindTexture(GL_TEXTURE_2D, texture.m_id);
+
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture.m_width, texture.m_height,
+			0, texture.getGLFormat(), GL_FLOAT, LibMath::Vector4(1).getArray());
+
+		texture.setWrapModeU(ETextureWrapMode::REPEAT);
+		texture.setWrapModeV(ETextureWrapMode::REPEAT);
+
+		texture.setMinFilter(ETextureFilter::NEAREST);
+		texture.setMagFilter(ETextureFilter::NEAREST);
+	}
+
+	return texture;
+}
+
 bool LibGL::Resources::Texture::loadFromFile(const std::string& fileName)
 {
 	stbi_set_flip_vertically_on_load(true);
@@ -80,25 +110,48 @@ bool LibGL::Resources::Texture::loadFromFile(const std::string& fileName)
 		GL_UNSIGNED_BYTE, data);
 
 	glGenerateMipmap(GL_TEXTURE_2D);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	setMinFilter(ETextureFilter::LINEAR_MIPMAP_LINEAR);
 
 	stbi_image_free(data);
 
 	return true;
 }
 
-void LibGL::Resources::Texture::use() const
+void LibGL::Resources::Texture::bind(const uint8_t slot) const
 {
+	glActiveTexture(GL_TEXTURE0 + slot);
 	glBindTexture(GL_TEXTURE_2D, m_id);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, static_cast<GLint>(m_wrapModeU));
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, static_cast<GLint>(m_wrapModeV));
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, static_cast<GLint>(m_minFilter));
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, static_cast<GLint>(m_magFilter));
 }
 
-void LibGL::Resources::Texture::unbind()
+void LibGL::Resources::Texture::unbind(const uint8_t slot)
 {
+	glActiveTexture(GL_TEXTURE0 + slot);
 	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void LibGL::Resources::Texture::setWrapModeU(const ETextureWrapMode wrapMode)
+{
+	m_wrapModeU = wrapMode;
+}
+
+void LibGL::Resources::Texture::setWrapModeV(const ETextureWrapMode wrapMode)
+{
+	m_wrapModeV = wrapMode;
+}
+
+void LibGL::Resources::Texture::setMinFilter(const ETextureFilter textureFilter)
+{
+	m_minFilter = textureFilter;
+}
+
+void LibGL::Resources::Texture::setMagFilter(const ETextureFilter textureFilter)
+{
+	m_magFilter = textureFilter;
 }
 
 uint32_t LibGL::Resources::Texture::getGLFormat() const

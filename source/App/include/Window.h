@@ -1,5 +1,4 @@
 #pragma once
-#include <functional>
 #include <stdexcept>
 #include <unordered_map>
 
@@ -8,6 +7,7 @@
 #include "EKeyState.h"
 #include "EMouseButton.h"
 #include "EMouseButtonState.h"
+#include "Eventing/Event.h"
 #include "Vector/Vector2.h"
 
 // Forward declaration of GLFWwindow to avoid including glfw in the header
@@ -36,8 +36,10 @@ namespace LibGL::Application
 	public:
 		using dimensions_t = std::pair<int, int>;
 		using pos_t = std::pair<int, int>;
-		using key_callback_t = std::function<void(EKey key, int scanCode, EKeyState action, EInputModifier mods)>;
-		using mouse_callback_t = std::function<void(EMouseButton button, EMouseButtonState action, EInputModifier mods)>;
+
+		Event<EKey, int, EKeyState, EInputModifier>				m_keyEvent;
+		Event<EMouseButton, EMouseButtonState, EInputModifier>	m_mouseButtonEvent;
+		Event<dimensions_t>										m_resizeEvent;
 
 		/**
 		 * \brief Creates a GLFW window
@@ -139,32 +141,6 @@ namespace LibGL::Application
 		bool shouldClose() const;
 
 		/**
-		 * \brief Registers the given keyboard input callback and returns it's id
-		 * \param callback The keyboard input callback to register
-		 * \return The id of the added callback
-		 */
-		uint64_t addKeyCallback(const key_callback_t& callback);
-
-		/**
-		 * \brief Removes the key callback with the given id.
-		 * \param callbackId The id of the callback to remove.
-		 */
-		void removeKeyCallback(uint64_t callbackId);
-
-		/**
-		 * \brief Registers the given mouse button callback and returns it's id
-		 * \param callback The mouse button callback to register
-		 * \return The id of the added callback
-		 */
-		uint64_t addMouseButtonCallback(const mouse_callback_t& callback);
-
-		/**
-		 * \brief Removes the mouse button callback with the given id.
-		 * \param callbackId The id of the callback to remove.
-		 */
-		void removeMouseButtonCallback(uint64_t callbackId);
-
-		/**
 		 * \brief Swaps the render buffers
 		 */
 		void swapBuffers() const;
@@ -177,12 +153,6 @@ namespace LibGL::Application
 
 	private:
 		inline static std::unordered_map<GLFWwindow*, Window*> s_windowsMap;
-
-		std::unordered_map<uint64_t, key_callback_t>	m_keyCallbacks;
-		std::unordered_map<uint64_t, mouse_callback_t>	m_mouseCallbacks;
-
-		uint64_t			m_currentKeyCallbackId = 1;
-		uint64_t			m_currentMouseCallbackId = 1;
 
 		std::string			m_title;
 		dimensions_t		m_size;

@@ -23,9 +23,10 @@ namespace LibGL::DataStructure
 		/**
 		 * \brief Adds the given node to the graph
 		 * \param node The node to add to the graph
+		 * \return A reference to the added node
 		 */
 		template <typename DataT>
-		void addNode(DataT& node);
+		DataT& addNode(DataT& node);
 
 		/**
 		 * \brief Removes the given node from the graph
@@ -35,7 +36,7 @@ namespace LibGL::DataStructure
 
 		/**
 		 * \brief Gets the graph's root nodes list
-		 * \return A reference to the graph's root nodes list
+		 * \return The graph's root nodes list
 		 */
 		std::vector<std::shared_ptr<NodeT>> getNodes();
 
