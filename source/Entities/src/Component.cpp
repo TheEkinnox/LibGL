@@ -26,6 +26,16 @@ namespace LibGL
 		return *this;
 	}
 
+	bool Component::operator==(const Component& other) const
+	{
+		return m_id == other.m_id;
+	}
+
+	bool Component::operator!=(const Component& other) const
+	{
+		return !(*this == other);
+	}
+
 	Component::~Component()
 	{
 		m_owner.removeComponent(*this);
@@ -44,6 +54,11 @@ namespace LibGL
 		m_isActive = active;
 
 		m_isActive ? onEnable() : onDisable();
+	}
+
+	Component::ComponentId Component::getId() const
+	{
+		return m_id;
 	}
 
 	Entity& Component::getOwner() const

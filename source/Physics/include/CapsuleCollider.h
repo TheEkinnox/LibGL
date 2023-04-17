@@ -44,6 +44,14 @@ namespace LibGL::Physics
 		bool check(const LibMath::Vector3& point) const override;
 
 		/**
+		 * \brief Checks if a given ray is colliding with the collider.
+		 * \param ray The ray to check collision for.
+		 * \return True if the ray is colliding with the collider.
+		 * False otherwise.
+		 */
+		bool check(const Ray& ray) const override;
+
+		/**
 		 * \brief Checks if a given collider is colliding with the capsule collider.
 		 * \param other The collider to check collision for.
 		 * \return True if the collider is colliding with the capsule collider.
@@ -74,6 +82,13 @@ namespace LibGL::Physics
 		 * False otherwise.
 		 */
 		bool checkCapsule(const CapsuleCollider& other) const;
+
+		/**
+		 * \brief Computes the closest point to the given position inside the collider
+		 * \param point The point of which we want the closest in-bounds point
+		 * \return The closest point to the given position in the collider
+		 */
+		LibMath::Vector3 getClosestPoint(const LibMath::Vector3& point) const override;
 
 	private:
 		LibMath::Vector3	m_center = LibMath::Vector3::zero();

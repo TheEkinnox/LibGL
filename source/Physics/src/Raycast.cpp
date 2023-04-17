@@ -1,0 +1,49 @@
+#include "Raycast.h"
+
+#include "Arithmetic.h"
+#include "ICollider.h"
+
+using namespace LibMath;
+
+namespace LibGL::Physics
+{
+	bool raycast(const Vector3& origin, const Vector3& direction,
+		const float maxDistance)
+	{
+		RaycastHit tmp;
+		return raycast(origin, direction, tmp, maxDistance);
+	}
+
+	bool raycast(const Vector3& origin, const Vector3& direction,
+		RaycastHit& hitInfo, const float maxDistance)
+	{
+		const Vector3 dir = direction.normalized();
+		const auto colliders = ICollider::getColliders();
+		const Ray ray{ origin, dir };
+		const float maxDistanceSqr = maxDistance * maxDistance;
+
+		for (const auto& collider : colliders)
+		{
+			if (collider == nullptr || !collider->isActive())
+				continue;
+
+			// TODO: Handle distance properly
+			const float distanceSqr = origin.distanceSquaredFrom(collider->getClosestPoint(origin));
+
+			if (distanceSqr > maxDistanceSqr || distanceSqr >= hitInfo.m_distance ||
+				!collider->check(ray))
+				continue;
+
+			hitInfo.m_collider = collider;
+			hitInfo.m_distance = distanceSqr;
+		}
+
+		if (hitInfo.m_collider != nullptr)
+		{
+			hitInfo.m_distance = squareRoot(hitInfo.m_distance);
+			hitInfo.m_position = origin + dir * hitInfo.m_distance;
+		}
+
+		return hitInfo.m_collider != nullptr;
+	}
+}

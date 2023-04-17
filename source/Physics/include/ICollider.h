@@ -11,12 +11,45 @@ namespace LibGL
 
 namespace LibGL::Physics
 {
+	struct Ray
+	{
+		LibMath::Vector3	m_origin;
+		LibMath::Vector3	m_direction;
+
+		/**
+		 * \brief Gets the closest point on the ray from the given position
+		 * \param point The point to check against
+		 * \return The closest point to the given position on the ray
+		 */
+		LibMath::Vector3 getClosestPoint(const LibMath::Vector3& point) const;
+
+		/**
+		 * \brief Gets the closest points between the given and current rays
+		 * \param other The ray to check against
+		 * \return The closest points between the given and current rays
+		 */
+		std::pair<LibMath::Vector3, LibMath::Vector3> getClosestPoints(const Ray& other) const;
+
+		/**
+		 * \brief Calculates the squared distance between the ray and the given point
+		 * \param point The point to check against
+		 * \return The squared distance between the ray and the given point
+		 */
+		float	distanceSquaredFrom(const LibMath::Vector3& point) const;
+
+		/**
+		 * \brief Calculates the squared distance between the current and received ray
+		 * \param other The ray to check against
+		 * \return The squared distance between the current and received ray
+		 */
+		float	distanceSquaredFrom(const Ray& other) const;
+	};
+
 	struct Bounds
 	{
-		LibMath::Vector3 m_center;
-		LibMath::Vector3 m_size;
-
-		float getSphereRadius() const;
+		LibMath::Vector3	m_center;
+		LibMath::Vector3	m_boxSize;
+		float				m_sphereRadius;
 	};
 
 	class ICollider : public Component
@@ -24,6 +57,10 @@ namespace LibGL::Physics
 	public:
 		virtual ~ICollider() override;
 
+		/**
+		 * \brief Gets the collider's bounding data in world space
+		 * \return The collider's bounds in world space
+		 */
 		Bounds getBounds() const;
 
 		/**
@@ -32,7 +69,15 @@ namespace LibGL::Physics
 		 * \return True if the point is colliding with the collider.
 		 * False otherwise.
 		 */
-		virtual bool check(const LibMath::Vector3& point) const = 0;
+		virtual bool check(const LibMath::Vector3& point) const;
+
+		/**
+		 * \brief Checks if a given ray is colliding with the collider.
+		 * \param ray The ray to check collision for.
+		 * \return True if the ray is colliding with the collider.
+		 * False otherwise.
+		 */
+		virtual bool check(const Ray& ray) const;
 
 		/**
 		 * \brief Checks if a collider is colliding with the current collider.
@@ -42,7 +87,18 @@ namespace LibGL::Physics
 		 */
 		virtual bool check(const ICollider& other) const;
 
-		static std::vector<const ICollider*> getColliders();
+		/**
+		 * \brief Computes the closest point to the given position inside the collider
+		 * \param point The point of which we want the closest in-bounds point
+		 * \return The closest point to the given position in the collider
+		 */
+		virtual LibMath::Vector3 getClosestPoint(const LibMath::Vector3& point) const = 0;
+
+		/**
+		 * \brief Gets a list of all loaded colliders
+		 * \return A list of all loaded colliders
+		 */
+		static std::vector<ICollider*> getColliders();
 
 	protected:
 		ICollider(Entity& owner, const Bounds& bounds);

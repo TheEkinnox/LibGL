@@ -15,7 +15,7 @@ namespace LibGL
 	{
 		static_assert(std::is_same_v<Component, T> || std::is_base_of_v<Component, T>);
 
-		m_components.push_back(std::make_shared<T>(args...));
+		m_components.push_back(std::make_shared<T>(*this, args...));
 
 		return static_cast<T&>(*m_components.back());
 	}
@@ -31,15 +31,15 @@ namespace LibGL
 
 	inline void Entity::removeComponent(const Component& component)
 	{
-		const auto findIfFunc = [component](const ComponentPtr& ptr)
+		if (m_components.empty())
+			return;
+
+		const auto findFunc = [component](const ComponentPtr& ptr)
 		{
-			return ptr.get() == &component;
+			return *ptr == component;
 		};
 
-		const auto found = std::ranges::find_if(m_components, findIfFunc);
-
-		if (found != m_components.end())
-			m_components.erase(found);
+		std::erase_if(m_components, findFunc);
 	}
 
 	inline void Entity::update()
@@ -57,6 +57,18 @@ namespace LibGL
 		for (const auto& component : m_components)
 		{
 			if (typeid(component.get()) == typeid(T*))
+				return static_cast<T*>(component.get());
+		}
+
+		return nullptr;
+	}
+
+	template <typename T>
+	T* Entity::getComponent(const Component::ComponentId id)
+	{
+		for (const auto& component : m_components)
+		{
+			if (id == component->m_id && typeid(component.get()) == typeid(T*))
 				return static_cast<T*>(component.get());
 		}
 

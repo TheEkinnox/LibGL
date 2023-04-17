@@ -29,6 +29,9 @@ namespace LibGL
 		T* getComponent();
 
 		template <typename T>
+		T* getComponent(Component::ComponentId id);
+
+		template <typename T>
 		std::vector<std::shared_ptr<T>> getComponents();
 
 		virtual void update() override;
