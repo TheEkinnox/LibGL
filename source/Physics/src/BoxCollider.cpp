@@ -1,8 +1,9 @@
+#include "Arithmetic.h"
 #include "BoxCollider.h"
 #include "SphereCollider.h"
 #include "CapsuleCollider.h"
 
-#include "Arithmetic.h"
+#include "Vector/Vector3.h"
 #include "Debug/Log.h"
 
 using namespace LibMath;
@@ -94,12 +95,16 @@ namespace LibGL::Physics
 		const auto min = center - size;
 		const auto max = center + size;
 
-		return
-		{
-			clamp(point.m_x, min.m_x, max.m_x),
-			clamp(point.m_y, min.m_y, max.m_y),
-			clamp(point.m_z, min.m_z, max.m_z)
-		};
+		return clamp(point, min, max);
+	}
+
+	Vector3 BoxCollider::getClosestPointOnSurface(const Vector3& point) const
+	{
+		const auto [center, size, _] = getBounds();
+		const auto min = center - size;
+		const auto max = center + size;
+
+		return snap(point, min, max);
 	}
 
 	Bounds BoxCollider::calculateBounds(const Vector3& center, const Vector3& size)

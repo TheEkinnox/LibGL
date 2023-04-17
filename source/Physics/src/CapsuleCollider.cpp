@@ -1,8 +1,8 @@
+#include "Arithmetic.h"
 #include "CapsuleCollider.h"
 #include "BoxCollider.h"
 #include "SphereCollider.h"
 
-#include "Arithmetic.h"
 #include "Entity.h"
 #include "Debug/Log.h"
 #include "Matrix/Matrix4.h"
@@ -142,6 +142,20 @@ namespace LibGL::Physics
 	}
 
 	Vector3 CapsuleCollider::getClosestPoint(const Vector3& point) const
+	{
+		const auto [ center, _, halfHeight ] = getBounds();
+		const float radius = getRadius();
+
+		const Vector3 offset = getUpDirection() * (halfHeight - radius);
+		const Vector3 base = center - offset;
+		const Vector3 tip = center + offset;
+
+		const Vector3 centerPoint = getClosestPointOnSegment(point, base, tip);
+
+		return centerPoint + (point - centerPoint).normalized() * min(radius, centerPoint.distanceFrom(point));
+	}
+
+	Vector3 CapsuleCollider::getClosestPointOnSurface(const Vector3& point) const
 	{
 		const auto [ center, _, halfHeight ] = getBounds();
 		const float radius = getRadius();

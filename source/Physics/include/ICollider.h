@@ -95,6 +95,13 @@ namespace LibGL::Physics
 		virtual LibMath::Vector3 getClosestPoint(const LibMath::Vector3& point) const = 0;
 
 		/**
+		 * \brief Computes the closest point to the given position on the surface of the collider
+		 * \param point The point of which we want the closest on-surface point
+		 * \return The closest point to the given position on the surface of the collider
+		 */
+		virtual LibMath::Vector3 getClosestPointOnSurface(const LibMath::Vector3& point) const = 0;
+
+		/**
 		 * \brief Gets a list of all loaded colliders
 		 * \return A list of all loaded colliders
 		 */

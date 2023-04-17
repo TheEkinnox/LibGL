@@ -72,6 +72,13 @@ namespace LibGL::Physics
 		 */
 		LibMath::Vector3 getClosestPoint(const LibMath::Vector3& point) const override;
 
+		/**
+		 * \brief Computes the closest point to the given position on the surface of the collider
+		 * \param point The point of which we want the closest on-surface point
+		 * \return The closest point to the given position on the surface of the collider
+		 */
+		LibMath::Vector3 getClosestPointOnSurface(const LibMath::Vector3& point) const override;
+
 	private:
 		LibMath::Vector3	m_center;
 		float				m_radius;

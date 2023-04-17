@@ -1,3 +1,4 @@
+#include "Arithmetic.h"
 #include "SphereCollider.h"
 #include "CapsuleCollider.h"
 #include "BoxCollider.h"
@@ -78,6 +79,12 @@ namespace LibGL::Physics
 	Vector3 SphereCollider::getClosestPoint(const Vector3& point) const
 	{
 		const auto [ center, _, radius ] = getBounds();
+		return center + (point - center).normalized() * min(radius, center.distanceFrom(point));
+	}
+
+	Vector3 SphereCollider::getClosestPointOnSurface(const Vector3& point) const
+	{
+		const auto [center, _, radius] = getBounds();
 		return center + (point - center).normalized() * radius;
 	}
 }
