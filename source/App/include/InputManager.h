@@ -56,25 +56,11 @@ namespace LibGL::Application
 		static int getScanCode(EKey key);
 
 		/**
-		 * \brief Checks whether a given key is down
-		 * \param key The key to check
-		 * \return True if the key is down. False otherwise.
-		 */
-		bool isKeyDown(EKey key) const;
-
-		/**
 		 * \brief Checks whether a given key is up
 		 * \param key The key to check
 		 * \return True if the key is up. False otherwise
 		 */
 		bool isKeyUp(EKey key) const;
-
-		/**
-		 * \brief Checks whether the key with a given scan code is down
-		 * \param scanCode The scan code of the key to check
-		 * \return True if the key is down. False otherwise.
-		 */
-		bool isKeyDown(int scanCode) const;
 
 		/**
 		 * \brief Checks whether the key with a given scan code is up
@@ -84,27 +70,95 @@ namespace LibGL::Application
 		bool isKeyUp(int scanCode) const;
 
 		/**
-		 * \brief Checks whether a given mouse button is pressed
-		 * \param button The mouse button to check
-		 * \return True if the mouse button is pressed. False otherwise.
+		 * \brief Checks whether a given key is down
+		 * \param key The key to check
+		 * \return True if the key is down. False otherwise.
 		 */
-		bool isMouseButtonPressed(EMouseButton button) const;
+		bool isKeyDown(EKey key) const;
+
+		/**
+		 * \brief Checks whether the key with a given scan code is down
+		 * \param scanCode The scan code of the key to check
+		 * \return True if the key is down. False otherwise.
+		 */
+		bool isKeyDown(int scanCode) const;
+
+		/**
+		 * \brief Checks whether a given key was pressed during the current frame
+		 * \param key The key to check
+		 * \return True if the key was pressed during the current frame. False otherwise.
+		 */
+		bool isKeyPressed(EKey key) const;
+
+		/**
+		 * \brief Checks whether a given key was pressed during the current frame
+		 * \param scanCode The scan code of the key to check
+		 * \return True if the key was pressed during the current frame. False otherwise.
+		 */
+		bool isKeyPressed(int scanCode) const;
+
+		/**
+		 * \brief Checks whether a given key was released during the current frame
+		 * \param key The key to check
+		 * \return True if the key was released during the current frame. False otherwise.
+		 */
+		bool isKeyReleased(EKey key) const;
+
+		/**
+		 * \brief Checks whether a given key was released during the current frame
+		 * \param scanCode The scan code of the key to check
+		 * \return True if the key was released during the current frame. False otherwise.
+		 */
+		bool isKeyReleased(int scanCode) const;
 
 		/**
 		 * \brief Checks whether a given mouse button is released
 		 * \param button The mouse button to check
 		 * \return True if the mouse button is released. False otherwise.
 		 */
+		bool isMouseButtonUp(EMouseButton button) const;
+
+		/**
+		 * \brief Checks whether a given mouse button is pressed
+		 * \param button The mouse button to check
+		 * \return True if the mouse button is down. False otherwise.
+		 */
+		bool isMouseButtonDown(EMouseButton button) const;
+
+		/**
+		 * \brief Checks whether a given mouse button was released during the current frame
+		 * \param button The mouse button to check
+		 * \return True if the mouse button was pressed during the current frame. False otherwise.
+		 */
+		bool isMouseButtonPressed(EMouseButton button) const;
+
+		/**
+		 * \brief Checks whether a given mouse button was released during the current frame
+		 * \param button The mouse button to check
+		 * \return True if the mouse button was released during the current frame. False otherwise.
+		 */
 		bool isMouseButtonReleased(EMouseButton button) const;
 
 		/**
 		 * \brief Clears the cached input states
-		 * \note Call this after each frame to make pressed and released functions
+		 * \note Call this after each frame to make up and down functions
 		 * return true only if the action was performed in the same frame.
 		 */
 		void clearStates();
 
 	private:
+		struct KeyInfo
+		{
+			EKeyState			m_keyState;
+			size_t				m_stateChangeFrame;
+		};
+
+		struct MouseButtonInfo
+		{
+			EMouseButtonState	m_buttonState;
+			size_t				m_stateChangeFrame;
+		};
+
 		Window&				m_window;
 
 		LibMath::Vector2	m_mousePos;
@@ -115,9 +169,9 @@ namespace LibGL::Application
 		uint64_t			m_keyCallbackId = 0;
 		uint64_t			m_mouseButtonCallbackId = 0;
 
-		std::unordered_map<EKey, EKeyState>					m_keyStates;
-		std::unordered_map<int, EKeyState>					m_scanCodeStates;
-		std::unordered_map<EMouseButton, EMouseButtonState>	m_mouseButtonStates;
+		std::unordered_map<EKey, KeyInfo>					m_keyInfos;
+		std::unordered_map<int, KeyInfo>					m_scanCodeInfo;
+		std::unordered_map<EMouseButton, MouseButtonInfo>	m_mouseButtonInfo;
 
 		/**
 		 * \brief Window onKey callback - caches the given key's state

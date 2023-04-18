@@ -291,8 +291,8 @@ namespace LibGL::Demo
 		auto& inputManager = LGL_SERVICE(InputManager);
 		auto& camera = Camera::getCurrent();
 
-		if (!inputManager.isMouseButtonPressed(EMouseButton::MOUSE_BUTTON_LEFT) &&
-			!inputManager.isMouseButtonPressed(EMouseButton::MOUSE_BUTTON_RIGHT))
+		if (!inputManager.isMouseButtonDown(EMouseButton::MOUSE_BUTTON_LEFT) &&
+			!inputManager.isMouseButtonDown(EMouseButton::MOUSE_BUTTON_RIGHT))
 		{
 			LGL_SERVICE(Window).showCursor();
 			inputManager.resetFirstMouse();

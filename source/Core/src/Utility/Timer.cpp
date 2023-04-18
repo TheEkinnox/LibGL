@@ -27,6 +27,8 @@ namespace LibGL::Utility
 			m_unscaledTime += m_deltaTime;
 			m_time += m_deltaTime * m_timeScale;
 		}
+
+		m_frameCount++;
 	}
 
 	float Timer::getTime() const
@@ -57,5 +59,10 @@ namespace LibGL::Utility
 	void Timer::setTimeScale(const float timeScale)
 	{
 		m_timeScale = timeScale;
+	}
+
+	size_t Timer::getFrameCount() const
+	{
+		return m_frameCount;
 	}
 }
