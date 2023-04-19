@@ -44,7 +44,7 @@ namespace LibGL::Physics
 			m_velocity += force;
 			break;
 		default:
-			const std::string msg = formatString("Invalid force mode: %u", forceMode);
+			const std::string msg = formatString("Invalid force mode: %u\n", forceMode);
 			DEBUG_LOG(msg.c_str());
 			throw std::out_of_range(msg);
 		}

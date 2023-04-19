@@ -99,7 +99,7 @@ bool LibGL::Resources::Texture::loadFromFile(const std::string& fileName)
 
 	if (data == nullptr)
 	{
-		DEBUG_LOG("Unable to load texture from path \"%s\"", fileName.c_str());
+		DEBUG_LOG("Unable to load texture from path \"%s\"\n", fileName.c_str());
 		return false;
 	}
 
@@ -167,7 +167,7 @@ uint32_t LibGL::Resources::Texture::getGLFormat() const
 	case 4:
 		return GL_RGBA;
 	default:
-		DEBUG_LOG("Invalid channels count. Accepted 1, 2, 3 or 4 but received \"%d\".", m_channels);
+		DEBUG_LOG("Invalid channels count. Accepted 1, 2, 3 or 4 but received \"%d\".\n", m_channels);
 		throw std::out_of_range("Invalid channels count - Accepted 1, 2, 3 or 4. "
 			"Received \"" + std::to_string(m_channels) + "\".");
 	}
