@@ -38,7 +38,7 @@ namespace LibGL
 
 	Component::~Component()
 	{
-		m_owner.removeComponent(*this);
+		m_owner.removeComponent(m_id);
 	}
 
 	bool Component::isActive() const
@@ -64,5 +64,10 @@ namespace LibGL
 	Entity& Component::getOwner() const
 	{
 		return m_owner;
+	}
+
+	Component::Component(Entity& owner) :
+		m_owner(owner), m_id(s_currentId++)
+	{
 	}
 }

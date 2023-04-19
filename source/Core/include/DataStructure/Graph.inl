@@ -31,6 +31,7 @@ namespace LibGL::DataStructure
 	template <class NodeT>
 	void Graph<NodeT>::clear()
 	{
-		m_nodes.clear();
+		if (!m_nodes.empty())
+			m_nodes.clear();
 	}
 }

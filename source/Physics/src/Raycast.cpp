@@ -10,8 +10,8 @@ namespace LibGL::Physics
 	bool raycast(const Vector3& origin, const Vector3& direction,
 		const float maxDistance)
 	{
-		RaycastHit tmp;
-		return raycast(origin, direction, tmp, maxDistance);
+		RaycastHit discard;
+		return raycast(origin, direction, discard, maxDistance);
 	}
 
 	bool raycast(const Vector3& origin, const Vector3& direction,

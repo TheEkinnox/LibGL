@@ -51,7 +51,7 @@ namespace LibGL
 		Entity& getOwner() const;
 
 	protected:
-		explicit Component(Entity& owner) : m_owner(owner), m_id(s_currentId++) {}
+		explicit Component(Entity& owner);
 
 	private:
 		inline static ComponentId s_currentId = 0;

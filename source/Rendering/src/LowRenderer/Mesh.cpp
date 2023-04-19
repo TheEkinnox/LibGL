@@ -12,8 +12,8 @@ using namespace LibGL::Resources;
 
 namespace LibGL::Rendering
 {
-	Mesh::Mesh(SceneNode* parent, const Model& model, const Material& material)
-		: SceneNode(parent, Transform()), m_model(&model), m_material(material)
+	Mesh::Mesh(Entity* parent, const Model& model, const Material& material)
+		: Entity(parent, Transform()), m_model(&model), m_material(material)
 	{
 	}
 
@@ -59,6 +59,6 @@ namespace LibGL::Rendering
 	{
 		draw();
 
-		SceneNode::update();
+		Entity::update();
 	}
 }

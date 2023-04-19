@@ -8,26 +8,26 @@ namespace LibGL::Rendering
 	Camera* Camera::m_current = nullptr;
 
 	Camera::Camera()
-		: SceneNode(),
+		: Entity(),
 		m_projectionMatrix(Matrix4::orthographicProjection(-1, 1, -1, 1, -1, 1))
 	{
 		updateMatrices();
 	}
 
-	Camera::Camera(SceneNode* parent, const Transform& transform, Matrix4 projectionMatrix)
-		: SceneNode(parent, transform), m_projectionMatrix(std::move(projectionMatrix))
+	Camera::Camera(Entity* parent, const Transform& transform, Matrix4 projectionMatrix)
+		: Entity(parent, transform), m_projectionMatrix(std::move(projectionMatrix))
 	{
 		updateMatrices();
 	}
 
 	Camera::Camera(const Camera& other)
-		: SceneNode(other), m_projectionMatrix(other.m_projectionMatrix)
+		: Entity(other), m_projectionMatrix(other.m_projectionMatrix)
 	{
 		updateMatrices();
 	}
 
 	Camera::Camera(Camera&& other) noexcept
-		: SceneNode(std::move(other)),
+		: Entity(std::move(other)),
 		m_projectionMatrix(std::move(other.m_projectionMatrix))
 	{
 		updateMatrices();
@@ -140,7 +140,7 @@ namespace LibGL::Rendering
 
 	void Camera::onChange()
 	{
-		SceneNode::onChange();
+		Entity::onChange();
 		updateMatrices();
 	}
 

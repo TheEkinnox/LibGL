@@ -1,14 +1,14 @@
 #pragma once
-
-#include "Scene.h"
-#include "Component.h"
-
 #include <memory> // shared_ptr
 #include <vector>
 
+#include "Transform.h"
+#include "Component.h"
+#include "DataStructure/Node.h"
+
 namespace LibGL
 {
-	class Entity : public Resources::SceneNode
+	class Entity : public DataStructure::Node, public LibMath::Transform
 	{
 		typedef std::shared_ptr<Component> ComponentPtr;
 		typedef std::vector<ComponentPtr> ComponentList;
@@ -16,6 +16,18 @@ namespace LibGL
 	public:
 		Entity() = default;
 		Entity(Entity* parent, const Transform& transform);
+		Entity(const Entity&) = default;
+		Entity(Entity&&) noexcept = default;
+		~Entity() override;
+
+		Entity& operator=(const Entity&) = default;
+		Entity& operator=(Entity&&) noexcept = default;
+
+		/**
+		 * \brief Gets the entity's global transformation matrix
+		 * \return The entity's global transformation matrix
+		 */
+		Transform getGlobalTransform() const;
 
 		template <typename T, typename ... Args>
 		T& addComponent(Args&&... args);
@@ -24,6 +36,8 @@ namespace LibGL
 		void removeComponent();
 
 		void removeComponent(const Component& component);
+
+		void removeComponent(Component::ComponentId id);
 
 		template <typename T>
 		T* getComponent();
@@ -34,10 +48,34 @@ namespace LibGL
 		template <typename T>
 		std::vector<std::shared_ptr<T>> getComponents();
 
-		virtual void update() override;
+		/**
+		 * \brief Adds the given node as a child of the current node
+		 * \param child A pointer to the child to add to the current node
+		 */
+		void addChild(Node& child) override;
+
+		/**
+		 * \brief Removes the given node from this node's children
+		 * \param child A pointer to the child to remove from the node's children
+		 */
+		void removeChild(Node& child) override;
+
+		/**
+		 * \brief Updates the entity (does nothing by default)
+		 */
+		virtual void update();
+
+	protected:
+		/**
+		 * \brief Updates the entity's transformation matrices
+		 */
+		void onChange() override;
 
 	private:
 		ComponentList	m_components;
+		Transform		m_globalTransform;
+
+		void updateGlobalTransform();
 	};
 }
 

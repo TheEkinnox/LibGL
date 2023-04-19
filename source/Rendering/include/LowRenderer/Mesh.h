@@ -10,11 +10,11 @@ namespace LibGL::Resources
 
 namespace LibGL::Rendering
 {
-	class Mesh : public Resources::SceneNode
+	class Mesh : public Entity
 	{
 	public:
 					Mesh() = delete;
-		explicit	Mesh(SceneNode* parent, const Resources::Model& model, const Material& material);
+		explicit	Mesh(Entity* parent, const Resources::Model& model, const Material& material);
 					Mesh(const Mesh& other) = default;
 					Mesh(Mesh&& other) noexcept = default;
 					~Mesh() override = default;

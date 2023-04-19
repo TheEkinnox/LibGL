@@ -8,8 +8,14 @@
 #include "Debug/Assertion.h"
 #include "Angle.h"
 #include "Arithmetic.h"
+#include "BoxCollider.h"
+#include "SphereCollider.h"
+#include "CapsuleCollider.h"
 #include "DemoContext.h"
+#include "Entity.h"
 #include "InputManager.h"
+#include "Raycast.h"
+#include "Rigidbody.h"
 #include "Transform.h"
 #include "Trigonometry.h"
 #include "Utility/ServiceLocator.h"
@@ -32,7 +38,8 @@ namespace LibGL::Demo
 {
 
 	DemoApp::DemoApp(const int windowWidth, const int windowHeight, const char* title)
-		: IApplication(std::make_unique<DemoContext>(windowWidth, windowHeight, title))
+		: IApplication(std::make_unique<DemoContext>(windowWidth, windowHeight, title)),
+		m_controllableMesh(nullptr)
 	{
 		// Initialize debugger
 		Debug::Log::openFile("debug.log");
@@ -59,7 +66,8 @@ namespace LibGL::Demo
 	void DemoApp::createScene()
 	{
 		auto& resourceManager = LGL_SERVICE(ResourceManager);
-		const auto& camera = Camera::getCurrent();
+		auto& camera = Camera::getCurrent();
+		camera.setPosition({ 0.f, 1.8f, 1.f });
 
 		//const Shader* shader = setupUnlitShader("shaders/Unlit.glsl");
 		//const Shader* shader = setupUnlitShader("shaders/Normal.glsl");
@@ -98,7 +106,7 @@ namespace LibGL::Demo
 		const Material floorMat(
 			*shader,
 			{ floorDiffuse, floorSpecular, nullptr },
-			{ Vector2(.5f), Vector2(2.f)},
+			{ Vector2(.5f), Vector2(14.f)},
 			{ Color(.25f, .6f, .9f)},
 			32.f
 		);
@@ -121,20 +129,27 @@ namespace LibGL::Demo
 
 		// Place the meshes
 		Mesh mesh(nullptr, *floorModel, floorMat);
-		mesh.setScale(Vector3( 7, 1, 7 ));
-		m_scene.addNode(mesh);
+		mesh.setScale(Vector3( 7.f, 1.f, 7.f ));
+		Mesh& floorMesh = m_scene.addNode(mesh);
+		floorMesh.addComponent<Physics::BoxCollider>(Vector3(0.f, -.05f, 0.f), Vector3(1.f, .1f, 1.f));
 
 		mesh = Mesh(nullptr, *headModel, headMat);
-		mesh.setPosition(Vector3(-1, -1, -1.f));
-		m_scene.addNode(mesh);
+		mesh.setPosition(Vector3(-1.f, 1.f, -1.f));
+		Mesh& headMesh = m_scene.addNode(mesh);
+		headMesh.addComponent<Physics::SphereCollider>(Vector3(0.f, .8f, 0.f), .125f);
+		//headMesh.addComponent<Physics::BoxCollider>(Vector3(0.f, -.05f, 0.f), Vector3(1.f, .1f, 1.f));
+		headMesh.addComponent<Physics::Rigidbody>();
+		m_controllableMesh = &headMesh;
 
 		mesh = Mesh(nullptr, *diabloModel, diabloMat);
-		mesh.setPosition(Vector3(.5f, -.5f, -1.f));
-		mesh.setScale(Vector3(.5f));
-		m_scene.addNode(mesh);
+		mesh.setPosition(Vector3(.5f, 1.f, -1.f));
+		Mesh& diabloMesh = m_scene.addNode(mesh);
+		diabloMesh.addComponent<Physics::CapsuleCollider>(Vector3::zero(), Vector3::up(), 3.f, .5f);
+		diabloMesh.addComponent<Physics::Rigidbody>();
+		//m_controllableMesh = &diabloMesh;
 
 		// Setup the lights
-		m_ambientLight = Color(.05f, .05f, .05f, 100.f);
+		m_ambientLight = Color(.1f, .1f, .1f, 100.f);
 
 		m_dirLight =
 		{
@@ -145,21 +160,21 @@ namespace LibGL::Demo
 		m_pointLights[0] =
 		{
 			Color::magenta,
-			{ -1, 0, 1 },
+			{ -1, 1, 1 },
 			AttenuationData(16)
 		};
 
 		m_pointLights[1] =
 		{
 			Color::magenta,
-			{ 1, 0, 1 },
+			{ 1, 1, 1 },
 			AttenuationData(16)
 		};
 
 		m_pointLights[2] =
 		{
 			Color::magenta,
-			{ 0, 0, -1 },
+			{ 0, 1, -1 },
 			AttenuationData(16)
 		};
 
@@ -222,8 +237,8 @@ namespace LibGL::Demo
 
 		if (inputManager.isKeyDown(EKey::KEY_R))
 		{
-			camera.setPosition(Vector3::zero());
-			camera.setRotation(Vector3::zero());
+			m_scene.clear();
+			createScene();
 		}
 
 		const float deltaTime = LGL_SERVICE(Timer).getDeltaTime();
@@ -242,48 +257,100 @@ namespace LibGL::Demo
 			m_dirLight.m_direction.rotate(Degree(ROTATION_SPEED * deltaTime), Vector3::up());
 
 		// Movement
-		float moveSpeed = MOVE_SPEED * deltaTime;
+		float moveSpeed = MOVE_SPEED;
 
 		if (inputManager.isKeyDown(EKey::KEY_LEFT_CONTROL)
 			|| inputManager.isKeyDown(EKey::KEY_RIGHT_CONTROL))
 			moveSpeed *= 1.5f;
 
-		if (inputManager.isKeyDown(EKey::KEY_W))
-			camera.translate(camera.forward() * moveSpeed);
+		if (m_controllableMesh != nullptr && inputManager.isKeyDown(EKey::KEY_LEFT_ALT))
+		{
+			Physics::Rigidbody* rb = m_controllableMesh->getComponent<Physics::Rigidbody>();
 
-		if (inputManager.isKeyDown(EKey::KEY_S))
-			camera.translate(camera.back() * moveSpeed);
+			Vector3 direction;
 
-		if (inputManager.isKeyDown(EKey::KEY_A))
-			camera.translate(camera.left() * moveSpeed);
+			if (inputManager.isKeyDown(EKey::KEY_W))
+				direction += m_controllableMesh->forward();
 
-		if (inputManager.isKeyDown(EKey::KEY_D))
-			camera.translate(camera.right() * moveSpeed);
+			if (inputManager.isKeyDown(EKey::KEY_S))
+				direction += m_controllableMesh->back();
 
-		if (inputManager.isKeyDown(EKey::KEY_SPACE))
-			camera.translate(Vector3::up() * moveSpeed);
+			if (inputManager.isKeyDown(EKey::KEY_A))
+				direction += m_controllableMesh->left();
 
-		if (inputManager.isKeyDown(EKey::KEY_LEFT_SHIFT)
-			|| inputManager.isKeyDown(EKey::KEY_RIGHT_SHIFT))
-			camera.translate(Vector3::down() * moveSpeed);
+			if (inputManager.isKeyDown(EKey::KEY_D))
+				direction += m_controllableMesh->right();
 
-		// Rotation
-		if (inputManager.isKeyDown(EKey::KEY_UP))
-			camera.rotate(ROTATION_SPEED * Vector3::right() * deltaTime);
+			if (inputManager.isKeyPressed(EKey::KEY_SPACE))
+				rb->addForce(Vector3::up() * 4, Physics::EForceMode::IMPULSE);
 
-		if (inputManager.isKeyDown(EKey::KEY_DOWN))
-			camera.rotate(-ROTATION_SPEED * Vector3::right() * deltaTime);
+			Vector3 targetVelocity;
 
-		if (inputManager.isKeyDown(EKey::KEY_Q) ||
-			inputManager.isKeyDown(EKey::KEY_LEFT))
-			camera.rotate(-ROTATION_SPEED * Vector3::up() * deltaTime);
+			if (!floatEquals(moveSpeed, 0.f) && direction != Vector3::zero())
+				targetVelocity = direction * (moveSpeed / direction.magnitude());
 
-		if (inputManager.isKeyDown(EKey::KEY_E) ||
-			inputManager.isKeyDown(EKey::KEY_RIGHT))
-			camera.rotate(ROTATION_SPEED * Vector3::up() * deltaTime);
+			targetVelocity.m_y += rb->m_velocity.m_y;
+			rb->m_velocity = targetVelocity;
 
-		m_spotLight.m_position = camera.getPosition();
-		m_spotLight.m_direction = camera.forward();
+			// Rotation
+			if (inputManager.isKeyDown(EKey::KEY_Q) ||
+				inputManager.isKeyDown(EKey::KEY_LEFT))
+				m_controllableMesh->rotate(-ROTATION_SPEED * Vector3::up() * deltaTime);
+
+			if (inputManager.isKeyDown(EKey::KEY_E) ||
+				inputManager.isKeyDown(EKey::KEY_RIGHT))
+				m_controllableMesh->rotate(ROTATION_SPEED * Vector3::up() * deltaTime);
+		}
+		else
+		{
+			moveSpeed *= deltaTime;
+
+			if (inputManager.isKeyDown(EKey::KEY_W))
+				camera.translate(camera.forward() * moveSpeed);
+
+			if (inputManager.isKeyDown(EKey::KEY_S))
+				camera.translate(camera.back() * moveSpeed);
+
+			if (inputManager.isKeyDown(EKey::KEY_A))
+				camera.translate(camera.left() * moveSpeed);
+
+			if (inputManager.isKeyDown(EKey::KEY_D))
+				camera.translate(camera.right() * moveSpeed);
+
+			if (inputManager.isKeyDown(EKey::KEY_SPACE))
+				camera.translate(Vector3::up() * moveSpeed);
+
+			if (inputManager.isKeyDown(EKey::KEY_LEFT_SHIFT)
+				|| inputManager.isKeyDown(EKey::KEY_RIGHT_SHIFT))
+				camera.translate(Vector3::down() * moveSpeed);
+
+			// Rotation
+			if (inputManager.isKeyDown(EKey::KEY_UP))
+				camera.rotate(ROTATION_SPEED * Vector3::right() * deltaTime);
+
+			if (inputManager.isKeyDown(EKey::KEY_DOWN))
+				camera.rotate(-ROTATION_SPEED * Vector3::right() * deltaTime);
+
+			if (inputManager.isKeyDown(EKey::KEY_Q) ||
+				inputManager.isKeyDown(EKey::KEY_LEFT))
+				camera.rotate(-ROTATION_SPEED * Vector3::up() * deltaTime);
+
+			if (inputManager.isKeyDown(EKey::KEY_E) ||
+				inputManager.isKeyDown(EKey::KEY_RIGHT))
+				camera.rotate(ROTATION_SPEED * Vector3::up() * deltaTime);
+
+			m_spotLight.m_position = camera.getPosition();
+			m_spotLight.m_direction = camera.forward();
+		}
+
+		if (inputManager.isKeyPressed(EKey::KEY_C))
+		{
+			Physics::RaycastHit hitInfo;
+			const auto& camCollider = camera.getComponent<Physics::ICollider>();
+			const Vector3 castOffset = camCollider != nullptr ? camera.forward() * (camCollider->getBounds().m_sphereRadius + .01f) : Vector3::zero();
+			if (Physics::raycast(camera.getPosition() + castOffset, camera.forward(), hitInfo))
+				hitInfo.m_collider->getOwner().translate(Vector3::down());
+		}
 	}
 
 	void DemoApp::handleMouse() const

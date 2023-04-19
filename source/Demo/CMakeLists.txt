@@ -77,6 +77,6 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
 
 # copy the assets folder in the target build directory
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${ASSETS_DIR} $<TARGET_FILE_DIR:${PROJECT_NAME}>/${ASSETS_DIR_NAME})
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${ASSETS_DIR} $<TARGET_FILE_DIR:${PROJECT_NAME}>/assets)
 
 set(EXE_NAME ${PROJECT_NAME} PARENT_SCOPE)

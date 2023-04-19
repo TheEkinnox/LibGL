@@ -67,11 +67,10 @@ namespace LibGL::Physics
 	Bounds ICollider::getBounds() const
 	{
 		const Transform transform = getOwner().getGlobalTransform();
-		const Vector3 worldCenter = transform.getMatrix() * Vector4(m_bounds.m_center, 1.f);
+		const Vector3 worldCenter = (transform.getMatrix() * Vector4(m_bounds.m_center, 1.f)).xyz();
+		const Vector3 worldSize = (transform.getMatrix() * Vector4(m_bounds.m_boxSize, 0)).xyz();
 
 		const Vector3 scale = transform.getScale();
-		const Vector3 worldSize = m_bounds.m_boxSize * scale;
-
 		const float radiusScale = max(max(scale.m_x, scale.m_y), scale.m_z);
 		const float worldRadius = m_bounds.m_sphereRadius * radiusScale;
 
@@ -94,7 +93,6 @@ namespace LibGL::Physics
 	{
 		const auto [center, _, sphereRadius] = getBounds();
 		const auto [otherCenter, _o, otherSphereRadius] = other.getBounds();
-
 		const float totalRadius = sphereRadius + otherSphereRadius;
 
 		return center.distanceSquaredFrom(otherCenter) <= totalRadius * totalRadius;

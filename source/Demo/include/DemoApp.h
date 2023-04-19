@@ -3,6 +3,11 @@
 #include "LowRenderer/Light.h"
 #include "IApplication.h"
 
+namespace LibGL::Rendering
+{
+	class Mesh;
+}
+
 namespace LibGL::Demo
 {
 	class DemoApp final : public Application::IApplication
@@ -49,6 +54,7 @@ namespace LibGL::Demo
 		Rendering::PointLight		m_pointLights[NB_POINT_LIGHTS];
 		Rendering::DirectionalLight	m_dirLight;
 		Rendering::SpotLight		m_spotLight;
+		Rendering::Mesh*			m_controllableMesh;
 
 		/**
 		 * \brief Function to call on the application start
