@@ -66,7 +66,7 @@ namespace LibGL::Utility
 		 * \brief Gets the number of time the "update" function has been called
 		 * \return The elapsed number of frames since the timer's creation
 		 */
-		size_t getFrameCount() const;
+		uint64_t getFrameCount() const;
 
 	private:
 		using clock = std::chrono::steady_clock;
@@ -74,13 +74,13 @@ namespace LibGL::Utility
 		clock::time_point	m_currentTime = clock::now();
 		clock::time_point	m_lastUpdate = clock::now();
 
-		size_t	m_frameCount = 0;
+		uint64_t			m_frameCount = 0;
 
-		float	m_time = 0;
-		float	m_unscaledTime = 0;
-		float	m_deltaTime = 0;
-		float	m_timeScale = 1;
+		float				m_time = 0;
+		float				m_unscaledTime = 0;
+		float				m_deltaTime = 0;
+		float				m_timeScale = 1;
 
-		bool	m_isFirstUpdate = true;
+		bool				m_isFirstUpdate = true;
 	};
 }

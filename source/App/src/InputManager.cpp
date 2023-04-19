@@ -151,7 +151,7 @@ namespace LibGL::Application
 
 	void InputManager::keyCallback(const EKey key, const int scanCode, const EKeyState state, EInputModifier)
 	{
-		const size_t currentFrame = LGL_SERVICE(Timer).getFrameCount();
+		const uint64_t currentFrame = LGL_SERVICE(Timer).getFrameCount();
 
 		m_keyInfos[key] = { state, currentFrame };
 		m_scanCodeInfo[scanCode] = { state, currentFrame };

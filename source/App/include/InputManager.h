@@ -150,13 +150,13 @@ namespace LibGL::Application
 		struct KeyInfo
 		{
 			EKeyState			m_keyState;
-			size_t				m_stateChangeFrame;
+			uint64_t			m_stateChangeFrame;
 		};
 
 		struct MouseButtonInfo
 		{
 			EMouseButtonState	m_buttonState;
-			size_t				m_stateChangeFrame;
+			uint64_t			m_stateChangeFrame;
 		};
 
 		Window&				m_window;

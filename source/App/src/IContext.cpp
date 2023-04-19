@@ -54,8 +54,8 @@ namespace LibGL::Application
 
 	void IContext::update()
 	{
-		glfwPollEvents();
 		m_timer->update();
+		glfwPollEvents();
 	}
 
 	void IContext::bindDebugCallback()

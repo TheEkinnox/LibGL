@@ -61,7 +61,7 @@ namespace LibGL::Utility
 		m_timeScale = timeScale;
 	}
 
-	size_t Timer::getFrameCount() const
+	uint64_t Timer::getFrameCount() const
 	{
 		return m_frameCount;
 	}
