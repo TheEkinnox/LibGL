@@ -16,12 +16,12 @@ namespace LibGL
 	public:
 		Entity() = default;
 		Entity(Entity* parent, const Transform& transform);
-		Entity(const Entity&) = default;
-		Entity(Entity&&) noexcept = default;
+		Entity(const Entity& other);
+		Entity(Entity&& other) noexcept;
 		~Entity() override;
 
-		Entity& operator=(const Entity&) = default;
-		Entity& operator=(Entity&&) noexcept = default;
+		Entity& operator=(const Entity& other);
+		Entity& operator=(Entity&& other) noexcept;
 
 		/**
 		 * \brief Gets the entity's global transformation matrix
@@ -29,6 +29,11 @@ namespace LibGL
 		 */
 		Transform getGlobalTransform() const;
 
+		/**
+		 * \brief Adds a component of the given type to the entity
+		 * \param args The component's constructor's parameters
+		 * \return A reference to the added component
+		 */
 		template <typename T, typename ... Args>
 		T& addComponent(Args&&... args);
 

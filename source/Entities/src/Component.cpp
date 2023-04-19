@@ -4,6 +4,18 @@
 
 namespace LibGL
 {
+	Component::Component(const Component& other) :
+		m_owner(other.getOwner()), m_id(s_currentId++),
+		m_isActive(other.isActive())
+	{
+	}
+
+	Component::Component(Component&& other) noexcept :
+		m_owner(other.getOwner()), m_id(other.m_id),
+		m_isActive(other.isActive())
+	{
+	}
+
 	Component& Component::operator=(const Component& other)
 	{
 		if (&other == this)
@@ -11,6 +23,7 @@ namespace LibGL
 
 		m_owner = other.m_owner;
 		m_isActive = other.m_isActive;
+		m_id = s_currentId++;
 
 		return *this;
 	}
@@ -22,6 +35,9 @@ namespace LibGL
 
 		m_owner = std::move(other.m_owner);
 		m_isActive = other.m_isActive;
+		m_id = other.m_id;
+
+		other.m_id = 0;
 
 		return *this;
 	}

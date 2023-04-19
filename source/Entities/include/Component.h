@@ -10,8 +10,8 @@ namespace LibGL
 	public:
 		typedef uint64_t ComponentId;
 
-		Component(const Component& other) = default;
-		Component(Component&& other) = default;
+		Component(const Component& other);
+		Component(Component&& other) noexcept;
 
 		Component& operator=(const Component& other);
 		Component& operator=(Component&& other) noexcept;
@@ -54,7 +54,8 @@ namespace LibGL
 		explicit Component(Entity& owner);
 
 	private:
-		inline static ComponentId s_currentId = 0;
+		friend class Entity;
+		inline static ComponentId s_currentId = 1;
 
 		Entity&		m_owner;
 		ComponentId	m_id;
