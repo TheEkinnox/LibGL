@@ -9,22 +9,24 @@ namespace LibGL
 
 	Entity::Entity(const Entity& other) :
 		Node(other), Transform(other),
-		m_components(other.m_components),
-		m_globalTransform(other.m_globalTransform)
+		m_components(other.m_components)
 	{
 		if (!m_components.empty())
 			for (const auto& component : m_components)
 				component->m_owner = *this;
+
+		updateGlobalTransform();
 	}
 
 	Entity::Entity(Entity&& other) noexcept :
 		Node(std::move(other)), Transform(std::move(other)),
-		m_components(std::move(other.m_components)),
-		m_globalTransform(std::move(other.m_globalTransform))
+		m_components(std::move(other.m_components))
 	{
 		if (!m_components.empty())
 			for (const auto& component : m_components)
 				component->m_owner = *this;
+
+		updateGlobalTransform();
 	}
 
 	Entity::~Entity()
@@ -38,14 +40,18 @@ namespace LibGL
 		if (&other == this)
 			return *this;
 
+		Node::operator=(other);
+		Transform::operator=(other);
+
 		m_components.clear();
 
 		m_components = other.m_components;
-		m_globalTransform = other.m_globalTransform;
 
 		if (!m_components.empty())
 			for (const auto& component : m_components)
 				component->m_owner = *this;
+
+		updateGlobalTransform();
 
 		return *this;
 	}
@@ -55,6 +61,9 @@ namespace LibGL
 		if (&other == this)
 			return *this;
 
+		Node::operator=(other);
+		Transform::operator=(other);
+
 		m_components.clear();
 
 		m_components = std::move(other.m_components);
@@ -63,6 +72,8 @@ namespace LibGL
 		if (!m_components.empty())
 			for (const auto& component : m_components)
 				component->m_owner = *this;
+
+		updateGlobalTransform();
 
 		return *this;
 	}
