@@ -70,8 +70,8 @@ namespace LibGL::Physics
 
 		// Get the closest point to the sphere's center on the capsule's center segment
 		const Vector3 closestPoint = getClosestPointOnSegment(center,
-			capsuleOrientedHeight / 2.f - capsuleCenter,
-			capsuleOrientedHeight / 2.f + capsuleCenter);
+			capsuleCenter - capsuleOrientedHeight / 2.f,
+			capsuleCenter + capsuleOrientedHeight / 2.f);
 
 		return center.distanceSquaredFrom(closestPoint) <= totalRadius * totalRadius;
 	}
