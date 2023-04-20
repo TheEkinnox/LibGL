@@ -29,6 +29,14 @@ namespace LibGL::DataStructure
 		DataT& addNode(DataT& node);
 
 		/**
+		 * \brief Adds the given node to the graph
+		 * \param args The arguments to pass to the created node's constructor
+		 * \return A reference to the added node
+		 */
+		template <typename DataT, typename ... Args>
+		DataT& addNode(Args&&... args);
+
+		/**
 		 * \brief Removes the given node from the graph
 		 * \param node The node to remove from the graph
 		 */

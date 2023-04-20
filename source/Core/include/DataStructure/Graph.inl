@@ -14,6 +14,16 @@ namespace LibGL::DataStructure
 	}
 
 	template <class NodeT>
+	template <typename DataT, typename ... Args>
+	DataT& Graph<NodeT>::addNode(Args&&... args)
+	{
+		static_assert(std::is_same_v<NodeT, DataT> || std::is_base_of_v<NodeT, DataT>);
+		const auto addedNode = std::make_shared<DataT>(args...);
+		m_nodes.push_back(addedNode);
+		return *addedNode;
+	}
+
+	template <class NodeT>
 	void Graph<NodeT>::removeNode(const NodeT& node)
 	{
 		const auto nodeIter = std::find(m_nodes.begin(), m_nodes.end(), std::make_shared<NodeT>(&node));
