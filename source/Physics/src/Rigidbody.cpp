@@ -217,17 +217,17 @@ namespace LibGL::Physics
 							if (!otherRigidbody->m_isKinematic)
 							{
 								if (normal.dot(otherVelocity) >= 0.f)
-									otherRigidbody->addForce((otherVelocity * normalMask).magnitude() * -normal, EForceMode::ACCELERATION);
+									otherRigidbody->addForce((otherVelocity * normalMask).magnitude() * -normal, EForceMode::VELOCITY_CHANGE);
 
 								if (normal.dot(-velocity) >= 0.f)
-									otherRigidbody->addForce((velocity * m_mass * normalMask).magnitude() * -normal, EForceMode::FORCE);
+									otherRigidbody->addForce((velocity * m_mass * normalMask).magnitude() * -normal, EForceMode::IMPULSE);
 							}
 
 							if (normal.dot(-velocity) >= 0.f)
-								addForce((velocity * normalMask).magnitude() * normal, EForceMode::ACCELERATION);
+								addForce((velocity * normalMask).magnitude() * normal, EForceMode::VELOCITY_CHANGE);
 
 							if (normal.dot(otherVelocity) >= 0.f)
-								addForce((otherVelocity * otherRigidbody->m_mass * normalMask).magnitude() * normal, EForceMode::FORCE);
+								addForce((otherVelocity * otherRigidbody->m_mass * normalMask).magnitude() * normal, EForceMode::IMPULSE);
 						}
 						else if (normal.dot(-velocity) >= 0.f)
 						{

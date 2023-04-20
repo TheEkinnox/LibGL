@@ -39,7 +39,7 @@ namespace LibGL::Physics
 		LibMath::Vector3 getDraggedVelocity() const;
 
 	private:
-		bool					m_isSleeping = false;
+		bool	m_isSleeping = false;
 
 		void simulate();
 
