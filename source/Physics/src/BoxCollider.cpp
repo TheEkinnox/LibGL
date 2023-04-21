@@ -85,6 +85,20 @@ namespace LibGL::Physics
 		if (!ICollider::check(other))
 			return false;
 
+		const auto [center, size, radius] = getBounds();
+		const auto [otherCenter, otherSize, otherRadius] = other.getBounds();
+
+		const Vector3 min = center - size / 2;
+		const Vector3 max = center + size / 2;
+		const Vector3 otherMin = otherCenter - otherSize / 2;
+		const Vector3 otherMax = otherCenter + otherSize / 2;
+
+		// Check AABB to avoid unnecessary capsule collision computation
+		if (min.m_x > otherMax.m_x || max.m_x < otherMin.m_x ||
+			min.m_y > otherMax.m_y || max.m_y < otherMin.m_y ||
+			min.m_z > otherMax.m_z || max.m_z < otherMin.m_z)
+			return false;
+
 		// TODO: Box-Capsule collisions
 		return true;
 	}
