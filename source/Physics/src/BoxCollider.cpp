@@ -17,8 +17,10 @@ namespace LibGL::Physics
 
 	bool BoxCollider::check(const Vector3& point) const
 	{
-		const Vector3 min = m_center - m_size / 2;
-		const Vector3 max = m_center + m_size / 2;
+		const auto [center, size, _] = getBounds();
+
+		const Vector3 min = center - size / 2.f;
+		const Vector3 max = center + size / 2.f;
 
 		return min.m_x <= point.m_x && max.m_x >= point.m_x &&
 			min.m_y <= point.m_y && max.m_y >= point.m_y &&
@@ -57,10 +59,10 @@ namespace LibGL::Physics
 		const auto [center, size, radius] = getBounds();
 		const auto [otherCenter, otherSize, otherRadius] = other.getBounds();
 
-		const Vector3 min = center - size / 2;
-		const Vector3 max = center + size / 2;
-		const Vector3 otherMin = otherCenter - otherSize / 2;
-		const Vector3 otherMax = otherCenter + otherSize / 2;
+		const Vector3 min = center - size / 2.f;
+		const Vector3 max = center + size / 2.f;
+		const Vector3 otherMin = otherCenter - otherSize / 2.f;
+		const Vector3 otherMax = otherCenter + otherSize / 2.f;
 
 		return min.m_x <= otherMax.m_x && max.m_x >= otherMin.m_x &&
 			min.m_y <= otherMax.m_y && max.m_y >= otherMin.m_y &&
@@ -88,10 +90,10 @@ namespace LibGL::Physics
 		const auto [center, size, radius] = getBounds();
 		const auto [otherCenter, otherSize, otherRadius] = other.getBounds();
 
-		const Vector3 min = center - size / 2;
-		const Vector3 max = center + size / 2;
-		const Vector3 otherMin = otherCenter - otherSize / 2;
-		const Vector3 otherMax = otherCenter + otherSize / 2;
+		const Vector3 min = center - size / 2.f;
+		const Vector3 max = center + size / 2.f;
+		const Vector3 otherMin = otherCenter - otherSize / 2.f;
+		const Vector3 otherMax = otherCenter + otherSize / 2.f;
 
 		// Check AABB to avoid unnecessary capsule collision computation
 		if (min.m_x > otherMax.m_x || max.m_x < otherMin.m_x ||
@@ -106,8 +108,8 @@ namespace LibGL::Physics
 	Vector3 BoxCollider::getClosestPoint(const Vector3& point) const
 	{
 		const auto [center, size, _] = getBounds();
-		const auto min = center - size;
-		const auto max = center + size;
+		const auto min = center - (size / 2.f);
+		const auto max = center + (size / 2.f);
 
 		return clamp(point, min, max);
 	}
@@ -115,12 +117,10 @@ namespace LibGL::Physics
 	Vector3 BoxCollider::getClosestPointOnSurface(const Vector3& point) const
 	{
 		const auto [center, size, _] = getBounds();
-		const auto minCorner = center - size;
-		const auto maxCorner = center + size;
+		const auto minCorner = center - (size / 2.f);
+		const auto maxCorner = center + (size / 2.f);
 
-		if (!(minCorner.m_x <= point.m_x && maxCorner.m_x >= point.m_x &&
-			minCorner.m_y <= point.m_y && maxCorner.m_y >= point.m_y &&
-			minCorner.m_z <= point.m_z && maxCorner.m_z >= point.m_z))
+		if (!check(point))
 			return clamp(point, minCorner, maxCorner);
 
 		const Vector3 snappedX
@@ -155,6 +155,6 @@ namespace LibGL::Physics
 
 	Bounds BoxCollider::calculateBounds(const Vector3& center, const Vector3& size)
 	{
-		return { center, size, size.magnitude() * 2.f };
+		return { center, size, (size / 2.f).magnitude() };
 	}
 }
