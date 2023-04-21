@@ -163,13 +163,36 @@ namespace LibGL::Resources
 				line = line.substr(token.size());
 				const auto faceStrings = Utility::splitString(line, " ", true);
 
-				ASSERT(faceStrings.size() == 3);
+				ASSERT(faceStrings.size() == 3 || faceStrings.size() == 4);
 
-				for (const auto& faceStr : faceStrings)
+				uint32_t verticesCount;
+				uint32_t* faceIndices;
+
+				if (faceStrings.size() == 3)
 				{
-					size_t posIdx = 0, uvIdx = 0, normalIdx = 0;
+					verticesCount = 3;
+					faceIndices = static_cast<uint32_t*>(alloca(3 * sizeof(uint32_t)));
+					faceIndices[0] = 0;
+					faceIndices[1] = 1;
+					faceIndices[2] = 2;
+				}
+				else
+				{
+					verticesCount = 6;
+					faceIndices = static_cast<uint32_t*>(alloca(6 * sizeof(uint32_t)));
+					faceIndices[0] = 0;
+					faceIndices[1] = 1;
+					faceIndices[2] = 2;
+					faceIndices[3] = 0;
+					faceIndices[4] = 2;
+					faceIndices[5] = 3;
+				}
 
-					const auto faceData = Utility::splitString(faceStr, "/", true);
+				for (size_t i = 0; i < verticesCount; i++)
+				{
+					size_t faceIdx = faceIndices[i], posIdx = 0, uvIdx = 0, normalIdx = 0;
+
+					const auto faceData = Utility::splitString(faceStrings[faceIdx], "/", true);
 
 					if (!faceData[0].empty())
 					{
@@ -204,7 +227,7 @@ namespace LibGL::Resources
 
 					uint32_t	vertexIdx;
 					bool		isDuplicate = false;
-					
+
 					//vertexIdx = static_cast<uint32_t>(m_vertices.size());
 					for (vertexIdx = 0; vertexIdx < m_vertices.size(); ++vertexIdx)
 					{
