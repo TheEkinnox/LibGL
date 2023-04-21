@@ -27,8 +27,9 @@ namespace LibGL::Physics
 			if (collider == nullptr || !collider->isActive())
 				continue;
 
-			// TODO: Handle distance properly
-			const float distanceSqr = origin.distanceSquaredFrom(collider->getClosestPoint(origin));
+			const auto closestOnSurface = collider->getClosestPointOnSurface(origin);
+			const auto closestOnRay = ray.getClosestPoint(closestOnSurface);
+			const float distanceSqr = origin.distanceSquaredFrom(closestOnRay);
 
 			if (distanceSqr > maxDistanceSqr || distanceSqr >= hitInfo.m_distance ||
 				!collider->check(ray))
