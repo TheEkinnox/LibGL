@@ -77,7 +77,7 @@ namespace LibGL::Demo
 		ASSERT(shader != nullptr);
 
 		// Load the models
-		const Model* floorModel = resourceManager.getOrCreate<Model>("meshes/floor.obj");
+		const Model* floorModel = resourceManager.getOrCreate<Model>("meshes/primitives/plane.obj");
 		ASSERT(floorModel != nullptr);
 
 		const Texture* floorDiffuse = resourceManager.getOrCreate<Texture>("textures/container2.png");
@@ -104,6 +104,9 @@ namespace LibGL::Demo
 		const Texture* diabloSpecular = resourceManager.getOrCreate<Texture>("meshes/diablo3_pose/diablo3_pose_spec.tga");
 		ASSERT(diabloSpecular != nullptr);
 
+		const Model* cubeModel = resourceManager.getOrCreate<Model>("meshes/primitives/cube.obj");
+		ASSERT(diabloModel != nullptr);
+
 		const Material floorMat(
 			*shader,
 			{ floorDiffuse, floorSpecular, nullptr },
@@ -128,25 +131,34 @@ namespace LibGL::Demo
 			16.f
 		);
 
+		const Material cubeMat(
+			*shader,
+			{ nullptr, nullptr, nullptr },
+			{ Vector2::zero(), Vector2::one() },
+			{ Color::lightGray },
+			16.f
+		);
+
 		// Place the meshes
-		Mesh mesh(nullptr, *floorModel, floorMat);
-		mesh.setScale(Vector3( 7.f, 1.f, 7.f ));
-		Mesh& floorMesh = m_scene.addNode(mesh);
-		floorMesh.addComponent<Physics::BoxCollider>(Vector3(0.f, -.05f, 0.f), Vector3(1.f, .1f, 1.f));
+		Mesh& floorMesh = m_scene.addNode<Mesh>(nullptr, *floorModel, floorMat);
+		floorMesh.setScale(Vector3(14.f, 1.f, 14.f));
+		floorMesh.addComponent<BoxCollider>(Vector3(0.f, -.05f, 0.f), Vector3(1.f, .1f, 1.f));
 
-		mesh = Mesh(nullptr, *headModel, headMat);
-		mesh.setPosition(Vector3(-1.f, 1.f, -1.f));
-		Mesh& headMesh = m_scene.addNode(mesh);
-		headMesh.addComponent<Physics::SphereCollider>(Vector3(0.f, .8f, 0.f), .125f);
-		//headMesh.addComponent<Physics::BoxCollider>(Vector3(0.f, -.05f, 0.f), Vector3(1.f, .1f, 1.f));
-		headMesh.addComponent<Physics::Rigidbody>();
+		Mesh& headMesh = m_scene.addNode<Mesh>(nullptr, *headModel, headMat);
+		headMesh.setPosition(Vector3(-1.f, 1.f, -1.f));
+		headMesh.addComponent<SphereCollider>(Vector3(0.f, .8f, .05f), .125f);
+		headMesh.addComponent<Rigidbody>();
 		m_controllableMesh = &headMesh;
+		
+		Mesh& cubeMesh = m_scene.addNode<Mesh>(nullptr, *cubeModel, cubeMat);
+		cubeMesh.setPosition(Vector3(0.f, 1.f, -2.f));
+		cubeMesh.addComponent<BoxCollider>(Vector3::zero(), Vector3::one());
+		cubeMesh.addComponent<Rigidbody>();
 
-		mesh = Mesh(nullptr, *diabloModel, diabloMat);
-		mesh.setPosition(Vector3(.5f, 1.f, -1.f));
-		Mesh& diabloMesh = m_scene.addNode(mesh);
-		diabloMesh.addComponent<Physics::CapsuleCollider>(Vector3::zero(), Vector3::up(), 2.f, .5f);
-		diabloMesh.addComponent<Physics::Rigidbody>();
+		Mesh& diabloMesh = m_scene.addNode<Mesh>(nullptr, *diabloModel, diabloMat);
+		diabloMesh.setPosition(Vector3(.5f, 1.f, -1.f));
+		diabloMesh.addComponent<CapsuleCollider>(Vector3::zero(), Vector3::up(), 2.f, .5f);
+		diabloMesh.addComponent<Rigidbody>();
 		//m_controllableMesh = &diabloMesh;
 
 		// Setup the lights
@@ -159,7 +171,7 @@ namespace LibGL::Demo
 		};
 
 		m_pointLights[0] =
-		{
+		{ 
 			Color::magenta,
 			{ -1, 1, 1 },
 			AttenuationData(16)
@@ -266,7 +278,7 @@ namespace LibGL::Demo
 
 		if (m_controllableMesh != nullptr && inputManager.isKeyDown(EKey::KEY_LEFT_ALT))
 		{
-			Physics::Rigidbody* rb = m_controllableMesh->getComponent<Physics::Rigidbody>();
+			Rigidbody* rb = m_controllableMesh->getComponent<Rigidbody>();
 
 			Vector3 direction;
 
@@ -283,7 +295,7 @@ namespace LibGL::Demo
 				direction += m_controllableMesh->right();
 
 			if (inputManager.isKeyPressed(EKey::KEY_SPACE))
-				rb->addForce(Vector3::up() * 4, Physics::EForceMode::IMPULSE);
+				rb->addForce(Vector3::up() * 4, EForceMode::IMPULSE);
 
 			Vector3 targetVelocity;
 
@@ -348,7 +360,7 @@ namespace LibGL::Demo
 		if (inputManager.isKeyPressed(EKey::KEY_C))
 		{
 			RaycastHit hitInfo;
-			const auto& camCollider = camera.getComponent<Physics::ICollider>();
+			const auto& camCollider = camera.getComponent<ICollider>();
 			const Vector3 castOffset = camCollider != nullptr ? camera.forward() * (camCollider->getBounds().m_sphereRadius + .01f) : Vector3::zero();
 
 			if (raycast(camera.getPosition() + castOffset, camera.forward(), hitInfo))
