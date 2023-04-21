@@ -31,6 +31,7 @@ using namespace LibMath::Literal;
 using namespace LibGL::Utility;
 using namespace LibGL::Resources;
 using namespace LibGL::Rendering;
+using namespace LibGL::Physics;
 using namespace LibGL::Application;
 using namespace LibGL::Application::Exceptions;
 
@@ -144,7 +145,7 @@ namespace LibGL::Demo
 		mesh = Mesh(nullptr, *diabloModel, diabloMat);
 		mesh.setPosition(Vector3(.5f, 1.f, -1.f));
 		Mesh& diabloMesh = m_scene.addNode(mesh);
-		diabloMesh.addComponent<Physics::CapsuleCollider>(Vector3::zero(), Vector3::up(), 3.f, .5f);
+		diabloMesh.addComponent<Physics::CapsuleCollider>(Vector3::zero(), Vector3::up(), 2.f, .5f);
 		diabloMesh.addComponent<Physics::Rigidbody>();
 		//m_controllableMesh = &diabloMesh;
 
@@ -324,31 +325,33 @@ namespace LibGL::Demo
 				|| inputManager.isKeyDown(EKey::KEY_RIGHT_SHIFT))
 				camera.translate(Vector3::down() * moveSpeed);
 
-			// Rotation
-			if (inputManager.isKeyDown(EKey::KEY_UP))
-				camera.rotate(ROTATION_SPEED * Vector3::right() * deltaTime);
-
-			if (inputManager.isKeyDown(EKey::KEY_DOWN))
-				camera.rotate(-ROTATION_SPEED * Vector3::right() * deltaTime);
-
-			if (inputManager.isKeyDown(EKey::KEY_Q) ||
-				inputManager.isKeyDown(EKey::KEY_LEFT))
-				camera.rotate(-ROTATION_SPEED * Vector3::up() * deltaTime);
-
-			if (inputManager.isKeyDown(EKey::KEY_E) ||
-				inputManager.isKeyDown(EKey::KEY_RIGHT))
-				camera.rotate(ROTATION_SPEED * Vector3::up() * deltaTime);
-
 			m_spotLight.m_position = camera.getPosition();
-			m_spotLight.m_direction = camera.forward();
 		}
+
+		// Rotation
+		if (inputManager.isKeyDown(EKey::KEY_UP))
+			camera.rotate(ROTATION_SPEED * Vector3::right() * deltaTime);
+
+		if (inputManager.isKeyDown(EKey::KEY_DOWN))
+			camera.rotate(-ROTATION_SPEED * Vector3::right() * deltaTime);
+
+		if (inputManager.isKeyDown(EKey::KEY_Q) ||
+			inputManager.isKeyDown(EKey::KEY_LEFT))
+			camera.rotate(-ROTATION_SPEED * Vector3::up() * deltaTime);
+
+		if (inputManager.isKeyDown(EKey::KEY_E) ||
+			inputManager.isKeyDown(EKey::KEY_RIGHT))
+			camera.rotate(ROTATION_SPEED * Vector3::up() * deltaTime);
+
+		m_spotLight.m_direction = camera.forward();
 
 		if (inputManager.isKeyPressed(EKey::KEY_C))
 		{
-			Physics::RaycastHit hitInfo;
+			RaycastHit hitInfo;
 			const auto& camCollider = camera.getComponent<Physics::ICollider>();
 			const Vector3 castOffset = camCollider != nullptr ? camera.forward() * (camCollider->getBounds().m_sphereRadius + .01f) : Vector3::zero();
-			if (Physics::raycast(camera.getPosition() + castOffset, camera.forward(), hitInfo))
+
+			if (raycast(camera.getPosition() + castOffset, camera.forward(), hitInfo))
 				hitInfo.m_collider->getOwner().translate(Vector3::down());
 		}
 	}
