@@ -132,7 +132,7 @@ namespace LibGL::Physics
 		if (floatEquals(minDist, entityCenter.distanceSquaredFrom(snappedY)))
 			return Vector3::up() * sign(snappedY.m_y - center.m_y);
 
-		if (floatEquals(minDist, entityCenter.distanceSquaredFrom(snappedY)))
+		if (floatEquals(minDist, entityCenter.distanceSquaredFrom(snappedZ)))
 			return Vector3::front() * sign(snappedZ.m_z - center.m_z);
 
 		return Vector3::zero();
