@@ -37,7 +37,7 @@ namespace LibGL::Rendering
 		/**
 		 * \brief Destroys the camera
 		 */
-		~Camera() override = default;
+		~Camera() override;
 
 		/**
 		 * \brief Assigns a copy of the given camera to the current one

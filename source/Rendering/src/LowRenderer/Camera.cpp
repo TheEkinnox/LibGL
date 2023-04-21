@@ -33,6 +33,12 @@ namespace LibGL::Rendering
 		updateMatrices();
 	}
 
+	Camera::~Camera()
+	{
+		if (this == m_current)
+			m_current = nullptr;
+	}
+
 	Camera& Camera::operator=(const Camera& other)
 	{
 		if (&other == this)
