@@ -424,7 +424,7 @@ namespace LibGL::Demo
 		// Setup camera
 		shader->setUniformVec3("u_viewPos", Camera::getCurrent().getGlobalTransform().getPosition());
 
-		m_ambientLight.setupUniform("u_ambientLight", *shader);
+		m_ambientLight.setupUniform("u_ambient", *shader);
 
 		// Setup directional light
 		m_dirLight.setupUniform("u_dirLight", *shader);
