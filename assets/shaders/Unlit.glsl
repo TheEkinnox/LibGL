@@ -40,6 +40,13 @@ uniform Material u_material;
 void main()
 {
 	vec2 texCoords = TexCoords * u_material.uvScale + u_material.uvOffset;
+	vec4 texColor = texture(u_material.diffuse, texCoords);
 
-	FragColor = texture(u_material.diffuse, texCoords) * u_material.tint;
+	if (texColor.a == 0)
+	{
+		discard;
+		return;
+	}
+
+	FragColor = texColor * u_material.tint;
 }

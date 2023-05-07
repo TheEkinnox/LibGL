@@ -138,6 +138,12 @@ void main()
 	for (int i = 0; i < NB_POINT_LIGHTS; i++)
 		litColor += calculatePointLight(u_pointLights[i]);
 
+	if (g_diffColor.a == 0)
+	{
+		discard;
+		return;
+	}
+
 	litColor += calculateSpotLight(u_spotLight);
 
 	FragColor = vec4(litColor, g_diffColor.w);
