@@ -349,11 +349,11 @@ namespace LibGL::Demo
 
 		if (inputManager.isKeyDown(EKey::KEY_Q) ||
 			inputManager.isKeyDown(EKey::KEY_LEFT))
-			camera.rotate(-ROTATION_SPEED * Vector3::up() * deltaTime);
+			camera.rotate(ROTATION_SPEED * Vector3::up() * deltaTime);
 
 		if (inputManager.isKeyDown(EKey::KEY_E) ||
 			inputManager.isKeyDown(EKey::KEY_RIGHT))
-			camera.rotate(ROTATION_SPEED * Vector3::up() * deltaTime);
+			camera.rotate(-ROTATION_SPEED * Vector3::up() * deltaTime);
 
 		m_spotLight.m_direction = camera.forward();
 
@@ -393,10 +393,10 @@ namespace LibGL::Demo
 			return;
 
 		Vector3 camRotation = camera.getRotation();
-		camRotation.m_x += -mouseDelta.m_y * rotationSpeed;
-		camRotation.m_y += mouseDelta.m_x * rotationSpeed;
+		camRotation.m_x -= mouseDelta.m_y * rotationSpeed;
+		camRotation.m_y -= mouseDelta.m_x * rotationSpeed;
 
-		camRotation.m_x = clamp(camRotation.m_x, -80.f, 80.f);
+		camRotation.m_x = clamp(camRotation.m_x, -90.f, 90.f);
 		camRotation.m_y = wrap(camRotation.m_y, 0.f, 360.f);
 
 		camera.setRotation(camRotation);
