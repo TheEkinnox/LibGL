@@ -137,12 +137,7 @@ namespace LibGL
 		const Entity* castParent = reinterpret_cast<Entity*>(getParent());
 
 		if (castParent != nullptr)
-		{
-			const Transform parentTransform = castParent->getGlobalTransform();
-			m_globalTransform.translate(parentTransform.getPosition());
-			m_globalTransform.rotate(parentTransform.getRotation());
-			m_globalTransform.scale(parentTransform.getScale());
-		}
+			m_globalTransform = castParent->getGlobalTransform() * m_globalTransform;
 	}
 
 	void Entity::addChild(Node& child)
