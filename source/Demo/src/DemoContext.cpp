@@ -21,7 +21,7 @@ namespace LibGL::Demo
 		m_resourceManager(std::make_unique<ResourceManager>()),
 		m_renderer(std::make_unique<Renderer>()),
 		m_camera(std::make_unique<Camera>(nullptr, Transform(),
-			Matrix4::perspectiveProjection(90_deg,
+			perspectiveProjection(90_deg,
 				static_cast<float>(windowWidth) / static_cast<float>(windowHeight),
 				CAM_NEAR, CAM_FAR))
 		)
@@ -29,7 +29,7 @@ namespace LibGL::Demo
 		const auto resizeFunc = [&](const Window::dimensions_t size)
 		{
 			m_renderer->setViewPort(0, 0, size.first, size.second);
-			m_camera->setProjectionMatrix(Matrix4::perspectiveProjection(90_deg,
+			m_camera->setProjectionMatrix(perspectiveProjection(90_deg,
 				static_cast<float>(size.first) / static_cast<float>(size.second),
 				CAM_NEAR, CAM_FAR));
 		};
@@ -46,7 +46,7 @@ namespace LibGL::Demo
 		m_renderer->setCapability(ERenderingCapability::CULL_FACE, true);
 		m_renderer->setCullFace(ECullFace::BACK);
 
-		// Enable depth-test
+		// Enable depth-test 
 		m_renderer->setCapability(ERenderingCapability::DEPTH_TEST, true);
 
 		// Enable alpha-blending

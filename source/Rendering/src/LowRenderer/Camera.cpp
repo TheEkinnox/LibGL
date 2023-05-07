@@ -9,7 +9,7 @@ namespace LibGL::Rendering
 
 	Camera::Camera()
 		: Entity(),
-		m_projectionMatrix(Matrix4::orthographicProjection(-1, 1, -1, 1, -1, 1))
+		m_projectionMatrix(orthographicProjection(-1.f, 1.f, -1.f, 1.f, -1.f, 1.f))
 	{
 		updateMatrices();
 	}
@@ -56,7 +56,7 @@ namespace LibGL::Rendering
 		if (&other == this)
 			return *this;
 
-		m_projectionMatrix = std::move(other.m_projectionMatrix);
+		m_projectionMatrix = other.m_projectionMatrix;
 
 		updateMatrices();
 
@@ -153,7 +153,7 @@ namespace LibGL::Rendering
 	void Camera::updateMatrices()
 	{
 		const auto camCenter = getGlobalTransform().getPosition() + getGlobalTransform().forward();
-		m_viewMatrix = Matrix4::lookAt(getGlobalTransform().getPosition(), camCenter, Vector3::up());
+		m_viewMatrix = lookAt(getGlobalTransform().getPosition(), camCenter, Vector3::up());
 		m_viewProjectionMatrix = m_projectionMatrix * m_viewMatrix;
 	}
 }

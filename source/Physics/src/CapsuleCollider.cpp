@@ -34,10 +34,10 @@ namespace LibGL::Physics
 	{
 		const auto ownerScale = getOwner().getGlobalTransform().getScale();
 
-		const Matrix4 rotationMat = Matrix4::rotationFromTo(Vector3::up(), m_upDirection);
+		const Matrix4 rotationMat = rotationFromTo(Vector3::up(), m_upDirection);
 		const Vector3 rightScale = static_cast<Vector3>(rotationMat * Vector4::right()) * ownerScale;
 		const Vector3 frontScale = static_cast<Vector3>(rotationMat * Vector4::front()) * ownerScale;
-		
+
 		return (rightScale.isLongerThan(frontScale) ? rightScale : frontScale).magnitude() * m_radius;
 	}
 
@@ -172,7 +172,7 @@ namespace LibGL::Physics
 	Bounds CapsuleCollider::calculateBounds(const Vector3& center, const Vector3& upDir,
 		const float height, const float radius)
 	{
-		const Matrix4 rotationMat = Matrix4::rotationFromTo(Vector3::up(), upDir);
+		const Matrix4 rotationMat = rotationFromTo(Vector3::up(), upDir);
 		const Vector3 rightDir = (rotationMat * Vector4::right()).xyz();
 		const Vector3 frontDir = (rotationMat * Vector4::front()).xyz();
 
