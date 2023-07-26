@@ -1,6 +1,5 @@
 #include "Window.h"
 #include <GLFW/glfw3.h>
-#include <ranges>
 
 #include "Debug/Log.h"
 

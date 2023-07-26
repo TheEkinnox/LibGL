@@ -179,15 +179,15 @@ namespace LibGL::Application
 		static Window* getInstance(GLFWwindow* window);
 
 		/**
-		 * \brief OpenGL frame buffer size change callback
-		 * \param glfwWindow The window for which the frame buffer size has hanged
+		 * \brief GLFW frame buffer size change callback
+		 * \param glfwWindow The window for which the frame buffer size has changed
 		 * \param width The window's frame buffer's new width
 		 * \param height The window's frame buffer's new height
 		 */
 		static void onFrameBufferResize(GLFWwindow* glfwWindow, int width, int height);
 
 		/**
-		 * \brief OpenGL key action callback
+		 * \brief GLFW key action callback
 		 * \param glfwWindow The window for which a key action has been performed
 		 * \param key The key that has been interacted with
 		 * \param scanCode The scan code of the key that has been interacted with
@@ -197,8 +197,8 @@ namespace LibGL::Application
 		static void onKey(GLFWwindow* glfwWindow, int key, int scanCode, int action, int mods);
 
 		/**
-		 * \brief OpenGL frame buffer size change callback
-		 * \param glfwWindow The window for which the frame buffer size has hanged
+		 * \brief GLFW mouse button action callback
+		 * \param glfwWindow The window for which a mouse button has been interacted with
 		 * \param button The mouse button that has been interacted with
 		 * \param action The action that has been performed
 		 * \param mods The input modifiers of the key event
