@@ -1,5 +1,5 @@
 #pragma once
-#include "Core/Buffers/ShaderStorageBuffer.inl"
+#include "Core/Buffers/ShaderStorageBuffer.h"
 
 namespace LibGL::Rendering
 {
