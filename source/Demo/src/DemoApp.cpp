@@ -105,7 +105,7 @@ namespace LibGL::Demo
 		ASSERT(diabloSpecular != nullptr);
 
 		const Model* cubeModel = resourceManager.getOrCreate<Model>("meshes/primitives/cube.obj");
-		ASSERT(diabloModel != nullptr);
+		ASSERT(cubeModel != nullptr);
 
 		const Material floorMat(
 			*shader,
