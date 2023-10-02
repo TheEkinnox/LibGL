@@ -196,58 +196,57 @@ namespace LibGL::Physics
 				for (const auto& worldCollider : worldColliders)
 				{
 					if (worldCollider == nullptr || !worldCollider->isActive() ||
-						std::ranges::find(checkedColliders, worldCollider->getId()) != checkedColliders.end())
+						&worldCollider->getOwner() == &getOwner() || *entityCollider == *worldCollider ||
+						std::ranges::find(checkedColliders, worldCollider->getId()) != checkedColliders.end() ||
+						!entityCollider->check(*worldCollider))
 						continue;
 
-					if (*entityCollider != *worldCollider && entityCollider->check(*worldCollider))
+					const Vector3 normal = getBoundsNormal(*entityCollider, *worldCollider);
+
+					const Vector3 normalMask
 					{
-						const Vector3 normal = getBoundsNormal(*entityCollider, *worldCollider);
+						LibMath::abs(normal.m_x) > 0.f ? sign(normal.m_x) : 0.f,
+						LibMath::abs(normal.m_y) > 0.f ? sign(normal.m_y) : 0.f,
+						LibMath::abs(normal.m_z) > 0.f ? sign(normal.m_z) : 0.f
+					};
 
-						const Vector3 normalMask
+					const Vector3 frictionMask
+					{
+						floatEquals(normalMask.m_x, 0.f) ? sign(normalMask.m_x) : 0.f,
+						floatEquals(normalMask.m_y, 0.f) ? sign(normalMask.m_y) : 0.f,
+						floatEquals(normalMask.m_z, 0.f) ? sign(normalMask.m_z) : 0.f
+					};
+
+					Rigidbody* otherRigidbody = worldCollider->getOwner().getComponent<Rigidbody>();
+
+					// There is a collision, apply opposite forces
+					if (otherRigidbody != nullptr && otherRigidbody != this && otherRigidbody->isActive())
+					{
+						const Vector3 otherVelocity = otherRigidbody->getDraggedVelocity();
+
+						if (!otherRigidbody->m_isKinematic)
 						{
-							LibMath::abs(normal.m_x) > 0.f ? sign(normal.m_x) : 0.f,
-							LibMath::abs(normal.m_y) > 0.f ? sign(normal.m_y) : 0.f,
-							LibMath::abs(normal.m_z) > 0.f ? sign(normal.m_z) : 0.f
-						};
-
-						const Vector3 frictionMask
-						{
-							floatEquals(normalMask.m_x, 0.f) ? sign(normalMask.m_x) : 0.f,
-							floatEquals(normalMask.m_y, 0.f) ? sign(normalMask.m_y) : 0.f,
-							floatEquals(normalMask.m_z, 0.f) ? sign(normalMask.m_z) : 0.f
-						};
-
-						Rigidbody* otherRigidbody = worldCollider->getOwner().getComponent<Rigidbody>();
-
-						// There is a collision, apply opposite forces
-						if (otherRigidbody != nullptr && otherRigidbody->isActive())
-						{
-							const Vector3 otherVelocity = otherRigidbody->getDraggedVelocity();
-
-							if (!otherRigidbody->m_isKinematic)
-							{
-								if (normal.dot(otherVelocity) >= 0.f)
-									otherRigidbody->addForce((otherVelocity * normalMask).magnitude() * -normal, EForceMode::VELOCITY_CHANGE);
-
-								if (normal.dot(-velocity) >= 0.f)
-									otherRigidbody->addForce((velocity * m_mass * normalMask).magnitude() * -normal, EForceMode::IMPULSE);
-							}
+							if (normal.dot(otherVelocity) >= 0.f)
+								otherRigidbody->addForce((otherVelocity * normalMask).magnitude() * -normal, EForceMode::VELOCITY_CHANGE);
 
 							if (normal.dot(-velocity) >= 0.f)
-								addForce((velocity * normalMask).magnitude() * normal, EForceMode::VELOCITY_CHANGE);
-
-							if (normal.dot(otherVelocity) >= 0.f)
-								addForce((otherVelocity * otherRigidbody->m_mass * normalMask).magnitude() * normal, EForceMode::IMPULSE);
+								otherRigidbody->addForce((velocity * m_mass * normalMask).magnitude() * -normal, EForceMode::IMPULSE);
 						}
-						else if (normal.dot(-velocity) >= 0.f)
-						{
+
+						if (normal.dot(-velocity) >= 0.f)
 							addForce((velocity * normalMask).magnitude() * normal, EForceMode::VELOCITY_CHANGE);
-						}
 
-						addForce(-velocity * frictionMask * g_friction * g_gravity.magnitude(), EForceMode::ACCELERATION);
-
-						checkedColliders.push_back(worldCollider->getId());
+						if (normal.dot(otherVelocity) >= 0.f)
+							addForce((otherVelocity * otherRigidbody->m_mass * normalMask).magnitude() * normal, EForceMode::IMPULSE);
 					}
+					else if (normal.dot(-velocity) >= 0.f)
+					{
+						addForce((velocity * normalMask).magnitude() * normal, EForceMode::VELOCITY_CHANGE);
+					}
+
+					addForce(-velocity * frictionMask * g_friction * g_gravity.magnitude(), EForceMode::ACCELERATION);
+
+					checkedColliders.push_back(worldCollider->getId());
 				}
 			}
 
