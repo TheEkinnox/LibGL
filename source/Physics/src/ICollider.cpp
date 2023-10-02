@@ -68,7 +68,11 @@ namespace LibGL::Physics
 	{
 		const Transform& transform = getOwner();
 		const Vector3 worldCenter = (transform.getWorldMatrix() * Vector4(m_bounds.m_center, 1.f)).xyz();
-		const Vector3 worldSize = (transform.getWorldMatrix() * Vector4(m_bounds.m_boxSize, 0)).xyz();
+		Vector3 worldSize = (transform.getWorldMatrix() * Vector4(m_bounds.m_boxSize, 0)).xyz();
+
+		worldSize.m_x = LibMath::abs(worldSize.m_x);
+		worldSize.m_y = LibMath::abs(worldSize.m_y);
+		worldSize.m_z = LibMath::abs(worldSize.m_z);
 
 		const Vector3 scale = transform.getWorldScale();
 		const float radiusScale = max(max(scale.m_x, scale.m_y), scale.m_z);
@@ -83,10 +87,13 @@ namespace LibGL::Physics
 		return point.distanceSquaredFrom(center) <= radius * radius;
 	}
 
-	bool ICollider::check(const Ray& ray) const
+	bool ICollider::check(const Ray& ray, float& distanceSqr) const
 	{
 		const auto [center, _, radius] = getBounds();
-		return ray.distanceSquaredFrom(center) <= radius * radius;
+		const Vector3 closestPoint = ray.getClosestPoint(center);
+		const bool colliding = closestPoint.distanceSquaredFrom(center) <= radius * radius;
+		distanceSqr = colliding ? closestPoint.distanceSquaredFrom(ray.m_origin) : INFINITY;
+		return colliding;
 	}
 
 	bool ICollider::check(const ICollider& other) const

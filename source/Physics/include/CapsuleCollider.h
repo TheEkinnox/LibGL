@@ -46,10 +46,12 @@ namespace LibGL::Physics
 		/**
 		 * \brief Checks if a given ray is colliding with the collider.
 		 * \param ray The ray to check collision for.
+		 * \param distanceSqr The squared distance from the origin to the closest intersection point
+		 * Infinity if no intersection
 		 * \return True if the ray is colliding with the collider.
 		 * False otherwise.
 		 */
-		bool check(const Ray& ray) const override;
+		bool check(const Ray& ray, float& distanceSqr) const override;
 
 		/**
 		 * \brief Checks if a given collider is colliding with the capsule collider.

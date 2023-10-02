@@ -66,24 +66,22 @@ namespace LibGL::Physics
 		/**
 		 * \brief Checks if a given point is colliding with the collider.
 		 * \param point The point to check collision for.
-		 * \return True if the point is colliding with the collider.
-		 * False otherwise.
+		 * \return True if the point is colliding with the collider. False otherwise.
 		 */
 		virtual bool check(const LibMath::Vector3& point) const;
 
 		/**
 		 * \brief Checks if a given ray is colliding with the collider.
 		 * \param ray The ray to check collision for.
-		 * \return True if the ray is colliding with the collider.
-		 * False otherwise.
+		 * \param distanceSqr The squared distance from the origin to the closest intersection point. Infinity if no intersection
+		 * \return True if the ray is colliding with the collider. False otherwise.
 		 */
-		virtual bool check(const Ray& ray) const;
+		virtual bool check(const Ray& ray, float& distanceSqr) const;
 
 		/**
 		 * \brief Checks if a collider is colliding with the current collider.
 		 * \param other The collider to check collision for.
-		 * \return True if the other collider is colliding with the current collider.
-		 * False otherwise.
+		 * \return True if the other collider is colliding with the current collider. False otherwise.
 		 */
 		virtual bool check(const ICollider& other) const;
 

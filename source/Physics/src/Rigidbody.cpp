@@ -73,8 +73,14 @@ namespace LibGL::Physics
 
 	void Rigidbody::simulate()
 	{
-		if (!isActive() || m_isKinematic)
+		if (!isActive())
 			return;
+
+		if (m_isKinematic)
+		{
+			move();
+			return;
+		}
 
 		if (m_useGravity)
 			addForce(g_gravity, EForceMode::ACCELERATION);
@@ -127,24 +133,28 @@ namespace LibGL::Physics
 				entityCenter.distanceSquaredFrom(snappedZ)));
 
 		if (floatEquals(minDist, entityCenter.distanceSquaredFrom(snappedX)))
-			return Vector3::right() * sign(snappedX.m_x - center.m_x);
+			return (Vector3::right() * sign(snappedX.m_x - center.m_x)).normalized();
 
 		if (floatEquals(minDist, entityCenter.distanceSquaredFrom(snappedY)))
-			return Vector3::up() * sign(snappedY.m_y - center.m_y);
+			return (Vector3::up() * sign(snappedY.m_y - center.m_y)).normalized();
 
 		if (floatEquals(minDist, entityCenter.distanceSquaredFrom(snappedZ)))
-			return Vector3::front() * sign(snappedZ.m_z - center.m_z);
+			return (Vector3::front() * sign(snappedZ.m_z - center.m_z)).normalized();
 
 		return Vector3::zero();
 	}
 
 	void Rigidbody::move()
 	{
-		if (!isActive() || isSleeping() || m_isKinematic)
+		if (!isActive() || isSleeping())
 			return;
 
-		const auto ownerColliders = getOwner().getComponents<ICollider>();
 		const float deltaTime = LGL_SERVICE(Timer).getDeltaTime();
+
+		if (m_isKinematic)
+			getOwner().translate(m_velocity * deltaTime);
+
+		const auto ownerColliders = getOwner().getComponents<ICollider>();
 
 		if (ownerColliders.empty())
 		{
@@ -202,14 +212,14 @@ namespace LibGL::Physics
 
 						const Vector3 frictionMask
 						{
-							floatEquals(normal.m_x, 0.f) ? sign(normal.m_x) : 0.f,
-							floatEquals(normal.m_x, 0.f) ? sign(normal.m_y) : 0.f,
-							floatEquals(normal.m_x, 0.f) ? sign(normal.m_z) : 0.f
+							floatEquals(normalMask.m_x, 0.f) ? sign(normalMask.m_x) : 0.f,
+							floatEquals(normalMask.m_y, 0.f) ? sign(normalMask.m_y) : 0.f,
+							floatEquals(normalMask.m_z, 0.f) ? sign(normalMask.m_z) : 0.f
 						};
 
 						Rigidbody* otherRigidbody = worldCollider->getOwner().getComponent<Rigidbody>();
 
-						// There is a collision, apply opposite forces and clamp position to collision point
+						// There is a collision, apply opposite forces
 						if (otherRigidbody != nullptr && otherRigidbody->isActive())
 						{
 							const Vector3 otherVelocity = otherRigidbody->getDraggedVelocity();
@@ -234,7 +244,7 @@ namespace LibGL::Physics
 							addForce((velocity * normalMask).magnitude() * normal, EForceMode::VELOCITY_CHANGE);
 						}
 
-						addForce(-velocity * frictionMask * g_friction * g_gravity.magnitudeSquared(), EForceMode::ACCELERATION);
+						addForce(-velocity * frictionMask * g_friction * g_gravity.magnitude(), EForceMode::ACCELERATION);
 
 						checkedColliders.push_back(worldCollider->getId());
 					}

@@ -20,9 +20,9 @@ namespace LibGL::Physics
 		return ICollider::check(point);
 	}
 
-	bool SphereCollider::check(const Ray& ray) const
+	bool SphereCollider::check(const Ray& ray, float& distanceSqr) const
 	{
-		return ICollider::check(ray);
+		return ICollider::check(ray, distanceSqr);
 	}
 
 	bool SphereCollider::check(const ICollider& other) const

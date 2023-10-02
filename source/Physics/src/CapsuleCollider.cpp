@@ -22,7 +22,7 @@ namespace LibGL::Physics
 
 	Vector3 CapsuleCollider::getUpDirection() const
 	{
-		return m_upDirection;
+		return (getOwner().getWorldMatrix() * Vector4(m_upDirection, 0.f)).xyz();
 	}
 
 	float CapsuleCollider::getHeight() const
@@ -35,8 +35,8 @@ namespace LibGL::Physics
 		const auto ownerScale = getOwner().getWorldScale();
 
 		const Matrix4 rotationMat = rotationFromTo(Vector3::up(), m_upDirection);
-		const Vector3 rightScale = static_cast<Vector3>(rotationMat * Vector4::right()) * ownerScale;
-		const Vector3 frontScale = static_cast<Vector3>(rotationMat * Vector4::front()) * ownerScale;
+		const Vector3 rightScale = (rotationMat * Vector4::right()).xyz() * ownerScale;
+		const Vector3 frontScale = (rotationMat * Vector4::front()).xyz() * ownerScale;
 
 		return (rightScale.isLongerThan(frontScale) ? rightScale : frontScale).magnitude() * m_radius;
 	}
@@ -59,16 +59,16 @@ namespace LibGL::Physics
 		return point.distanceSquaredFrom(closestPoint) <= radius * radius;
 	}
 
-	bool CapsuleCollider::check(const Ray& ray) const
+	bool CapsuleCollider::check(const Ray& ray, float& distanceSqr) const
 	{
 		// Check the bounding spheres first to avoid unnecessary computation
-		if (!ICollider::check(ray))
+		if (!ICollider::check(ray, distanceSqr))
 			return false;
 
 		const auto [center, _, halfHeight] = getBounds();
 		const float radius = getRadius();
 		const auto orientedHeight = getUpDirection() * (halfHeight - radius) * 2.f;
-		
+
 		const Ray centerRay = { center, getUpDirection() };
 
 		auto [ rayClosest, capsuleClosest ] = ray.getClosestPoints(centerRay);
@@ -79,7 +79,9 @@ namespace LibGL::Physics
 
 		rayClosest = ray.getClosestPoint(capsuleClosest);
 
-		return rayClosest.distanceSquaredFrom(capsuleClosest) <= radius * radius;
+		const bool colliding = rayClosest.distanceSquaredFrom(center) <= radius * radius;
+		distanceSqr = colliding ? rayClosest.distanceFrom(ray.m_origin) : INFINITY;
+		return colliding;
 	}
 
 	bool CapsuleCollider::check(const ICollider& other) const
