@@ -5,7 +5,6 @@
 
 #include "EKeyState.h"
 #include "Window.h"
-#include "Utility/ServiceLocator.h"
 #include "Utility/Timer.h"
 
 using namespace LibGL::Application::Exceptions;
@@ -58,28 +57,28 @@ namespace LibGL::Application
 	{
 		return m_keyInfos.contains(key)
 			&& m_keyInfos.at(key).m_keyState == EKeyState::KEY_PRESSED
-			&& m_keyInfos.at(key).m_stateChangeFrame == LGL_SERVICE(Timer).getFrameCount();
+			&& m_keyInfos.at(key).m_stateChangeFrame == m_currentFrame;
 	}
 
 	bool InputManager::isKeyPressed(const int scanCode) const
 	{
 		return m_scanCodeInfo.contains(scanCode)
 			&& m_scanCodeInfo.at(scanCode).m_keyState == EKeyState::KEY_PRESSED
-			&& m_scanCodeInfo.at(scanCode).m_stateChangeFrame == LGL_SERVICE(Timer).getFrameCount();
+			&& m_scanCodeInfo.at(scanCode).m_stateChangeFrame == m_currentFrame;
 	}
 
 	bool InputManager::isKeyReleased(const EKey key) const
 	{
 		return m_keyInfos.contains(key)
 			&& m_keyInfos.at(key).m_keyState == EKeyState::KEY_RELEASED
-			&& m_keyInfos.at(key).m_stateChangeFrame == LGL_SERVICE(Timer).getFrameCount();
+			&& m_keyInfos.at(key).m_stateChangeFrame == m_currentFrame;
 	}
 
 	bool InputManager::isKeyReleased(const int scanCode) const
 	{
 		return m_scanCodeInfo.contains(scanCode)
 			&& m_scanCodeInfo.at(scanCode).m_keyState == EKeyState::KEY_RELEASED
-			&& m_scanCodeInfo.at(scanCode).m_stateChangeFrame == LGL_SERVICE(Timer).getFrameCount();
+			&& m_scanCodeInfo.at(scanCode).m_stateChangeFrame == m_currentFrame;
 	}
 
 	bool InputManager::isMouseButtonUp(const EMouseButton button) const
@@ -98,14 +97,14 @@ namespace LibGL::Application
 	{
 		return m_mouseButtonInfo.contains(button)
 			&& m_mouseButtonInfo.at(button).m_buttonState == EMouseButtonState::MOUSE_PRESSED
-			&& m_mouseButtonInfo.at(button).m_stateChangeFrame == LGL_SERVICE(Timer).getFrameCount();
+			&& m_mouseButtonInfo.at(button).m_stateChangeFrame == m_currentFrame;
 	}
 
 	bool InputManager::isMouseButtonReleased(const EMouseButton button) const
 	{
 		return m_mouseButtonInfo.contains(button)
 			&& m_mouseButtonInfo.at(button).m_buttonState == EMouseButtonState::MOUSE_RELEASED
-			&& m_mouseButtonInfo.at(button).m_stateChangeFrame == LGL_SERVICE(Timer).getFrameCount();
+			&& m_mouseButtonInfo.at(button).m_stateChangeFrame == m_currentFrame;
 	}
 
 	void InputManager::clearStates()
@@ -115,7 +114,7 @@ namespace LibGL::Application
 		m_mouseButtonInfo.clear();
 	}
 
-	void InputManager::updateMouse()
+	void InputManager::update()
 	{
 		m_mousePos = m_window.getCursorPosition();
 
@@ -127,6 +126,7 @@ namespace LibGL::Application
 
 		m_mouseDelta = m_mousePos - m_lastMousePos;
 		m_lastMousePos = m_mousePos;
+		++m_currentFrame;
 	}
 
 	void InputManager::resetFirstMouse()
@@ -151,14 +151,12 @@ namespace LibGL::Application
 
 	void InputManager::keyCallback(const EKey key, const int scanCode, const EKeyState state, EInputModifier)
 	{
-		const uint64_t currentFrame = LGL_SERVICE(Timer).getFrameCount();
-
-		m_keyInfos[key] = { state, currentFrame };
-		m_scanCodeInfo[scanCode] = { state, currentFrame };
+		m_keyInfos[key] = { state, m_currentFrame };
+		m_scanCodeInfo[scanCode] = { state, m_currentFrame };
 	}
 
 	void InputManager::mouseButtonCallback(const EMouseButton button, const EMouseButtonState state, EInputModifier)
 	{
-		m_mouseButtonInfo[button] = { state, LGL_SERVICE(Timer).getFrameCount() };
+		m_mouseButtonInfo[button] = { state, m_currentFrame };
 	}
 }

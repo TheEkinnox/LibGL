@@ -56,6 +56,6 @@ namespace LibGL::Demo
 	void DemoContext::update()
 	{
 		IContext::update();
-		m_inputManager->updateMouse();
+		m_inputManager->update();
 	}
 }

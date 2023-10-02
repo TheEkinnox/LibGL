@@ -29,7 +29,7 @@ namespace LibGL::Application
 		/**
 		 * \brief Updates cached mouse data
 		 */
-		void updateMouse();
+		void update();
 
 		/**
 		 * \brief Resets the input manager to consider the mouse as not moved
@@ -168,6 +168,7 @@ namespace LibGL::Application
 
 		uint64_t			m_keyCallbackId = 0;
 		uint64_t			m_mouseButtonCallbackId = 0;
+		uint64_t			m_currentFrame = 0;
 
 		std::unordered_map<EKey, KeyInfo>					m_keyInfos;
 		std::unordered_map<int, KeyInfo>					m_scanCodeInfo;
