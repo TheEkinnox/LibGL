@@ -27,8 +27,7 @@ namespace LibGL::Rendering
 	}
 
 	Camera::Camera(Camera&& other) noexcept
-		: Entity(std::move(other)),
-		m_projectionMatrix(std::move(other.m_projectionMatrix))
+		: Entity(std::forward<Camera&&>(other)), m_projectionMatrix(std::move(other.m_projectionMatrix))
 	{
 		updateMatrices();
 	}
