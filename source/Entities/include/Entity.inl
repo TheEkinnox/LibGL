@@ -10,7 +10,7 @@ namespace LibGL
 	{
 		static_assert(std::is_same_v<Component, T> || std::is_base_of_v<Component, T>);
 
-		m_components.push_back(std::make_shared<T>(*this, args...));
+		m_components.push_back(std::make_shared<T>(*this, std::forward<Args>(args)...));
 
 		return static_cast<T&>(*m_components.back());
 	}

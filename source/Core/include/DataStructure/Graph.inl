@@ -18,7 +18,7 @@ namespace LibGL::DataStructure
 	DataT& Graph<NodeT>::addNode(Args&&... args)
 	{
 		static_assert(std::is_same_v<NodeT, DataT> || std::is_base_of_v<NodeT, DataT>);
-		const auto addedNode = std::make_shared<DataT>(args...);
+		const auto addedNode = std::make_shared<DataT>(std::forward<Args>(args)...);
 		m_nodes.push_back(addedNode);
 		return *addedNode;
 	}
