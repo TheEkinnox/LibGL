@@ -32,7 +32,7 @@ namespace LibGL::Physics
 
 	float CapsuleCollider::getRadius() const
 	{
-		const auto ownerScale = getOwner().getGlobalTransform().getScale();
+		const auto ownerScale = getOwner().getWorldScale();
 
 		const Matrix4 rotationMat = rotationFromTo(Vector3::up(), m_upDirection);
 		const Vector3 rightScale = static_cast<Vector3>(rotationMat * Vector4::right()) * ownerScale;

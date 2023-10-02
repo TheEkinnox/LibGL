@@ -422,7 +422,7 @@ namespace LibGL::Demo
 		shader->use();
 
 		// Setup camera
-		shader->setUniformVec3("u_viewPos", Camera::getCurrent().getGlobalTransform().getPosition());
+		shader->setUniformVec3("u_viewPos", Camera::getCurrent().getWorldPosition());
 
 		m_ambientLight.setupUniform("u_ambient", *shader);
 

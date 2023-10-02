@@ -24,12 +24,6 @@ namespace LibGL
 		Entity& operator=(Entity&& other) noexcept;
 
 		/**
-		 * \brief Gets the entity's global transformation matrix
-		 * \return The entity's global transformation matrix
-		 */
-		Transform getGlobalTransform() const;
-
-		/**
 		 * \brief Adds a component of the given type to the entity
 		 * \param args The component's constructor's parameters
 		 * \return A reference to the added component
@@ -70,17 +64,8 @@ namespace LibGL
 		 */
 		virtual void update();
 
-	protected:
-		/**
-		 * \brief Updates the entity's transformation matrices
-		 */
-		void onChange() override;
-
 	private:
 		ComponentList	m_components;
-		Transform		m_globalTransform;
-
-		void updateGlobalTransform();
 	};
 }
 

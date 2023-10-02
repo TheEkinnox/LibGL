@@ -14,8 +14,6 @@ namespace LibGL
 		if (!m_components.empty())
 			for (const auto& component : m_components)
 				component->m_owner = *this;
-
-		updateGlobalTransform();
 	}
 
 	Entity::Entity(Entity&& other) noexcept :
@@ -25,8 +23,6 @@ namespace LibGL
 		if (!m_components.empty())
 			for (const auto& component : m_components)
 				component->m_owner = *this;
-
-		updateGlobalTransform();
 	}
 
 	Entity::~Entity()
@@ -51,8 +47,6 @@ namespace LibGL
 			for (const auto& component : m_components)
 				component->m_owner = *this;
 
-		updateGlobalTransform();
-
 		return *this;
 	}
 
@@ -67,20 +61,12 @@ namespace LibGL
 		m_components.clear();
 
 		m_components = std::move(other.m_components);
-		m_globalTransform = std::move(other.m_globalTransform);
 
 		if (!m_components.empty())
 			for (const auto& component : m_components)
 				component->m_owner = *this;
 
-		updateGlobalTransform();
-
 		return *this;
-	}
-
-	LibMath::Transform Entity::getGlobalTransform() const
-	{
-		return m_globalTransform;
 	}
 
 
@@ -119,36 +105,15 @@ namespace LibGL
 			reinterpret_cast<Entity*>(child)->update();
 	}
 
-	void Entity::onChange()
-	{
-		Transform::onChange();
-
-		updateGlobalTransform();
-
-		for (auto* child : getChildren())
-			if (child != nullptr)
-				reinterpret_cast<Entity*>(child)->updateGlobalTransform();
-	}
-
-	void Entity::updateGlobalTransform()
-	{
-		m_globalTransform = static_cast<Transform>(*this);
-
-		const Entity* castParent = reinterpret_cast<Entity*>(getParent());
-
-		if (castParent != nullptr)
-			m_globalTransform = castParent->getGlobalTransform() * m_globalTransform;
-	}
-
 	void Entity::addChild(Node& child)
 	{
 		Node::addChild(child);
-		reinterpret_cast<Entity&>(child).updateGlobalTransform();
+		reinterpret_cast<Entity&>(child).setParent(*this);
 	}
 
 	void Entity::removeChild(Node& child)
 	{
 		Node::removeChild(child);
-		reinterpret_cast<Entity&>(child).updateGlobalTransform();
+		reinterpret_cast<Entity&>(child).removeParent();
 	}
 }

@@ -1,7 +1,5 @@
 #include "LowRenderer/Mesh.h"
 
-#include <glad/glad.h>
-
 #include "LowRenderer/Camera.h"
 #include "Resources/Model.h"
 #include "Resources/Shader.h"
@@ -43,7 +41,7 @@ namespace LibGL::Rendering
 
 		const Shader& shader = m_material.getShader();
 		const Matrix4 viewProjMat = Camera::getCurrent().getViewProjectionMatrix();
-		const Matrix4 modelMat = getGlobalTransform().getMatrix();
+		const Matrix4 modelMat = getWorldMatrix();
 
 		shader.setUniformMat4("u_mvp", viewProjMat * modelMat);
 		shader.setUniformMat4("u_modelMat", modelMat);

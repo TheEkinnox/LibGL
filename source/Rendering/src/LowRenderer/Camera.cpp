@@ -151,8 +151,8 @@ namespace LibGL::Rendering
 
 	void Camera::updateMatrices()
 	{
-		const auto camCenter = getGlobalTransform().getPosition() + getGlobalTransform().forward();
-		m_viewMatrix = lookAt(getGlobalTransform().getPosition(), camCenter, getGlobalTransform().up());
+		const auto camCenter = getWorldPosition() + worldForward();
+		m_viewMatrix = lookAt(getWorldPosition(), camCenter, worldUp());
 		m_viewProjectionMatrix = m_projectionMatrix * m_viewMatrix;
 	}
 }
