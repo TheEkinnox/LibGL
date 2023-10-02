@@ -149,7 +149,7 @@ namespace LibGL::Demo
 		headMesh.addComponent<SphereCollider>(Vector3(0.f, .8f, .05f), .125f);
 		headMesh.addComponent<Rigidbody>();
 		m_controllableMesh = &headMesh;
-		
+
 		Mesh& cubeMesh = m_scene.addNode<Mesh>(nullptr, *cubeModel, cubeMat);
 		cubeMesh.setPosition(Vector3(0.f, 1.f, -2.f));
 		cubeMesh.addComponent<BoxCollider>(Vector3::zero(), Vector3::one());
@@ -171,7 +171,7 @@ namespace LibGL::Demo
 		};
 
 		m_pointLights[0] =
-		{ 
+		{
 			Color::magenta,
 			{ -1, 1, 1 },
 			AttenuationData(16)

@@ -46,7 +46,7 @@ namespace LibGL::Demo
 		m_renderer->setCapability(ERenderingCapability::CULL_FACE, true);
 		m_renderer->setCullFace(ECullFace::BACK);
 
-		// Enable depth-test 
+		// Enable depth-test
 		m_renderer->setCapability(ERenderingCapability::DEPTH_TEST, true);
 
 		// Enable alpha-blending
