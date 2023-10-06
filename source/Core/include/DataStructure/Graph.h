@@ -49,6 +49,12 @@ namespace LibGL::DataStructure
 		std::vector<std::shared_ptr<NodeT>> getNodes();
 
 		/**
+		 * \brief Checks whether or not the graph is empty
+		 * \return True if the graph is empty. False otherwise
+		 */
+		bool isEmpty() const;
+
+		/**
 		 * \brief Removes all nodes from the graph
 		 */
 		void clear();

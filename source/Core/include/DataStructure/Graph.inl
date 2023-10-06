@@ -39,6 +39,12 @@ namespace LibGL::DataStructure
 	}
 
 	template <class NodeT>
+	bool Graph<NodeT>::isEmpty() const
+	{
+		return m_nodes.empty();
+	}
+
+	template <class NodeT>
 	void Graph<NodeT>::clear()
 	{
 		if (!m_nodes.empty())
