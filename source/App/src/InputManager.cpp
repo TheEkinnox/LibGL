@@ -29,14 +29,14 @@ namespace LibGL::Application
 
 	bool InputManager::isKeyUp(const EKey key) const
 	{
-		return m_keyInfos.contains(key)
-			&& m_keyInfos.at(key).m_keyState == EKeyState::KEY_RELEASED;
+		return !m_keyInfos.contains(key)
+			|| m_keyInfos.at(key).m_keyState == EKeyState::KEY_RELEASED;
 	}
 
 	bool InputManager::isKeyUp(const int scanCode) const
 	{
-		return m_scanCodeInfo.contains(scanCode)
-			&& m_scanCodeInfo.at(scanCode).m_keyState == EKeyState::KEY_RELEASED;
+		return !m_scanCodeInfo.contains(scanCode)
+			|| m_scanCodeInfo.at(scanCode).m_keyState == EKeyState::KEY_RELEASED;
 	}
 
 	bool InputManager::isKeyDown(const EKey key) const
@@ -83,8 +83,8 @@ namespace LibGL::Application
 
 	bool InputManager::isMouseButtonUp(const EMouseButton button) const
 	{
-		return m_mouseButtonInfo.contains(button)
-			&& m_mouseButtonInfo.at(button).m_buttonState == EMouseButtonState::MOUSE_RELEASED;
+		return !m_mouseButtonInfo.contains(button)
+			|| m_mouseButtonInfo.at(button).m_buttonState == EMouseButtonState::MOUSE_RELEASED;
 	}
 
 	bool InputManager::isMouseButtonDown(const EMouseButton button) const
