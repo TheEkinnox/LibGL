@@ -20,7 +20,7 @@ namespace LibGL::Utility
 			const int intSize = std::snprintf(nullptr, 0, format, args...) + 1;
 
 			if (intSize <= 0)
-				throw std::runtime_error("Unable to print to log - formatting failed.");
+				throw std::runtime_error("Unable to format string.");
 
 			// Create a buffer of the computed size
 			const size_t bufferSize = intSize;
