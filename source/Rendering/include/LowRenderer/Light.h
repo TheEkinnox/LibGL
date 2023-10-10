@@ -18,8 +18,10 @@ namespace LibGL::Rendering
 
 		Light() = default;
 		Light(const Color& color);
+
 		Light(const Light&) = default;
 		Light(Light&&) = default;
+
 		virtual ~Light() = default;
 
 		Light& operator=(const Light&) = default;
@@ -41,6 +43,7 @@ namespace LibGL::Rendering
 
 		DirectionalLight() = default;
 		DirectionalLight(const Light& light, const LibMath::Vector3& direction);
+
 		DirectionalLight(const DirectionalLight&) = default;
 		DirectionalLight(DirectionalLight&&) = default;
 		~DirectionalLight() override = default;
