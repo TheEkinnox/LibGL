@@ -55,6 +55,12 @@ namespace LibGL::Physics
 	class ICollider : public Component
 	{
 	public:
+		ICollider(const ICollider& other);
+		ICollider(ICollider&& other) noexcept;
+
+		ICollider& operator=(const ICollider& other) = default;
+		ICollider& operator=(ICollider&& other) noexcept = default;
+
 		virtual ~ICollider() override;
 
 		/**

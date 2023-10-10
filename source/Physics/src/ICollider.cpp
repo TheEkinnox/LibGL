@@ -59,6 +59,18 @@ namespace LibGL::Physics
 		return closest.distanceSquaredFrom(otherClosest);
 	}
 
+	ICollider::ICollider(const ICollider& other)
+		: Component(other), m_bounds(other.m_bounds)
+	{
+		m_colliders.push_back(this);
+	}
+
+	ICollider::ICollider(ICollider&& other) noexcept
+		: Component(std::forward<ICollider>(other)), m_bounds(other.m_bounds)
+	{
+		m_colliders.push_back(this);
+	}
+
 	ICollider::~ICollider()
 	{
 		m_colliders.erase(std::ranges::find(m_colliders, this));
