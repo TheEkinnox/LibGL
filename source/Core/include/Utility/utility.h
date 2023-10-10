@@ -23,7 +23,14 @@ namespace LibGL::Utility
 	 * \param includeEmpty Whether empty substrings should be included in the result
 	 * \return A vector containing the sub-strings
 	 */
-	std::vector<std::string> splitString(const std::string& str, char const* delimiter, bool includeEmpty);
+	std::vector<std::string> splitString(const std::string& str, const std::string& delimiter, bool includeEmpty);
+
+	/**
+	 * \brief Reads the lines of the given text file
+	 * \param fileName The file's path
+	 * \return A vector containing the file's lines
+	 */
+	std::vector<std::string> readFile(const std::string& fileName);
 }
 
 #include "Utility/utility.inl"
