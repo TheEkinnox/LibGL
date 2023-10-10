@@ -11,6 +11,12 @@ namespace LibGL::Rendering
 	{
 	public:
 		Renderer() = default;
+		Renderer(const Renderer& other) = default;
+		Renderer(Renderer&& other) = default;
+
+		Renderer& operator=(const Renderer& other) = default;
+		Renderer& operator=(Renderer&& other) = default;
+
 		~Renderer() = default;
 
 		/**
