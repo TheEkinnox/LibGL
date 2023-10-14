@@ -30,10 +30,11 @@ namespace LibGL::Resources
 	{
 		static_assert(std::is_same_v<IResource, T> || std::is_base_of_v<IResource, T>);
 
-		if (!m_resources.contains(fileName))
+		const auto it = m_resources.find(fileName);
+		if (it == m_resources.end())
 			return nullptr;
 
-		return reinterpret_cast<T*>(m_resources.at(fileName));
+		return reinterpret_cast<T*>(it->second);
 	}
 
 	template <typename T>
