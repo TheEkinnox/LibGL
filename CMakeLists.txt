@@ -15,6 +15,10 @@ add_subdirectory(dependencies)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(CMAKE_FOLDER LibGL)
 
+if (MSVC)
+  add_compile_options(/Zc:preprocessor)
+endif()
+
 add_subdirectory(source)
 
 if (MSVC AND ${LIBGL_BUILD_DEMO})
