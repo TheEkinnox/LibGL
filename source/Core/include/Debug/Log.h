@@ -42,13 +42,6 @@ namespace LibGL::Debug
 		template			<typename ... Args>
 		static void			debugLog(const char* file, size_t line, const char* format, Args ... args);
 
-#ifdef _DEBUG
-		/**
-		 * \brief Deletes the Logger singleton
-		 */
-		static void			removeInstance();
-#endif
-
 	private:
 		Log() = default;
 
@@ -58,15 +51,7 @@ namespace LibGL::Debug
 		 */
 		static Log&			getInstance();
 
-#ifndef _DEBUG
-		/**
-		 * \brief Deletes the Logger singleton
-		 */
-		static void			removeInstance();
-#endif
-
 		std::ofstream		m_file;
-		inline static Log*	s_instance = nullptr;
 	};
 }
 
