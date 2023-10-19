@@ -295,7 +295,7 @@ namespace LibGL::Demo
 				direction += m_controllableMesh->right();
 
 			if (inputManager.isKeyPressed(EKey::KEY_SPACE))
-				rb->addForce(Vector3::up() * 4, EForceMode::IMPULSE);
+				rb->addForce(Vector3::up() * 4.f, EForceMode::IMPULSE);
 
 			Vector3 targetVelocity;
 

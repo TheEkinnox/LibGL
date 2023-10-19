@@ -1,10 +1,7 @@
 #pragma once
 
-namespace LibMath
-{
-	class Vector3;
-	class Vector4;
-}
+#include "Vector/Vector3.h"
+#include "Vector/Vector4.h"
 
 namespace LibGL::Rendering
 {
