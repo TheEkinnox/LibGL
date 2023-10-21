@@ -1,8 +1,9 @@
 #pragma once
-#include "Scene.h"
+#include <Entity.h>
+#include <Transform.h>
+#include <Matrix/Matrix4.h>
+
 #include "Core/Color.h"
-#include "Matrix/Matrix4.h"
-#include "Transform.h"
 
 namespace LibGL::Rendering
 {

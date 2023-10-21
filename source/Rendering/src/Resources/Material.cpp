@@ -5,9 +5,8 @@
 #include "Resources/Texture.h"
 
 using namespace LibMath;
-using namespace LibGL::Resources;
 
-namespace LibGL::Rendering
+namespace LibGL::Rendering::Resources
 {
 	Material::Material(const Shader& shader, const Maps& matMaps,
 		const UVModifiers& uvModifiers, const ColorData& colors, const float shininess) :

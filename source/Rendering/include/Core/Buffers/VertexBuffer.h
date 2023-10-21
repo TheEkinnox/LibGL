@@ -2,7 +2,7 @@
 #include <vector>
 
 #include "Core/Buffers/Buffer.h"
-#include "Resources/Vertex.h"
+#include "Core/Vertex.h"
 
 namespace LibGL::Rendering
 {
@@ -10,8 +10,8 @@ namespace LibGL::Rendering
 	{
 	public:
 		VertexBuffer() = default;
-		VertexBuffer(const Resources::Vertex* vertices, intptr_t verticesCount);
-		explicit VertexBuffer(const std::vector<Resources::Vertex>& vertices);
+		VertexBuffer(const Vertex* vertices, intptr_t verticesCount);
+		explicit VertexBuffer(const std::vector<Vertex>& vertices);
 
 		/**
 		 * \brief Binds the vertex buffer to the current context

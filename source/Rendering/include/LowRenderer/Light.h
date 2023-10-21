@@ -1,11 +1,10 @@
 #pragma once
-#include "Core/Color.h"
-#include "Vector/Vector3.h"
+#include <Matrix/Matrix4.h>
+#include <Vector/Vector3.h>
 
-namespace LibGL::Resources
-{
-	class Shader;
-}
+#include "Core/Color.h"
+#include "Enums/ELightType.h"
+#include "Resources/Shader.h"
 
 namespace LibGL::Rendering
 {
@@ -35,6 +34,13 @@ namespace LibGL::Rendering
 		 * \param shader The shader for which the uniform should be set
 		 */
 		virtual void setupUniform(const std::string& uniformName, const Resources::Shader& shader) const;
+
+		/**
+		 * \brief Creates a matrix storing the light's color in the first column,\n
+		 and the light type in the fourth column's fourth row
+		 * \return A matrix containing the light's data
+		 */
+		virtual LibMath::Matrix4 getMatrix() const;
 	};
 
 	struct DirectionalLight final : Light
@@ -59,6 +65,14 @@ namespace LibGL::Rendering
 		 * \param shader The shader for which the uniform should be set
 		 */
 		void setupUniform(const std::string& uniformName, const Resources::Shader& shader) const override;
+
+		/**
+		 * \brief Creates a matrix storing the light's color in the first column,\n
+		 the direction in the remaining space of the first row,\n
+		 and the light type in the fourth column's fourth row
+		 * \return A matrix containing the light's data
+		 */
+		LibMath::Matrix4 getMatrix() const override;
 	};
 
 	struct AttenuationData
@@ -92,10 +106,19 @@ namespace LibGL::Rendering
 		 * \brief Sets up the uniform variables for the current light
 		 * in the given shader
 		 * \param uniformName The name of the light's uniform variable
-		 / in the given shader
+		 * in the given shader
 		 * \param shader The shader for which the uniform should be set
 		 */
 		void setupUniform(const std::string& uniformName, const Resources::Shader& shader) const override;
+
+		/**
+		 * \brief Creates a matrix storing the light's color in the first column,\n
+		 the position in the remaining space of the second row,\n
+		 the attenuation data in the remaining space of the third row,\n
+		 and the light type in the fourth column's fourth row
+		 * \return A matrix containing the light's data
+		 */
+		LibMath::Matrix4 getMatrix() const override;
 	};
 
 	struct Cutoff
@@ -132,5 +155,16 @@ namespace LibGL::Rendering
 		 * \param shader The shader for which the uniform should be set
 		 */
 		void setupUniform(const std::string& uniformName, const Resources::Shader& shader) const override;
+
+		/**
+		 * \brief Creates a matrix storing the light's color in the first column,\n
+		 the direction in the remaining space of the first row,\n
+		 the position in the remaining space of the second row,\n
+		 the attenuation data in the remaining space of the third row,\n
+		 the cutoff data in the remaining space of the fourth row,\n
+		 and the light type in the fourth column's fourth row
+		 * \return A matrix containing the light's data
+		 */
+		LibMath::Matrix4 getMatrix() const override;
 	};
 }

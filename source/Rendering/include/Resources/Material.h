@@ -1,23 +1,21 @@
 #pragma once
+#include <Vector/Vector2.h>
+
 #include "Core/Color.h"
-#include "Vector/Vector2.h"
 
-namespace LibGL::Resources
+namespace LibGL::Rendering::Resources
 {
-	class Shader;
-	class Texture;
-}
+    class Shader;
+    class Texture;
 
-namespace LibGL::Rendering
-{
 	class Material
 	{
 	public:
 		struct Maps
 		{
-			const Resources::Texture* m_diffuse;
-			const Resources::Texture* m_specular;
-			const Resources::Texture* m_normal;
+			const Texture* m_diffuse;
+			const Texture* m_specular;
+			const Texture* m_normal;
 		};
 
 		struct ColorData
@@ -33,7 +31,7 @@ namespace LibGL::Rendering
 		};
 
 		Material() = delete;
-		Material(const Resources::Shader& shader, const Maps& matMaps,
+		Material(const Shader& shader, const Maps& matMaps,
 			const UVModifiers& uvModifiers, const ColorData& colors, float shininess);
 
 		Material(const Material& other) = default;
@@ -47,25 +45,25 @@ namespace LibGL::Rendering
 		 * \brief Gets the material's shader
 		 * \return A reference to the material's shader
 		 */
-		const Resources::Shader& getShader() const;
+		const Shader& getShader() const;
 
 		/**
 		 * \brief Gets the material's diffuse map
 		 * \return The material's diffuse map
 		 */
-		const Resources::Texture& getDiffuseMap() const;
+		const Texture& getDiffuseMap() const;
 
 		/**
 		 * \brief Gets the material's specular map
 		 * \return The material's specular map
 		 */
-		const Resources::Texture& getSpecularMap() const;
+		const Texture& getSpecularMap() const;
 
 		/**
 		 * \brief Gets the material's normal map
 		 * \return The material's normal map
 		 */
-		const Resources::Texture& getNormalMap() const;
+		const Texture& getNormalMap() const;
 
 		/**
 		 * \brief Gets the material's UV offset
@@ -95,25 +93,25 @@ namespace LibGL::Rendering
 		 * \brief Sets the material's shader to the given value
 		 * \param shader The material's new shader
 		 */
-		void setShader(const Resources::Shader& shader);
+		void setShader(const Shader& shader);
 
 		/**
 		 * \brief Sets the material's diffuse map to the given value
 		 * \param diffuseMap The material's new diffuse map
 		 */
-		void setDiffuseMap(const Resources::Texture* diffuseMap);
+		void setDiffuseMap(const Texture* diffuseMap);
 
 		/**
 		 * \brief Sets the material's diffuse map to the given value
 		 * \param specularMap The material's new normal map
 		 */
-		void setSpecularMap(const Resources::Texture* specularMap);
+		void setSpecularMap(const Texture* specularMap);
 
 		/**
 		 * \brief Sets the material's diffuse map to the given value
 		 * \param normalMap The material's new normal map
 		 */
-		void setNormalMap(const Resources::Texture* normalMap);
+		void setNormalMap(const Texture* normalMap);
 
 		/**
 		 * \brief Sets the material's UV offset to the given value
@@ -146,12 +144,10 @@ namespace LibGL::Rendering
 		void use() const;
 
 	private:
-		Maps						m_maps;
-		UVModifiers					m_uvModifiers;
-		ColorData					m_colors;
-		const Resources::Shader*	m_shader;
-		float						m_shininess;
+		Maps			m_maps;
+		UVModifiers		m_uvModifiers;
+		ColorData		m_colors;
+		const Shader*	m_shader;
+		float			m_shininess;
 	};
-
-#define TMP sizeof(const Resources::Shader*)
 }

@@ -1,7 +1,7 @@
 #include "Core/Color.h"
 
-#include "Vector/Vector3.h"
-#include "Vector/Vector4.h"
+#include <Vector/Vector3.h>
+#include <Vector/Vector4.h>
 
 namespace LibGL::Rendering
 {
@@ -82,7 +82,7 @@ namespace LibGL::Rendering
 
 	Color Color::operator*(const float scalar) const
 	{
-		return *this * LibMath::Vector4(scalar);
+		return this->rgba() * LibMath::Vector4(scalar);
 	}
 
 	Color Color::operator/(const float scalar) const

@@ -2,6 +2,9 @@
 
 namespace LibGL::Application
 {
+#undef MOD_SHIFT
+#undef MOD_CONTROL
+#undef MOD_ALT
 	enum class EInputModifier
 	{
 		MOD_SHIFT = 1 << 0,

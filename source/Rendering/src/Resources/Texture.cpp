@@ -1,174 +1,256 @@
-#include "Debug/Log.h"
-#include "Debug/Assertion.h"
+﻿#include <Debug/Log.h>
+#include <Debug/Assertion.h>
 #include "Resources/Texture.h"
 
 #include <glad/glad.h>
-#include <stdexcept>
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_ASSERT(x) ASSERT(x)
 #include <stb_image.h>
 
-#include "Vector/Vector4.h"
+#include <Vector/Vector4.h>
 
-using namespace LibGL::Rendering;
-
-LibGL::Resources::Texture::Texture(const std::filesystem::path& fileName)
+namespace LibGL::Rendering::Resources
 {
-	if (!Texture::loadFromFile(fileName.string()))
-		throw std::runtime_error("Unable to load texture from path \""
-			+ fileName.string() + "\"");
-}
+    REGISTER_RESOURCE_TYPE(Texture);
 
-LibGL::Resources::Texture::Texture(const Texture& other) :
-	m_id(other.m_id), m_width(other.m_width), m_height(other.m_height),
-	m_channels(other.m_channels)
-{
-}
+    Texture::Texture(const std::filesystem::path& fileName)
+    {
+        ASSERT(load(fileName.string()));
+    }
 
-LibGL::Resources::Texture::Texture(Texture&& other) noexcept :
-	m_id(other.m_id), m_width(other.m_width), m_height(other.m_height),
-	m_channels(other.m_channels)
-{
-	other.m_id = 0;
-}
+    Texture::Texture(const Texture& other) :
+        IResource(other), m_width(other.m_width), m_height(other.m_height),
+        m_channels(other.m_channels)
+    {
+        if (other.m_data != nullptr)
+            m_data = stbi_load_from_memory(other.m_data, other.m_width * other.m_height * other.m_channels, &m_width, &m_height,
+                &m_channels, 0);
+        else
+            m_data = nullptr;
 
-LibGL::Resources::Texture::~Texture()
-{
-	glDeleteTextures(1, &m_id);
-}
+        if (other.m_id != 0)
+        {
+            glGenTextures(1, &m_id);
+            glBindTexture(GL_TEXTURE_2D, m_id);
 
-LibGL::Resources::Texture& LibGL::Resources::Texture::operator=(const Texture& other)
-{
-	if (&other == this)
-		return *this;
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, getGLFormat(), GL_FLOAT, nullptr);
 
-	m_id = other.m_id;
-	m_width = other.m_width;
-	m_height = other.m_height;
-	m_channels = other.m_channels;
+            glCopyImageSubData(other.m_id, GL_TEXTURE_2D, 0, 0, 0, 0,
+                m_id, GL_TEXTURE_2D, 0, 0, 0, 0,
+                m_width, m_height, 1);
+        }
+        else
+        {
+            m_id = 0;
+        }
+    }
 
-	return *this;
-}
+    Texture::Texture(Texture&& other) noexcept :
+        m_data(other.m_data), m_id(other.m_id), m_width(other.m_width),
+        m_height(other.m_height), m_channels(other.m_channels)
+    {
+        other.m_id = 0;
+        other.m_data = nullptr;
+    }
 
-LibGL::Resources::Texture& LibGL::Resources::Texture::operator=(Texture&& other) noexcept
-{
-	if (&other == this)
-		return *this;
+    Texture::~Texture()
+    {
+        if (m_data != nullptr)
+            stbi_image_free(m_data);
 
-	m_id = other.m_id;
-	m_width = other.m_width;
-	m_height = other.m_height;
-	m_channels = other.m_channels;
+        if (m_id != 0)
+            glDeleteTextures(1, &m_id);
+    }
 
-	other.m_id = 0;
+    Texture& Texture::operator=(const Texture& other)
+    {
+        if (&other == this)
+            return *this;
 
-	return *this;
-}
+        m_width = other.m_width;
+        m_height = other.m_height;
+        m_channels = other.m_channels;
 
-LibGL::Resources::Texture& LibGL::Resources::Texture::getDefault()
-{
-	static Texture texture;
+        if (m_id != 0)
+            glDeleteTextures(1, &m_id);
 
-	if (texture.m_id == 0)
-	{
-		texture.m_width = 1;
-		texture.m_height = 1;
-		texture.m_channels = 4;
+        if (m_data != nullptr)
+            stbi_image_free(m_data);
 
-		glGenTextures(1, &texture.m_id);
-		glBindTexture(GL_TEXTURE_2D, texture.m_id);
+        if (other.m_data != nullptr)
+            m_data = stbi_load_from_memory(other.m_data, other.m_width * other.m_height, &m_width, &m_height, &m_channels, 0);
+        else
+            m_data = nullptr;
 
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture.m_width, texture.m_height,
-			0, texture.getGLFormat(), GL_FLOAT, LibMath::Vector4(1).getArray());
+        if (other.m_id != 0)
+        {
+            glGenTextures(1, &m_id);
+            glBindTexture(GL_TEXTURE_2D, m_id);
 
-		texture.setWrapModeU(ETextureWrapMode::REPEAT);
-		texture.setWrapModeV(ETextureWrapMode::REPEAT);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, getGLFormat(), GL_FLOAT, nullptr);
 
-		texture.setMinFilter(ETextureFilter::NEAREST);
-		texture.setMagFilter(ETextureFilter::NEAREST);
-	}
+            glCopyImageSubData(other.m_id, GL_TEXTURE_2D, 0, 0, 0, 0,
+                m_id, GL_TEXTURE_2D, 0, 0, 0, 0,
+                m_width, m_height, 1);
+        }
+        else
+        {
+            m_id = 0;
+        }
 
-	return texture;
-}
+        return *this;
+    }
 
-bool LibGL::Resources::Texture::loadFromFile(const std::string& fileName)
-{
-	stbi_set_flip_vertically_on_load(true);
-	stbi_uc* data = stbi_load(fileName.c_str(), &m_width, &m_height, &m_channels, 0);
+    Texture& Texture::operator=(Texture&& other) noexcept
+    {
+        if (&other == this)
+            return *this;
 
-	if (data == nullptr)
-	{
-		DEBUG_LOG("Unable to load texture from path \"%s\"\n", fileName.c_str());
-		return false;
-	}
+        glDeleteTextures(1, &m_id);
 
-	glGenTextures(1, &m_id);
-	glBindTexture(GL_TEXTURE_2D, m_id);
+        if (m_data != nullptr)
+            stbi_image_free(m_data);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, getGLFormat(),
-		GL_UNSIGNED_BYTE, data);
+        m_id = other.m_id;
+        m_width = other.m_width;
+        m_height = other.m_height;
+        m_channels = other.m_channels;
+        m_data = other.m_data;
 
-	glGenerateMipmap(GL_TEXTURE_2D);
-	setMinFilter(ETextureFilter::LINEAR_MIPMAP_LINEAR);
+        other.m_id = 0;
+        other.m_data = nullptr;
 
-	stbi_image_free(data);
+        return *this;
+    }
 
-	return true;
-}
+    Texture& Texture::getDefault()
+    {
+        static Texture texture;
 
-void LibGL::Resources::Texture::bind(const uint8_t slot) const
-{
-	glActiveTexture(GL_TEXTURE0 + slot);
-	glBindTexture(GL_TEXTURE_2D, m_id);
+        if (texture.m_id == 0)
+        {
+            texture.m_width = 1;
+            texture.m_height = 1;
+            texture.m_channels = 4;
 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, static_cast<GLint>(m_wrapModeU));
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, static_cast<GLint>(m_wrapModeV));
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, static_cast<GLint>(m_minFilter));
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, static_cast<GLint>(m_magFilter));
-}
+            glGenTextures(1, &texture.m_id);
+            glBindTexture(GL_TEXTURE_2D, texture.m_id);
 
-void LibGL::Resources::Texture::unbind(const uint8_t slot)
-{
-	glActiveTexture(GL_TEXTURE0 + slot);
-	glBindTexture(GL_TEXTURE_2D, 0);
-}
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texture.m_width, texture.m_height,
+                0, texture.getGLFormat(), GL_FLOAT, LibMath::Vector4(1).getArray());
 
-void LibGL::Resources::Texture::setWrapModeU(const ETextureWrapMode wrapMode)
-{
-	m_wrapModeU = wrapMode;
-}
+            texture.setWrapModeU(ETextureWrapMode::REPEAT);
+            texture.setWrapModeV(ETextureWrapMode::REPEAT);
 
-void LibGL::Resources::Texture::setWrapModeV(const ETextureWrapMode wrapMode)
-{
-	m_wrapModeV = wrapMode;
-}
+            texture.setMinFilter(ETextureFilter::NEAREST);
+            texture.setMagFilter(ETextureFilter::NEAREST);
+        }
 
-void LibGL::Resources::Texture::setMinFilter(const ETextureFilter textureFilter)
-{
-	m_minFilter = textureFilter;
-}
+        return texture;
+    }
 
-void LibGL::Resources::Texture::setMagFilter(const ETextureFilter textureFilter)
-{
-	m_magFilter = textureFilter;
-}
+    bool Texture::load(const char* fileName)
+    {
+        if (m_data != nullptr)
+            stbi_image_free(m_data);
 
-uint32_t LibGL::Resources::Texture::getGLFormat() const
-{
-	switch (m_channels)
-	{
-	case 1:
-		return GL_RED;
-	case 2:
-		return GL_RG;
-	case 3:
-		return GL_RGB;
-	case 4:
-		return GL_RGBA;
-	default:
-		DEBUG_LOG("Invalid channels count. Accepted 1, 2, 3 or 4 but received \"%d\".\n", m_channels);
-		throw std::out_of_range("Invalid channels count - Accepted 1, 2, 3 or 4. "
-			"Received \"" + std::to_string(m_channels) + "\".");
-	}
+        stbi_set_flip_vertically_on_load(true);
+        m_data = stbi_load(fileName, &m_width, &m_height, &m_channels, 0);
+
+        if (m_data == nullptr)
+        {
+            DEBUG_LOG("Unable to load texture from path \"%s\"\n", fileName);
+            return false;
+        }
+
+        return true;
+    }
+
+    bool Texture::init()
+    {
+        if (m_data == nullptr)
+        {
+            DEBUG_LOG("Unable to initialize texture - no pixels\n");
+            return false;
+        }
+
+        if (m_id == 0)
+        {
+            glGenTextures(1, &m_id);
+
+            if (m_id == 0)
+            {
+                DEBUG_LOG("Unable to generate texture id.\n");
+                return false;
+            }
+        }
+
+        glBindTexture(GL_TEXTURE_2D, m_id);
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, getGLFormat(),
+            GL_UNSIGNED_BYTE, m_data);
+
+        glGenerateMipmap(GL_TEXTURE_2D);
+        setMinFilter(ETextureFilter::LINEAR_MIPMAP_LINEAR);
+
+        stbi_image_free(m_data);
+        m_data = nullptr;
+
+        return true;
+    }
+
+    void Texture::bind(const uint8_t slot) const
+    {
+        glActiveTexture(GL_TEXTURE0 + slot);
+        glBindTexture(GL_TEXTURE_2D, m_id);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, static_cast<GLint>(m_wrapModeU));
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, static_cast<GLint>(m_wrapModeV));
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, static_cast<GLint>(m_minFilter));
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, static_cast<GLint>(m_magFilter));
+    }
+
+    void Texture::unbind(const uint8_t slot)
+    {
+        glActiveTexture(GL_TEXTURE0 + slot);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+
+    void Texture::setWrapModeU(const ETextureWrapMode wrapMode)
+    {
+        m_wrapModeU = wrapMode;
+    }
+
+    void Texture::setWrapModeV(const ETextureWrapMode wrapMode)
+    {
+        m_wrapModeV = wrapMode;
+    }
+
+    void Texture::setMinFilter(const ETextureFilter textureFilter)
+    {
+        m_minFilter = textureFilter;
+    }
+
+    void Texture::setMagFilter(const ETextureFilter textureFilter)
+    {
+        m_magFilter = textureFilter;
+    }
+
+    uint32_t Texture::getGLFormat() const
+    {
+        switch (m_channels)
+        {
+        case 1:
+            return GL_RED;
+        case 2:
+            return GL_RG;
+        case 3:
+            return GL_RGB;
+        case 4:
+            return GL_RGBA;
+        default:
+            ASSERT(false, "Invalid channels count. Accepted 1, 2, 3 or 4 but received \"%d\".\n", m_channels);
+        }
+    }
 }

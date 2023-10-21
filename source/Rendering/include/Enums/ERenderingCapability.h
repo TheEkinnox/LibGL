@@ -16,6 +16,6 @@ namespace LibGL::Rendering
 		SAMPLE_COVERAGE				= 0x80A0, // If enabled, the fragment's coverage is ANDed with the temporary coverage value. If GL_SAMPLE_COVERAGE_INVERT is set to GL_TRUE, invert the coverage value.
 		SCISSOR_TEST				= 0x0C11, // If enabled, discard fragments that are outside the scissor rectangle.
 		STENCIL_TEST				= 0x0B90, // If enabled, do stencil testing and update the stencil buffer.
-		MULTISAMPLE					= 0x809D  // If enabled, use multiple fragment samples in computing the final color of a pixel.	
+		MULTISAMPLE					= 0x809D  // If enabled, use multiple fragment samples in computing the final color of a pixel.
 	};
 }

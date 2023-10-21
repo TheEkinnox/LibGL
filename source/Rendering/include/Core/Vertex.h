@@ -1,8 +1,8 @@
 #pragma once
-#include "Vector/Vector2.h"
-#include "Vector/Vector3.h"
+#include <Vector/Vector2.h>
+#include <Vector/Vector3.h>
 
-namespace LibGL::Resources
+namespace LibGL::Rendering
 {
 	struct Vertex
 	{

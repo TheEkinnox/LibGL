@@ -1,4 +1,5 @@
 #pragma once
+#include "Scene.h"
 #include "LowRenderer/Camera.h"
 #include "LowRenderer/Light.h"
 #include "IApplication.h"
@@ -72,6 +73,23 @@ namespace LibGL::Demo
 		void onStop() override {}
 
 		/**
+		 * \brief Executes the given number of tasks of the given duration with and without the thread pool
+		 * \param taskCount The number of tasks to execute
+		 * \param taskDuration The duration of the task in ms
+		 */
+		static void testThreadPool(size_t taskCount, size_t taskDuration);
+
+		/**
+		 * \brief Loads the necessary resources for the scene
+		 */
+		static void loadResources();
+
+		/**
+		 * \brief Loads the necessary resources for the scene using multithreading
+		 */
+		static void loadResourcesMulti();
+
+		/**
 		 * \brief Creates the 3d environment
 		 */
 		void createScene();
@@ -79,12 +97,13 @@ namespace LibGL::Demo
 		/**
 		 * \brief Loads or creates a new lit shader from the given file
 		 */
-		static Resources::Shader* setupLitShader(const std::string& fileName);
+		static Rendering::Resources::Shader* setupShader(const std::string& fileName);
 
 		/**
-		 * \brief Loads or creates a new unlit shader from the given file
+		 * \brief Initializes the given shader
+		 * \param shader The shader to initialize
 		 */
-		static Resources::Shader* setupUnlitShader(const std::string& fileName);
+		static void initShader(Rendering::Resources::Shader* shader);
 
 		/**
 		 * \brief Processes user's keyboard input

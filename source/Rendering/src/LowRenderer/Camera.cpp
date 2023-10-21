@@ -1,7 +1,6 @@
 #include "LowRenderer/Camera.h"
 
 using namespace LibMath;
-using namespace LibGL::Resources;
 
 namespace LibGL::Rendering
 {

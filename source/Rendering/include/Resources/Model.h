@@ -1,69 +1,63 @@
-#pragma once
-#include <string>
-#include <vector>
-#include <Resources/IResource.h>
+﻿#pragma once
+#include <Vector/Vector2.h>
+#include <Vector/Vector3.h>
 
-#include "Vertex.h"
+#include "Resources/IResource.h"
+
+#include "Core/Vertex.h"
+#include "Core/VertexAttributes.h"
 #include "Core/Buffers/IndexBuffer.h"
 #include "Core/Buffers/VertexBuffer.h"
 
-namespace LibGL::Resources
+namespace LibGL::Rendering::Resources
 {
-	class Model final : public IResource
-	{
-	public:
-		class VertexAttributes
-		{
-		public:
-			VertexAttributes() = default;
-			explicit VertexAttributes(const Rendering::VertexBuffer& vbo, const Rendering::IndexBuffer& ebo);
+    class Model : public LibGL::Resources::IResource
+    {
+    public:
+        using IResource::load;
 
-			VertexAttributes(const VertexAttributes& other) = delete;
-			VertexAttributes(VertexAttributes&& other) noexcept;
-			~VertexAttributes();
+        /**
+         * \brief Loads the model from the given file
+         * \param fileName The path of the model to load
+         * \return True if the model was successfully loaded. False otherwise.
+         */
+        bool load(const char* fileName) override;
 
-			VertexAttributes& operator=(const VertexAttributes& other) = delete;
-			VertexAttributes& operator=(VertexAttributes&& other) noexcept;
+        /**
+         * \brief Initializes the model
+         * \return True if the model was successfully initialized. False otherwise.
+         */
+        bool init() override;
 
-			/**
-			 * \brief Binds the vertex attributes object to the current context
-			 */
-			void bind() const;
+        /**
+         * \brief Renders the model on screen
+         */
+        void draw() const;
 
-			/**
-			 * \brief Unbinds the vertex attributes object from the current context
-			 */
-			static void unbind();
+    protected:
+        std::vector<Vertex>   m_vertices;
+        std::vector<uint32_t> m_indices;
 
-		private:
-			uint32_t	m_vao = 0;
-		};
+        static LibMath::Vector3 parseVector3(const std::string& vec3Str);
+        static LibMath::Vector2 parseVector2(const std::string& vec2Str);
 
-		Model() = default;
-		Model(const Model& other);
-		Model(Model&& other) noexcept;
-		~Model() override = default;
+        static std::vector<size_t> getIndices(size_t vertexCount);
 
-		Model&	operator=(const Model& other);
-		Model&	operator=(Model&& other) noexcept;
+        static Vertex parseVertex(const std::string&                   str,
+                                  const std::vector<LibMath::Vector3>& positions,
+                                  const std::vector<LibMath::Vector3>& normals,
+                                  const std::vector<LibMath::Vector2>& uvs);
 
-		/**
-		 * \brief Loads a wavefront object model from the given file
-		 * \param fileName The path to the .obj model to load
-		 * \return True if the model could be loaded. False otherwise.
-		 */
-		bool loadFromFile(const std::string& fileName) override;
+        uint32_t addVertex(Vertex vertex);
 
-		/**
-		 * \brief Draws the model
-		 */
-		void draw() const;
+        void parseFace(const std::string&                   line,
+                       const std::vector<LibMath::Vector3>& positions,
+                       const std::vector<LibMath::Vector3>& normals,
+                       const std::vector<LibMath::Vector2>& uvs);
 
-	private:
-		std::vector<Vertex>		m_vertices;
-		std::vector<uint32_t>	m_indices;
-		Rendering::VertexBuffer	m_vbo;
-		Rendering::IndexBuffer	m_ebo;
-		VertexAttributes		m_vao;
-	};
+    private:
+        VertexBuffer     m_vbo;
+        IndexBuffer      m_ebo;
+        VertexAttributes m_vao;
+    };
 }

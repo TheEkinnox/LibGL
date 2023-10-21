@@ -1,265 +1,183 @@
-#include "Resources/Model.h"
+﻿#include "Resources/Model.h"
 
-#include "Debug/Assertion.h"
-#include "Debug/Log.h"
-
-#include <fstream>
 #include <sstream>
+
+#include <Debug/Assertion.h>
+#include <Debug/Log.h>
+
 #include <glad/glad.h>
 
-#include "Utility/utility.h"
+#include <Utility/utility.h>
+
+#define IGNORE_DUPLICATES 1
 
 using namespace LibMath;
-using namespace LibGL::Rendering;
 
-namespace LibGL::Resources
+namespace LibGL::Rendering::Resources
 {
-	Model::VertexAttributes::VertexAttributes(const VertexBuffer& vbo, const IndexBuffer& ebo)
-	{
-		glGenVertexArrays(1, &m_vao);
-		glBindVertexArray(m_vao);
+    REGISTER_RESOURCE_TYPE(Model);
 
-		vbo.bind();
-		ebo.bind();
+    bool Model::load(const char* fileName)
+    {
+        std::vector<std::string> lines = LibGL::Utility::readFile(fileName);
 
-		constexpr auto stride = sizeof(Vertex);
+        if (lines.empty())
+            return false;
 
-		// position attribute
-		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, nullptr);
+        m_vertices.clear();
+        m_indices.clear();
 
-		// normal attribute
-		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<void*>(sizeof(Vector3)));
+        std::vector<Vector3> positions, normals;
+        std::vector<Vector2> uvs;
 
-		// texture coordinates attribute
-		glEnableVertexAttribArray(2);
-		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<void*>(2 * sizeof(Vector3)));
-	}
+        for (std::string& line : lines)
+        {
+            std::string token(line.substr(0, 2));
 
-	Model::VertexAttributes::VertexAttributes(VertexAttributes&& other) noexcept
-		: m_vao(other.m_vao)
-	{
-		other.m_vao = 0;
-	}
+            if (token == "v ")
+                positions.push_back(parseVector3(line.substr(2)));
+            else if (token == "vt")
+                uvs.push_back(parseVector2(line.substr(3)));
+            else if (token == "vn")
+                normals.push_back(parseVector3(line.substr(3)));
+            else if (token == "f ")
+                parseFace(line.substr(2), positions, normals, uvs);
+        }
 
-	Model::VertexAttributes::~VertexAttributes()
-	{
-		glDeleteVertexArrays(1, &m_vao);
-	}
+        return true;
+    }
 
-	Model::VertexAttributes& Model::VertexAttributes::operator=(
-		VertexAttributes&& other) noexcept
-	{
-		if (&other == this)
-			return *this;
+    bool Model::init()
+    {
+        m_vbo = VertexBuffer(m_vertices);
+        m_ebo = IndexBuffer(m_indices);
+        m_vao = VertexAttributes(m_vbo, m_ebo);
 
-		glDeleteVertexArrays(1, &m_vao);
+        return true;
+    }
 
-		m_vao = other.m_vao;
+    void Model::draw() const
+    {
+        m_vao.bind();
+        m_vbo.bind();
+        m_ebo.bind();
 
-		other.m_vao = 0;
+        glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_indices.size()),
+            GL_UNSIGNED_INT, nullptr);
+    }
 
-		return *this;
-	}
+    Vector3 Model::parseVector3(const std::string& vec3Str)
+    {
+        std::istringstream vec3Stream(vec3Str);
+        Vector3            vec3;
 
-	void Model::VertexAttributes::bind() const
-	{
-		glBindVertexArray(m_vao);
-	}
+        vec3Stream >> vec3.m_x;
+        vec3Stream >> vec3.m_y;
+        vec3Stream >> vec3.m_z;
 
-	void Model::VertexAttributes::unbind()
-	{
-		glBindVertexArray(0);
-	}
+        return vec3;
+    }
 
-	Model::Model(const Model& other)
-		: m_vertices(other.m_vertices), m_indices(other.m_indices),
-		m_vbo(m_vertices), m_ebo(m_indices)
-	{
-	}
+    Vector2 Model::parseVector2(const std::string& vec2Str)
+    {
+        std::istringstream vec2Stream(vec2Str);
+        Vector2            vec2;
 
-	Model::Model(Model&& other) noexcept
-		: m_vertices(std::move(other.m_vertices)), m_indices(std::move(other.m_indices)),
-		m_vbo(m_vertices), m_ebo(m_indices)
-	{
-	}
+        vec2Stream >> vec2.m_x;
+        vec2Stream >> vec2.m_y;
 
-	Model& Model::operator=(const Model& other)
-	{
-		if (&other == this)
-			return *this;
+        return vec2;
+    }
 
-		m_indices = other.m_indices;
-		m_vertices = other.m_vertices;
+    std::vector<size_t> Model::getIndices(const size_t vertexCount)
+    {
+        ASSERT(vertexCount >= 3);
 
-		return *this;
-	}
+        std::vector<size_t> faceIndices;
+        faceIndices.reserve((vertexCount - 2) * 3);
 
-	Model& Model::operator=(Model&& other) noexcept
-	{
-		if (&other == this)
-			return *this;
+        for (uint32_t i = 1; i < vertexCount - 1; ++i)
+        {
+            faceIndices.push_back(0);
+            faceIndices.push_back(i);
+            faceIndices.push_back(i + 1);
+        }
 
-		m_indices = std::move(other.m_indices);
-		m_vertices = std::move(other.m_vertices);
+        return faceIndices;
+    }
 
-		return *this;
-	}
+    Vertex Model::parseVertex(const std::string& str, const std::vector<Vector3>& positions, const std::vector<Vector3>& normals,
+                              const std::vector<Vector2>& uvs)
+    {
+        size_t posIdx = 0, uvIdx = 0, normalIdx = 0;
 
-	bool Model::loadFromFile(const std::string& fileName)
-	{
-		std::ifstream fs(fileName);
+        const auto faceData = Utility::splitString(str, "/", true);
 
-		if (!fs.is_open())
-		{
-			DEBUG_LOG("Unable to open file at path \"%s\"\n", fileName.c_str());
-			return false;
-		}
+        if (!faceData[0].empty())
+        {
+            if (std::stol(faceData[0]) < 0)
+                posIdx = positions.size() + 1 + std::stol(faceData[0]);
+            else
+                posIdx = std::stoul(faceData[0]);
+        }
 
-		std::vector<Vector3>	positions, normals;
-		std::vector<Vector2>	uvs;
+        if (faceData.size() > 1 && !faceData[1].empty())
+        {
+            if (std::stol(faceData[1]) < 0)
+                uvIdx = uvs.size() + 1 + std::stol(faceData[1]);
+            else
+                uvIdx = std::stoul(faceData[1]);
+        }
 
-		std::string line;
+        if (faceData.size() > 2 && !faceData[2].empty())
+        {
+            if (std::stol(faceData[2]) < 0)
+                normalIdx = normals.size() + 1 + std::stol(faceData[2]);
+            else
+                normalIdx = std::stoul(faceData[2]);
+        }
 
-		while (std::getline(fs, line))
-		{
-			std::string token(line.substr(0, 2));
+        return {
+            posIdx > 0 ? positions[posIdx - 1] : Vector3(),
+            normalIdx > 0 ? normals[normalIdx - 1] : Vector3(),
+            uvIdx > 0 ? uvs[uvIdx - 1] : Vector2()
+        };
+    }
 
-			if (token == "v ")
-			{
-				std::istringstream posString(line.substr(2));
-				Vector3 pos;
+    uint32_t Model::addVertex(Vertex vertex)
+    {
+        uint32_t vertexIdx;
 
-				posString >> pos.m_x;
-				posString >> pos.m_y;
-				posString >> pos.m_z;
+#if IGNORE_DUPLICATES
+        vertexIdx = static_cast<uint32_t>(m_vertices.size());
+        m_vertices.push_back(vertex);
+#else
+        bool isDuplicate = false;
 
-				positions.push_back(pos);
-			}
-			else if (token == "vt")
-			{
-				std::istringstream uvString(line.substr(3));
-				Vector2 uv;
+        for (vertexIdx = 0; vertexIdx < m_vertices.size(); ++vertexIdx)
+        {
+            if (m_vertices[vertexIdx] == vertex)
+            {
+                isDuplicate = true;
+                break;
+            }
+        }
 
-				uvString >> uv.m_x;
-				uvString >> uv.m_y;
+        if (!isDuplicate)
+            m_vertices.push_back(vertex);
+#endif // IGNORE_DUPLICATES
 
-				uvs.push_back(uv);
-			}
-			else if (token == "vn")
-			{
-				std::istringstream normalString(line.substr(3));
-				Vector3 normal;
+        return vertexIdx;
+    }
 
-				normalString >> normal.m_x;
-				normalString >> normal.m_y;
-				normalString >> normal.m_z;
+    void Model::parseFace(const std::string& line, const std::vector<Vector3>& positions, const std::vector<Vector3>& normals,
+                          const std::vector<Vector2>& uvs)
+    {
+        const auto faceStrings = LibGL::Utility::splitString(line, " ", true);
 
-				normals.push_back(normal);
-			}
-			else if (token == "f ")
-			{
-				line = line.substr(token.size());
-				const auto faceStrings = Utility::splitString(line, " ", true);
+        const std::vector<size_t> indices = getIndices(faceStrings.size());
 
-				ASSERT(faceStrings.size() == 3 || faceStrings.size() == 4);
-
-				uint32_t verticesCount;
-				uint32_t* faceIndices;
-
-				if (faceStrings.size() == 3)
-				{
-					verticesCount = 3;
-					faceIndices = static_cast<uint32_t*>(alloca(3 * sizeof(uint32_t)));
-					faceIndices[0] = 0;
-					faceIndices[1] = 1;
-					faceIndices[2] = 2;
-				}
-				else
-				{
-					verticesCount = 6;
-					faceIndices = static_cast<uint32_t*>(alloca(6 * sizeof(uint32_t)));
-					faceIndices[0] = 0;
-					faceIndices[1] = 1;
-					faceIndices[2] = 2;
-					faceIndices[3] = 0;
-					faceIndices[4] = 2;
-					faceIndices[5] = 3;
-				}
-
-				for (size_t i = 0; i < verticesCount; i++)
-				{
-					size_t faceIdx = faceIndices[i], posIdx = 0, uvIdx = 0, normalIdx = 0;
-
-					const auto faceData = Utility::splitString(faceStrings[faceIdx], "/", true);
-
-					if (!faceData[0].empty())
-					{
-						if (std::stol(faceData[0]) < 0)
-							posIdx = positions.size() + 1 + std::stol(faceData[0]);
-						else
-							posIdx = std::stoul(faceData[0]);
-					}
-
-					if (!faceData[1].empty())
-					{
-						if (std::stol(faceData[1]) < 0)
-							uvIdx = uvs.size() + 1 + std::stol(faceData[1]);
-						else
-							uvIdx = std::stoul(faceData[1]);
-					}
-
-					if (!faceData[2].empty())
-					{
-						if (std::stol(faceData[2]) < 0)
-							normalIdx = normals.size() + 1 + std::stol(faceData[2]);
-						else
-							normalIdx = std::stoul(faceData[2]);
-					}
-
-					const Vertex vertex
-					{
-						posIdx > 0 ? positions[posIdx - 1] : Vector3(),
-						normalIdx > 0 ? normals[normalIdx - 1] : Vector3(),
-						uvIdx > 0 ? uvs[uvIdx - 1] : Vector2()
-					};
-
-					uint32_t	vertexIdx;
-					bool		isDuplicate = false;
-
-					//vertexIdx = static_cast<uint32_t>(m_vertices.size());
-					for (vertexIdx = 0; vertexIdx < m_vertices.size(); ++vertexIdx)
-					{
-						if (m_vertices[vertexIdx] == vertex)
-						{
-							isDuplicate = true;
-							break;
-						}
-					}
-
-					if (!isDuplicate)
-						m_vertices.push_back(vertex);
-
-					m_indices.push_back(vertexIdx);
-				}
-			}
-		}
-
-		m_vbo = VertexBuffer(m_vertices);
-		m_ebo = IndexBuffer(m_indices);
-		m_vao = VertexAttributes(m_vbo, m_ebo);
-
-		return true;
-	}
-
-	void Model::draw() const
-	{
-		m_vao.bind();
-		m_vbo.bind();
-		m_ebo.bind();
-
-		glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_indices.size()),
-			GL_UNSIGNED_INT, nullptr);
-	}
+        for (const size_t faceIdx : indices)
+            m_indices.push_back(addVertex(parseVertex(faceStrings[faceIdx], positions, normals, uvs)));
+    }
 }

@@ -2,8 +2,6 @@
 
 #include <glad/glad.h>
 
-using namespace LibGL::Resources;
-
 namespace LibGL::Rendering
 {
 	VertexBuffer::VertexBuffer(const Vertex* vertices, const intptr_t verticesCount)
@@ -15,14 +13,8 @@ namespace LibGL::Rendering
 	}
 
 	VertexBuffer::VertexBuffer(const std::vector<Vertex>& vertices)
+		: VertexBuffer(vertices.data(), static_cast<intptr_t>(vertices.size()))
 	{
-		const Vertex* verticesArray = vertices.data();
-
-		glGenBuffers(1, &m_bufferIndex);
-		glBindBuffer(GL_ARRAY_BUFFER, m_bufferIndex);
-		glBufferData(GL_ARRAY_BUFFER,
-			static_cast<GLsizeiptr>(vertices.size()) * static_cast<GLsizeiptr>(sizeof(Vertex)),
-			verticesArray, GL_STATIC_DRAW);
 	}
 
 	void VertexBuffer::bind() const

@@ -70,6 +70,12 @@ namespace LibGL::Rendering
 		glColorMask(enableRed, enableGreen, enableBlue, enableAlpha);
 	}
 
+	void Renderer::setBlendFunc(EBlendFactor sourceFactor, EBlendFactor destinationFactor) const
+	{
+		glBlendFunc(static_cast<GLenum>(sourceFactor),
+			static_cast<GLenum>(destinationFactor));
+	}
+
 	void Renderer::setViewPort(const int x, const int y,
 		const int width, const int height) const
 	{

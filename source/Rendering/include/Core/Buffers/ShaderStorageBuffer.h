@@ -1,5 +1,5 @@
 #pragma once
-#include "Core/EAccessSpecifier.h"
+#include "Enums/EAccessSpecifier.h"
 #include "Core/Buffers/Buffer.h"
 
 namespace LibGL::Rendering

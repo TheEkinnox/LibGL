@@ -1,12 +1,8 @@
 #pragma once
-#include "Resources/Material.h"
-#include "Scene.h"
+#include <Entity.h>
 
-namespace LibGL::Resources
-{
-	class Model;
-	class Texture;
-}
+#include "Resources/Material.h"
+#include "Resources/Model.h"
 
 namespace LibGL::Rendering
 {
@@ -14,7 +10,7 @@ namespace LibGL::Rendering
 	{
 	public:
 		Mesh() = delete;
-		explicit Mesh(Entity* parent, const Resources::Model& model, const Material& material);
+		explicit Mesh(Entity* parent, const Resources::Model& model, Resources::Material material);
 
 		Mesh(const Mesh& other) = default;
 		Mesh(Mesh&& other) noexcept = default;
@@ -40,13 +36,13 @@ namespace LibGL::Rendering
 		 * \brief Gets the mesh's material
 		 * \return A copy of the mesh's material
 		 */
-		Material getMaterial() const;
+		Resources::Material getMaterial() const;
 
 		/**
 		 * \brief Gets the mesh's material
 		 * \return A reference to the mesh's material
 		 */
-		Material& getMaterial();
+		Resources::Material& getMaterial();
 
 		/**
 		 * \brief Draws the mesh
@@ -60,6 +56,6 @@ namespace LibGL::Rendering
 
 	private:
 		const Resources::Model*	m_model = nullptr;
-		Material				m_material;
+		Resources::Material		m_material;
 	};
 }

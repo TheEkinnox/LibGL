@@ -6,12 +6,12 @@
 #include "Resources/Texture.h"
 
 using namespace LibMath;
-using namespace LibGL::Resources;
+using namespace LibGL::Rendering::Resources;
 
 namespace LibGL::Rendering
 {
-	Mesh::Mesh(Entity* parent, const Model& model, const Material& material)
-		: Entity(parent, Transform()), m_model(&model), m_material(material)
+	Mesh::Mesh(Entity* parent, const Model& model, Material material)
+		: Entity(parent, Transform()), m_model(&model), m_material(std::move(material))
 	{
 	}
 

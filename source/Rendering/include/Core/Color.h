@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Vector/Vector3.h"
-#include "Vector/Vector4.h"
+#include <Vector/Vector3.h>
+#include <Vector/Vector4.h>
 
 namespace LibGL::Rendering
 {
