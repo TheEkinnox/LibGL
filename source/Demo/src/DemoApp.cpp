@@ -253,19 +253,22 @@ namespace LibGL::Demo
         floorMesh.setScale(Vector3(14.f, 1.f, 14.f));
         floorMesh.addComponent<BoxCollider>(Vector3(0.f, -.05f, 0.f), Vector3(1.f, .1f, 1.f));
 
-        Mesh& sphereMesh = m_scene.addNode<Mesh>(nullptr, *sphereModel, sphereMat);
-        sphereMesh.setPosition(Vector3(-1.5f, 1.f, -1.5f));
-        sphereMesh.setScale(Vector3(.5f));
-        sphereMesh.addComponent<SphereCollider>(Vector3::zero(), 1.f);
-        sphereMesh.addComponent<Rigidbody>();
-        m_controllableMesh = &sphereMesh;
-
         Mesh& cubeMesh = m_scene.addNode<Mesh>(nullptr, *cubeModel, cubeMat);
         cubeMesh.setPosition(Vector3(0.f, 1.f, -3.f));
         cubeMesh.addComponent<BoxCollider>(Vector3::zero(), Vector3::one());
         cubeMesh.addComponent<Rigidbody>();
 
-        Mesh& bunnyMesh = m_scene.addNode<Mesh>(nullptr, *bunnyModel, bunnyMat);
+        m_controllableMesh = &cubeMesh;
+
+//        Mesh& sphereMesh = m_scene.addNode<Mesh>(nullptr, *sphereModel, sphereMat);
+        Mesh& sphereMesh = cubeMesh.addChild<Mesh>(nullptr, *sphereModel, sphereMat);
+        sphereMesh.setPosition(Vector3(-1.5f, 1.f, -1.5f));
+        sphereMesh.setScale(Vector3(.5f));
+        sphereMesh.addComponent<SphereCollider>(Vector3::zero(), 1.f);
+        sphereMesh.addComponent<Rigidbody>();
+
+//        Mesh& bunnyMesh = m_scene.addNode<Mesh>(nullptr, *bunnyModel, bunnyMat);
+        Mesh& bunnyMesh = cubeMesh.addChild<Mesh>(nullptr, *bunnyModel, bunnyMat);
         bunnyMesh.setPosition(Vector3(1.5f, 1.f, -1.5f));
         bunnyMesh.setScale(Vector3(.5f));
         bunnyMesh.addComponent<CapsuleCollider>(Vector3(.25f, .65f, .2f), Vector3::right(), 3.2f, 1.f);
@@ -346,15 +349,28 @@ namespace LibGL::Demo
             return;
         }
 
+        bool isShiftDown = inputManager.isKeyDown(EKey::KEY_LEFT_SHIFT) || inputManager.isKeyDown(EKey::KEY_RIGHT_SHIFT);
+
         if (inputManager.isKeyPressed(EKey::KEY_L))
         {
-            if (inputManager.isKeyDown(EKey::KEY_LEFT_SHIFT) || inputManager.isKeyDown(EKey::KEY_RIGHT_SHIFT))
+            if (isShiftDown)
                 loadResources();
             else
                 loadResourcesMulti();
 
             m_scene.clear();
             return;
+        }
+
+        if (inputManager.isKeyPressed(EKey::KEY_X))
+        {
+            for(auto& node : m_scene.getNodes())
+            {
+                if (isShiftDown)
+                    node->removeChildren<Mesh>();
+                else
+                    node->removeChild<Mesh>();
+            }
         }
 
         const float deltaTime = LGL_SERVICE(Timer).getDeltaTime();
