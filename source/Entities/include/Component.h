@@ -27,7 +27,7 @@ namespace LibGL
 		virtual void update() {}
 
 		/**
-		 * \brief Checks whether the component is active
+		 * \brief Checks whether the component is active or not
 		 * \return True if the component is currently active. False otherwise.
 		 */
 		bool isActive() const;
@@ -57,7 +57,7 @@ namespace LibGL
 		friend class Entity;
 		inline static ComponentId s_currentId = 1;
 
-		Entity&		m_owner;
+		Entity*		m_owner;
 		ComponentId	m_id;
 		bool		m_isActive = true;
 
