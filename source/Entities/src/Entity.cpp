@@ -134,11 +134,11 @@ namespace LibGL
 
 	void Entity::onChildAdded(Node& child)
 	{
-		reinterpret_cast<Entity&>(child).setParent(*this);
+		reinterpret_cast<Entity&>(child).setParent(this, false);
 	}
 
 	void Entity::onRemoveChild(Node& child)
 	{
-		reinterpret_cast<Entity&>(child).removeParent();
+		reinterpret_cast<Entity&>(child).setParent(nullptr, false);
 	}
 }
