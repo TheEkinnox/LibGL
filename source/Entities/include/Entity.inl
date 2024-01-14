@@ -29,8 +29,6 @@ namespace LibGL
 	template <typename T>
 	T* Entity::getComponent()
 	{
-		static_assert(std::is_same_v<Component, T> || std::is_base_of_v<Component, T>);
-
 		for (const auto& component : m_components)
 		{
 			if (typeid(component.get()) == typeid(T*) || dynamic_cast<T*>(component.get()) != nullptr)
@@ -41,15 +39,24 @@ namespace LibGL
 	}
 
 	template <typename T>
+	const T* Entity::getComponent() const
+	{
+		for (const auto& component : m_components)
+		{
+			if (typeid(component.get()) == typeid(T*) || dynamic_cast<const T*>(component.get()) != nullptr)
+				return dynamic_cast<const T*>(component.get());
+		}
+
+		return nullptr;
+	}
+
+	template <typename T>
 	T* Entity::getComponent(const Component::ComponentId id)
 	{
-		static_assert(std::is_same_v<Component, T> || std::is_base_of_v<Component, T>);
-
 		for (const auto& component : m_components)
 		{
 			if (id == component->getId() &&
-				(typeid(component.get()) == typeid(T*) ||
-					dynamic_cast<T*>(component.get()) != nullptr))
+				(typeid(component.get()) == typeid(T*) || dynamic_cast<T*>(component.get()) != nullptr))
 			{
 				return dynamic_cast<T*>(component.get());
 			}
@@ -59,16 +66,43 @@ namespace LibGL
 	}
 
 	template <typename T>
+	const T* Entity::getComponent(const Component::ComponentId id) const
+	{
+		for (const auto& component : m_components)
+		{
+			if (id == component->getId() &&
+				(typeid(component.get()) == typeid(T*) || dynamic_cast<const T*>(component.get()) != nullptr))
+			{
+				return dynamic_cast<const T*>(component.get());
+			}
+		}
+
+		return nullptr;
+	}
+
+	template <typename T>
 	std::vector<std::shared_ptr<T>> Entity::getComponents()
 	{
-		static_assert(std::is_same_v<Component, T> || std::is_base_of_v<Component, T>);
-
 		std::vector<std::shared_ptr<T>> components;
 
 		for (const auto& component : m_components)
 		{
 			if (typeid(component.get()) == typeid(T*) || dynamic_cast<T*>(component.get()) != nullptr)
 				components.push_back(std::dynamic_pointer_cast<T>(component));
+		}
+
+		return components;
+	}
+
+	template <typename T>
+	std::vector<std::shared_ptr<const T>> Entity::getComponents() const
+	{
+		std::vector<std::shared_ptr<T>> components;
+
+		for (const auto& component : m_components)
+		{
+			if (typeid(component.get()) == typeid(T*) || dynamic_cast<const T*>(component.get()) != nullptr)
+				components.push_back(std::dynamic_pointer_cast<const T>(component));
 		}
 
 		return components;
