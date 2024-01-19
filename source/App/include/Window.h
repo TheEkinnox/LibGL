@@ -34,8 +34,8 @@ namespace LibGL::Application
 	class Window
 	{
 	public:
-		using dimensions_t = std::pair<int, int>;
-		using pos_t = std::pair<int, int>;
+		using dimensions_t = LibMath::Vector2I;
+		using pos_t = LibMath::Vector2I;
 
 		Event<EKey, int, EKeyState, EInputModifier>				m_keyEvent;
 		Event<EMouseButton, EMouseButtonState, EInputModifier>	m_mouseButtonEvent;

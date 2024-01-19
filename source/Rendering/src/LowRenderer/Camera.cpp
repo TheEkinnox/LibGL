@@ -150,7 +150,7 @@ namespace LibGL::Rendering
 
 	void Camera::updateMatrices()
 	{
-		const auto camCenter = getWorldPosition() + worldForward();
+		const auto camCenter = getWorldPosition() + worldBack();
 		m_viewMatrix = lookAt(getWorldPosition(), camCenter, worldUp());
 		m_viewProjectionMatrix = m_projectionMatrix * m_viewMatrix;
 	}

@@ -13,20 +13,19 @@
 #include <Debug/Assertion.h>
 #include <Debug/Log.h>
 
-#include <LowRenderer/Mesh.h>
+#include <LowRenderer/Model.h>
 
-#include <Resources/Model.h>
-#include <Resources/ModelMulti.h>
+#include <Resources/Mesh.h>
+#include <Resources/MeshMulti.h>
 #include <Resources/Shader.h>
 #include <Resources/Texture.h>
 
 #include <Utility/ServiceLocator.h>
-#include <Utility/utility.h>
 
 #include "DemoContext.h"
 
 #define MOVE_SPEED .5f
-#define ROTATION_SPEED 30.f
+#define ROTATION_SPEED 30_deg
 #define MOUSE_SENSITIVITY .8f
 #define TEST_POOL 0
 
@@ -41,14 +40,24 @@ using namespace LibGL::Physics;
 using namespace LibGL::Application;
 using namespace LibGL::Application::Exceptions;
 
+#define SHADOW_MAP_WIDTH 1024
+#define SHADOW_MAP_HEIGHT SHADOW_MAP_WIDTH
+
 namespace LibGL::Demo
 {
     DemoApp::DemoApp(const int windowWidth, const int windowHeight, const char* title)
-        : IApplication(std::make_unique<DemoContext>(windowWidth, windowHeight, title)),
-          m_controllableMesh(nullptr)
+        : IApplication(std::make_unique<DemoContext>(windowWidth, windowHeight, title)), m_controllableModel(nullptr),
+        m_shadowMap(SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT, ETextureFormat::DEPTH_COMPONENT),
+        m_lightsSSBO(EAccessSpecifier::STREAM_DRAW)
     {
         // Initialize debugger
         Debug::Log::openFile("debug.log");
+
+        m_frameBuffer.bind();
+        m_shadowMap.attachToFrameBuffer(EFrameBufferAttachment::DEPTH);
+        FrameBuffer::unbind();
+
+        m_lightsSSBO.bind(0);
     }
 
     void DemoApp::testThreadPool(const size_t taskCount, const size_t taskDuration)
@@ -104,6 +113,9 @@ namespace LibGL::Demo
         handleKeyboard();
         handleMouse();
 
+        // Update scene
+        m_scene.update();
+
         // Handle rendering
         render();
 
@@ -118,15 +130,18 @@ namespace LibGL::Demo
 
         const auto loadStart = std::chrono::high_resolution_clock::now();
 
-        ASSERT(resourceManager.load<Model>("assets/meshes/primitives/plane.obj") != nullptr);
-        ASSERT(resourceManager.load<Model>("assets/meshes/primitives/sphere.obj") != nullptr);
-        ASSERT(resourceManager.load<Model>("assets/meshes/primitives/cube.obj") != nullptr);
-        ASSERT(resourceManager.load<Model>("assets/meshes/bunny.obj") != nullptr);
+        ASSERT(resourceManager.load<Mesh>("assets/meshes/primitives/plane.obj") != nullptr);
+        ASSERT(resourceManager.load<Mesh>("assets/meshes/primitives/quad.obj") != nullptr);
+        ASSERT(resourceManager.load<Mesh>("assets/meshes/primitives/sphere.obj") != nullptr);
+        ASSERT(resourceManager.load<Mesh>("assets/meshes/primitives/cube.obj") != nullptr);
+        ASSERT(resourceManager.load<Mesh>("assets/meshes/bunny.obj") != nullptr);
 
         ASSERT(setupShader("assets/shaders/Unlit.glsl") != nullptr);
         ASSERT(setupShader("assets/shaders/Normal.glsl") != nullptr);
         ASSERT(setupShader("assets/shaders/Basic.glsl") != nullptr);
         ASSERT(setupShader("assets/shaders/Lit.glsl") != nullptr);
+        ASSERT(setupShader("assets/shaders/Depth.glsl") != nullptr);
+        ASSERT(setupShader("assets/shaders/DrawDepth.glsl") != nullptr);
 
         ASSERT(resourceManager.load<Texture>("assets/textures/container.jpg") != nullptr);
         ASSERT(resourceManager.load<Texture>("assets/textures/container2.png") != nullptr);
@@ -147,15 +162,18 @@ namespace LibGL::Demo
 
         const auto loadStart = std::chrono::high_resolution_clock::now();
 
-        tasks.emplace_back(resourceManager.loadInBackground<ModelMulti, IResource>("assets/meshes/primitives/plane.obj"));
-        tasks.emplace_back(resourceManager.loadInBackground<ModelMulti, IResource>("assets/meshes/primitives/sphere.obj"));
-        tasks.emplace_back(resourceManager.loadInBackground<ModelMulti, IResource>("assets/meshes/primitives/cube.obj"));
-        tasks.emplace_back(resourceManager.loadInBackground<ModelMulti, IResource>("assets/meshes/bunny.obj"));
+        tasks.emplace_back(resourceManager.loadInBackground<MeshMulti, IResource>("assets/meshes/primitives/plane.obj"));
+        tasks.emplace_back(resourceManager.loadInBackground<MeshMulti, IResource>("assets/meshes/primitives/quad.obj"));
+        tasks.emplace_back(resourceManager.loadInBackground<MeshMulti, IResource>("assets/meshes/primitives/sphere.obj"));
+        tasks.emplace_back(resourceManager.loadInBackground<MeshMulti, IResource>("assets/meshes/primitives/cube.obj"));
+        tasks.emplace_back(resourceManager.loadInBackground<MeshMulti, IResource>("assets/meshes/bunny.obj"));
 
         shaderTasks.emplace_back(resourceManager.loadInBackground<Shader>("assets/shaders/Unlit.glsl"));
         shaderTasks.emplace_back(resourceManager.loadInBackground<Shader>("assets/shaders/Normal.glsl"));
         shaderTasks.emplace_back(resourceManager.loadInBackground<Shader>("assets/shaders/Basic.glsl"));
         shaderTasks.emplace_back(resourceManager.loadInBackground<Shader>("assets/shaders/Lit.glsl"));
+        shaderTasks.emplace_back(resourceManager.loadInBackground<Shader>("assets/shaders/Depth.glsl"));
+        shaderTasks.emplace_back(resourceManager.loadInBackground<Shader>("assets/shaders/DrawDepth.glsl"));
 
         tasks.emplace_back(resourceManager.loadInBackground<Texture, IResource>("assets/textures/container.jpg"));
         tasks.emplace_back(resourceManager.loadInBackground<Texture, IResource>("assets/textures/container2.png"));
@@ -182,8 +200,8 @@ namespace LibGL::Demo
 
         auto& resourceManager = LGL_SERVICE(ResourceManager);
         auto& camera = Camera::getCurrent();
-        camera.setPosition({ 0.f, 1.8f, 1.f });
-        camera.setRotation(Vector3::zero());
+        camera.setPosition({ 0.f, 1.8f, 0.f });
+        camera.setRotation(Quaternion::identity());
 
         //const Shader* shader = resourceManager.get<Shader>("assets/shaders/Unlit.glsl");
         //const Shader* shader = resourceManager.get<Shader>("assets/shaders/Normal.glsl");
@@ -192,8 +210,8 @@ namespace LibGL::Demo
         ASSERT(shader != nullptr);
 
         // Load the models
-        const Model* floorModel = resourceManager.get<Model>("assets/meshes/primitives/plane.obj");
-        ASSERT(floorModel != nullptr);
+        const Mesh* floorMesh = resourceManager.get<Mesh>("assets/meshes/primitives/plane.obj");
+        ASSERT(floorMesh != nullptr);
 
         const Texture* floorDiffuse = resourceManager.get<Texture>("assets/textures/container2.png");
         ASSERT(floorDiffuse != nullptr);
@@ -201,17 +219,17 @@ namespace LibGL::Demo
         const Texture* floorSpecular = resourceManager.get<Texture>("assets/textures/container2_specular.png");
         ASSERT(floorSpecular != nullptr);
 
-        const Model* sphereModel = resourceManager.get<Model>("assets/meshes/primitives/sphere.obj");
-        ASSERT(sphereModel != nullptr);
+        const Mesh* sphereMesh = resourceManager.get<Mesh>("assets/meshes/primitives/sphere.obj");
+        ASSERT(sphereMesh != nullptr);
 
         const Texture* sphereDiffuse = resourceManager.get<Texture>("assets/textures/grid.tga");
         ASSERT(sphereDiffuse != nullptr);
 
-        const Model* bunnyModel = resourceManager.get<Model>("assets/meshes/bunny.obj");
-        ASSERT(bunnyModel != nullptr);
+        const Mesh* bunnyMesh = resourceManager.get<Mesh>("assets/meshes/bunny.obj");
+        ASSERT(bunnyMesh != nullptr);
 
-        const Model* cubeModel = resourceManager.get<Model>("assets/meshes/primitives/cube.obj");
-        ASSERT(cubeModel != nullptr);
+        const Mesh* cubeMesh = resourceManager.get<Mesh>("assets/meshes/primitives/cube.obj");
+        ASSERT(cubeMesh != nullptr);
 
         const Texture* cubeDiffuse = resourceManager.get<Texture>("assets/textures/container.jpg");
         ASSERT(cubeDiffuse != nullptr);
@@ -248,60 +266,37 @@ namespace LibGL::Demo
             16.f
         );
 
-        // Place the meshes
-        Mesh& floorMesh = m_scene.addNode<Mesh>(nullptr, *floorModel, floorMat);
-        floorMesh.setScale(Vector3(14.f, 1.f, 14.f));
-        floorMesh.addComponent<BoxCollider>(Vector3(0.f, -.05f, 0.f), Vector3(1.f, .1f, 1.f));
+        // Place the models
+        Model& floorModel = m_scene.addNode<Model>(nullptr, *floorMesh, floorMat);
+        floorModel.setScale(Vector3(14.f, 1.f, 14.f));
+        floorModel.addComponent<BoxCollider>(Vector3(0.f, -.05f, 0.f), Vector3(1.f, .1f, 1.f));
 
-        Mesh& cubeMesh = m_scene.addNode<Mesh>(nullptr, *cubeModel, cubeMat);
-        cubeMesh.setPosition(Vector3(0.f, 1.f, -3.f));
-        cubeMesh.addComponent<BoxCollider>(Vector3::zero(), Vector3::one());
-        cubeMesh.addComponent<Rigidbody>();
+        Model& bunnyModel = m_scene.addNode<Model>(nullptr, *bunnyMesh, bunnyMat);
+        bunnyModel.setPosition(Vector3(0.f, 1.f, -3.f));
+        bunnyModel.setScale(Vector3(.5f));
+        bunnyModel.addComponent<CapsuleCollider>(Vector3(.25f, .65f, .2f), Vector3::right(), 3.2f, 1.f);
+        bunnyModel.addComponent<Rigidbody>();
 
-        m_controllableMesh = &cubeMesh;
+        m_controllableModel = &bunnyModel;
 
-//        Mesh& sphereMesh = m_scene.addNode<Mesh>(nullptr, *sphereModel, sphereMat);
-        Mesh& sphereMesh = cubeMesh.addChild<Mesh>(nullptr, *sphereModel, sphereMat);
-        sphereMesh.setPosition(Vector3(-1.5f, 1.f, -1.5f));
-        sphereMesh.setScale(Vector3(.5f));
-        sphereMesh.addComponent<SphereCollider>(Vector3::zero(), 1.f);
-        sphereMesh.addComponent<Rigidbody>();
+        Model& cubeModel = m_scene.addNode<Model>(nullptr, *cubeMesh, cubeMat);
+        cubeModel.setPosition(Vector3(0.f, 3.f, -4.5f));
+        cubeModel.addComponent<BoxCollider>(Vector3::zero(), Vector3::one());
+        cubeModel.addComponent<Rigidbody>();
 
-//        Mesh& bunnyMesh = m_scene.addNode<Mesh>(nullptr, *bunnyModel, bunnyMat);
-        Mesh& bunnyMesh = cubeMesh.addChild<Mesh>(nullptr, *bunnyModel, bunnyMat);
-        bunnyMesh.setPosition(Vector3(1.5f, 1.f, -1.5f));
-        bunnyMesh.setScale(Vector3(.5f));
-        bunnyMesh.addComponent<CapsuleCollider>(Vector3(.25f, .65f, .2f), Vector3::right(), 3.2f, 1.f);
-        bunnyMesh.addComponent<Rigidbody>();
+        Model& leftSphereModel = bunnyModel.addChild<Model>(nullptr, *sphereMesh, sphereMat);
+        leftSphereModel.setPosition(Vector3(-3.f, 4.f, -1.5f));
+        leftSphereModel.addComponent<SphereCollider>(Vector3::zero(), 1.f);
+
+        Model& rightSphereModel = bunnyModel.addChild<Model>(nullptr, *sphereMesh, sphereMat);
+        rightSphereModel.setPosition(Vector3(3.f, 4.f, -1.5f));
+        rightSphereModel.addComponent<SphereCollider>(Vector3::zero(), 1.f);
 
         // Setup the lights
-        m_ambientLight = Color(.1f, .1f, .1f, 100.f);
-
         m_dirLight =
         {
-            Color::skyBlue,
+            Color(1.f, .94f, .91f, 1.f),
             Vector3::down()
-        };
-
-        m_pointLights[0] =
-        {
-            Color::magenta,
-            { -1, 1, 1 },
-            AttenuationData(16)
-        };
-
-        m_pointLights[1] =
-        {
-            Color::magenta,
-            { 1, 1, 1 },
-            AttenuationData(16)
-        };
-
-        m_pointLights[2] =
-        {
-            Color::magenta,
-            { 0, 1, -1 },
-            AttenuationData(16)
         };
 
         m_spotLight =
@@ -315,6 +310,16 @@ namespace LibGL::Demo
                 cos(30_deg)
             }
         };
+
+        m_lightMatrices.clear();
+
+        m_lightMatrices.emplace_back(Light(Color(.2f, .2f, .2f, 1.f)).getMatrix());
+        m_lightMatrices.emplace_back(m_dirLight.getMatrix());
+        m_lightMatrices.emplace_back(m_spotLight.getMatrix());
+
+        m_lightMatrices.emplace_back(PointLight(Light{ Color::magenta }, Vector3{ -1, 1, 1 }, AttenuationData(16)).getMatrix());
+        m_lightMatrices.emplace_back(PointLight(Light{ Color::magenta }, Vector3{ 1, 1, 1 }, AttenuationData(16)).getMatrix());
+        m_lightMatrices.emplace_back(PointLight(Light{ Color::magenta }, Vector3{ 0, 1, -1 }, AttenuationData(16)).getMatrix());
     }
 
     Shader* DemoApp::setupShader(const std::string& fileName)
@@ -349,7 +354,7 @@ namespace LibGL::Demo
             return;
         }
 
-        bool isShiftDown = inputManager.isKeyDown(EKey::KEY_LEFT_SHIFT) || inputManager.isKeyDown(EKey::KEY_RIGHT_SHIFT);
+        const bool isShiftDown = inputManager.isKeyDown(EKey::KEY_LEFT_SHIFT) || inputManager.isKeyDown(EKey::KEY_RIGHT_SHIFT);
 
         if (inputManager.isKeyPressed(EKey::KEY_L))
         {
@@ -364,12 +369,12 @@ namespace LibGL::Demo
 
         if (inputManager.isKeyPressed(EKey::KEY_X))
         {
-            for(auto& node : m_scene.getNodes())
+            for (const auto& node : m_scene.getNodes())
             {
                 if (isShiftDown)
-                    node->removeChildren<Mesh>();
+                    node->removeChildren<Model>();
                 else
-                    node->removeChild<Mesh>();
+                    node->removeChild<Model>();
             }
         }
 
@@ -388,101 +393,97 @@ namespace LibGL::Demo
         if (inputManager.isKeyDown(EKey::KEY_K))
             m_dirLight.m_direction.rotate(Degree(ROTATION_SPEED * deltaTime), Vector3::up());
 
+        static const Matrix4 lightProjection = orthographicProjection(-10.f, 10.f, -10.f, 10.f, .01f, 20.f);
+        static const Matrix4 frontToUpMat = rotationFromTo(Vector3::front(), Vector3::up());
+
+        const Vector3 lightUp = (frontToUpMat * Vector4(m_dirLight.m_direction, 0.f)).xyz();
+        const Matrix4 lightView = lookAt(m_dirLight.m_direction * -10.f, Vector3::zero(), lightUp);
+        m_lightViewProjection = lightProjection * lightView;
+
         // Movement
         float moveSpeed = MOVE_SPEED;
 
-        if (inputManager.isKeyDown(EKey::KEY_LEFT_CONTROL)
-            || inputManager.isKeyDown(EKey::KEY_RIGHT_CONTROL))
+        if (inputManager.isKeyDown(EKey::KEY_LEFT_CONTROL) || inputManager.isKeyDown(EKey::KEY_RIGHT_CONTROL))
             moveSpeed *= 1.5f;
 
-        if (m_controllableMesh != nullptr && inputManager.isKeyDown(EKey::KEY_LEFT_ALT))
+        Vector3 rotation;
+
+        // Rotation
+        if (inputManager.isKeyDown(EKey::KEY_UP))
+            rotation.m_x += deltaTime;
+
+        if (inputManager.isKeyDown(EKey::KEY_DOWN))
+            rotation.m_x -= deltaTime;
+
+        if (inputManager.isKeyDown(EKey::KEY_Q) || inputManager.isKeyDown(EKey::KEY_LEFT))
+            rotation.m_y += deltaTime;
+
+        if (inputManager.isKeyDown(EKey::KEY_E) || inputManager.isKeyDown(EKey::KEY_RIGHT))
+            rotation.m_y -= deltaTime;
+
+        const bool shouldControlModel = m_controllableModel && inputManager.isKeyDown(EKey::KEY_LEFT_ALT);
+        Entity*    target = shouldControlModel ? static_cast<Entity*>(m_controllableModel) : static_cast<Entity*>(&camera);
+
+        const TVector3<Radian> euler(ROTATION_SPEED * rotation.m_x, ROTATION_SPEED * rotation.m_y, ROTATION_SPEED * rotation.m_z);
+        target->rotate(Quaternion::fromEuler(euler, ERotationOrder::ZXY));
+
+        Vector3 direction;
+
+        if (inputManager.isKeyDown(EKey::KEY_W))
+            direction += target->back();
+
+        if (inputManager.isKeyDown(EKey::KEY_S))
+            direction += target->forward();
+
+        if (inputManager.isKeyDown(EKey::KEY_A))
+            direction += target->left();
+
+        if (inputManager.isKeyDown(EKey::KEY_D))
+            direction += target->right();
+
+        if (direction != Vector3::zero())
+            direction.normalize();
+
+        if (shouldControlModel)
         {
-            auto* rb = m_controllableMesh->getComponent<Rigidbody>();
+            if (Rigidbody* rb = m_controllableModel->getComponent<Rigidbody>())
+            {
+                if (inputManager.isKeyPressed(EKey::KEY_SPACE))
+                    rb->addForce(Vector3::up() * 4.f, EForceMode::IMPULSE);
 
-            Vector3 direction;
+                Vector3 targetVelocity;
 
-            if (inputManager.isKeyDown(EKey::KEY_W))
-                direction += m_controllableMesh->forward();
+                if (!floatEquals(moveSpeed, 0.f) && direction != Vector3::zero())
+                    targetVelocity = direction * (moveSpeed / direction.magnitude());
 
-            if (inputManager.isKeyDown(EKey::KEY_S))
-                direction += m_controllableMesh->back();
-
-            if (inputManager.isKeyDown(EKey::KEY_A))
-                direction += m_controllableMesh->left();
-
-            if (inputManager.isKeyDown(EKey::KEY_D))
-                direction += m_controllableMesh->right();
-
-            if (inputManager.isKeyPressed(EKey::KEY_SPACE))
-                rb->addForce(Vector3::up() * 4.f, EForceMode::IMPULSE);
-
-            Vector3 targetVelocity;
-
-            if (!floatEquals(moveSpeed, 0.f) && direction != Vector3::zero())
-                targetVelocity = direction * (moveSpeed / direction.magnitude());
-
-            targetVelocity.m_y += rb->m_velocity.m_y;
-            rb->m_velocity = targetVelocity;
-
-            // Rotation
-            if (inputManager.isKeyDown(EKey::KEY_Q) ||
-                inputManager.isKeyDown(EKey::KEY_LEFT))
-                m_controllableMesh->rotate(-ROTATION_SPEED * Vector3::up() * deltaTime);
-
-            if (inputManager.isKeyDown(EKey::KEY_E) ||
-                inputManager.isKeyDown(EKey::KEY_RIGHT))
-                m_controllableMesh->rotate(ROTATION_SPEED * Vector3::up() * deltaTime);
+                targetVelocity.m_y += rb->m_velocity.m_y;
+                rb->m_velocity = targetVelocity;
+            }
         }
         else
         {
             moveSpeed *= deltaTime;
 
-            if (inputManager.isKeyDown(EKey::KEY_W))
-                camera.translate(camera.forward() * moveSpeed);
-
-            if (inputManager.isKeyDown(EKey::KEY_S))
-                camera.translate(camera.back() * moveSpeed);
-
-            if (inputManager.isKeyDown(EKey::KEY_A))
-                camera.translate(camera.left() * moveSpeed);
-
-            if (inputManager.isKeyDown(EKey::KEY_D))
-                camera.translate(camera.right() * moveSpeed);
+            camera.translate(direction * moveSpeed);
 
             if (inputManager.isKeyDown(EKey::KEY_SPACE))
                 camera.translate(Vector3::up() * moveSpeed);
 
-            if (inputManager.isKeyDown(EKey::KEY_LEFT_SHIFT)
-                || inputManager.isKeyDown(EKey::KEY_RIGHT_SHIFT))
+            if (inputManager.isKeyDown(EKey::KEY_LEFT_SHIFT) || inputManager.isKeyDown(EKey::KEY_RIGHT_SHIFT))
                 camera.translate(Vector3::down() * moveSpeed);
 
             m_spotLight.m_position = camera.getPosition();
+            m_spotLight.m_direction = camera.forward();
         }
-
-        // Rotation
-        if (inputManager.isKeyDown(EKey::KEY_UP))
-            camera.rotate(ROTATION_SPEED * Vector3::right() * deltaTime);
-
-        if (inputManager.isKeyDown(EKey::KEY_DOWN))
-            camera.rotate(-ROTATION_SPEED * Vector3::right() * deltaTime);
-
-        if (inputManager.isKeyDown(EKey::KEY_Q) ||
-            inputManager.isKeyDown(EKey::KEY_LEFT))
-            camera.rotate(ROTATION_SPEED * Vector3::up() * deltaTime);
-
-        if (inputManager.isKeyDown(EKey::KEY_E) ||
-            inputManager.isKeyDown(EKey::KEY_RIGHT))
-            camera.rotate(-ROTATION_SPEED * Vector3::up() * deltaTime);
-
-        m_spotLight.m_direction = camera.forward();
 
         if (inputManager.isKeyPressed(EKey::KEY_C))
         {
-            RaycastHit    hitInfo;
-            const auto&   camCollider = camera.getComponent<ICollider>();
-            const Vector3 castOffset = camCollider != nullptr
-                                           ? camera.forward() * (camCollider->getBounds().m_sphereRadius + .01f)
-                                           : Vector3::zero();
+            RaycastHit  hitInfo;
+            const auto& camCollider = camera.getComponent<ICollider>();
+            Vector3     castOffset = Vector3::zero();
+
+            if (camCollider != nullptr)
+                castOffset = camera.forward() * (camCollider->getBounds().m_sphereRadius + .01f);
 
             if (raycast(camera.getPosition() + castOffset, camera.forward(), hitInfo))
                 hitInfo.m_collider->getOwner().translate(Vector3::down());
@@ -492,7 +493,6 @@ namespace LibGL::Demo
     void DemoApp::handleMouse() const
     {
         auto& inputManager = LGL_SERVICE(InputManager);
-        auto& camera = Camera::getCurrent();
 
         if (!inputManager.isMouseButtonDown(EMouseButton::MOUSE_BUTTON_LEFT) &&
             !inputManager.isMouseButtonDown(EMouseButton::MOUSE_BUTTON_RIGHT))
@@ -505,32 +505,54 @@ namespace LibGL::Demo
         LGL_SERVICE(Window).disableCursor();
 
         //update camera rotation
-        const float rotationSpeed = ROTATION_SPEED * MOUSE_SENSITIVITY
-            * m_context->m_timer->getDeltaTime();
-
+        const Radian  rotationSpeed = ROTATION_SPEED * MOUSE_SENSITIVITY * m_context->m_timer->getDeltaTime();
         const Vector2 mouseDelta = inputManager.getMouseDelta();
 
-        if (mouseDelta == Vector2::zero())
+        if (rotationSpeed == 0_deg || mouseDelta == Vector2::zero())
             return;
 
-        Vector3 camRotation = camera.getRotation();
-        camRotation.m_x -= mouseDelta.m_y * rotationSpeed;
-        camRotation.m_y -= mouseDelta.m_x * rotationSpeed;
+        Camera&          camera = Camera::getCurrent();
+        TVector3<Degree> euler = camera.getEuler(ERotationOrder::ZXY);
 
-        camRotation.m_x = clamp(camRotation.m_x, -90.f, 90.f);
-        camRotation.m_y = wrap(camRotation.m_y, 0.f, 360.f);
+        euler.m_y += rotationSpeed * mouseDelta.m_x;
+        euler.m_x -= rotationSpeed * mouseDelta.m_y;
 
-        camera.setRotation(camRotation);
+        euler.m_x = clamp(euler.m_x, -90_deg, 90_deg);
+
+        camera.setEuler(euler, ERotationOrder::ZXY);
+        euler = camera.getEuler(ERotationOrder::ZXY);
     }
 
     void DemoApp::render()
     {
+        auto& sceneRenderer = LGL_SERVICE(SceneRenderer);
+        sceneRenderer.init(m_scene);
+
         const auto& renderer = LGL_SERVICE(Renderer);
-        renderer.clear(Camera::getCurrent());
+        renderer.setViewPort(0, 0, m_shadowMap.getWidth(), m_shadowMap.getHeight());
 
+        m_frameBuffer.bind();
+
+        renderer.clear(false, true, false);
+
+        const ResourceManager& resourceManager = LGL_SERVICE(ResourceManager);
+        const Shader*          shadowMapShader = resourceManager.get<Shader>("assets/shaders/Depth.glsl");
+        sceneRenderer.render(m_lightViewProjection, shadowMapShader);
+
+        FrameBuffer::unbind();
+
+        const Vector2I windowSize = m_context->m_window->getSize();
+        renderer.setViewPort(0, 0, windowSize.m_x, windowSize.m_y);
+
+        const Camera& cam = Camera::getCurrent();
+        renderer.clear(cam);
+
+        m_lightMatrices[1] = m_dirLight.getMatrix();
+        m_lightMatrices[2] = m_spotLight.getMatrix();
+
+        m_lightsSSBO.sendBlocks(m_lightMatrices.data(), m_lightMatrices.size());
         updateLitShader("assets/shaders/Lit.glsl");
-
-        m_scene.update();
+        sceneRenderer.render(cam.getViewProjectionMatrix(), nullptr);
     }
 
     void DemoApp::updateLitShader(const std::string& fileName) const
@@ -545,20 +567,12 @@ namespace LibGL::Demo
         // Setup camera
         shader->setUniformVec3("u_viewPos", Camera::getCurrent().getWorldPosition());
 
-        m_ambientLight.setupUniform("u_ambient", *shader);
+        // Setup light space matrix
+        shader->setUniformMat4("u_lightSpaceMat", m_lightViewProjection);
 
-        // Setup directional light
-        m_dirLight.setupUniform("u_dirLight", *shader);
-
-        // Setup point lights
-        for (size_t i = 0; i < NB_POINT_LIGHTS; i++)
-        {
-            const std::string prefix = formatString("u_pointLights[%i]", i);
-            m_pointLights[i].setupUniform(prefix, *shader);
-        }
-
-        // Setup spot light
-        m_spotLight.setupUniform("u_spotLight", *shader);
+        // Setup shadow map
+        m_shadowMap.bind(4);
+        shader->setUniformInt("u_shadowMap", 4);
 
         Shader::unbind();
     }

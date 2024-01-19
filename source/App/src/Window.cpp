@@ -23,7 +23,7 @@ namespace LibGL::Application
 #endif
 
 		// Create glfw window
-		m_glfwWindow = glfwCreateWindow(size.first, size.second, title,
+		m_glfwWindow = glfwCreateWindow(size.m_x, size.m_y, title,
 			nullptr, nullptr);
 
 		if (m_glfwWindow == nullptr)
@@ -32,7 +32,7 @@ namespace LibGL::Application
 			throw WindowCreationFailed("Failed to create GLFW window");
 		}
 
-		glfwGetWindowPos(m_glfwWindow, &m_pos.first, &m_pos.second);
+		glfwGetWindowPos(m_glfwWindow, &m_pos.m_x, &m_pos.m_y);
 
 		s_windowsMap[m_glfwWindow] = this;
 
@@ -94,7 +94,7 @@ namespace LibGL::Application
 
 	float Window::getAspect() const
 	{
-		return static_cast<float>(m_size.first) / static_cast<float>(m_size.second);
+		return static_cast<float>(m_size.m_x) / static_cast<float>(m_size.m_y);
 	}
 
 	void Window::showCursor() const
