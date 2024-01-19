@@ -8,7 +8,7 @@ namespace LibGL::Rendering
 	{
 	public:
 		ShaderStorageBuffer() = default;
-		ShaderStorageBuffer(EAccessSpecifier accessSpecifier);
+		explicit ShaderStorageBuffer(EAccessSpecifier accessSpecifier);
 
 		/**
 		 * \brief Sets the ssbo's binding point
