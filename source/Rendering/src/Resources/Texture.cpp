@@ -19,9 +19,48 @@ namespace LibGL::Rendering::Resources
         ASSERT(load(fileName.string()));
     }
 
+    Texture::Texture(const int width, const int height, const int channels)
+        : m_width(width), m_height(height), m_channels(channels)
+    {
+        glGenTextures(1, &m_id);
+        glBindTexture(GL_TEXTURE_2D, m_id);
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, getGLFormat(), GL_FLOAT, nullptr);
+    }
+
+    Texture::Texture(const int width, const int height, ETextureFormat format)
+        : m_width(width), m_height(height)
+    {
+        glGenTextures(1, &m_id);
+        glBindTexture(GL_TEXTURE_2D, m_id);
+
+        const GLenum texFormat = static_cast<GLenum>(format);
+        glTexImage2D(GL_TEXTURE_2D, 0, texFormat, m_width, m_height, 0, texFormat, GL_FLOAT, nullptr);
+
+        switch (format)
+        {
+        case ETextureFormat::RED:
+            m_channels = 1;
+            break;
+        case ETextureFormat::RG:
+            m_channels = 2;
+            break;
+        case ETextureFormat::RGB:
+        case ETextureFormat::BGR:
+            m_channels = 3;
+            break;
+        case ETextureFormat::RGBA:
+        case ETextureFormat::BGRA:
+            m_channels = 4;
+            break;
+        default:
+            m_channels = 0;
+            break;
+        }
+    }
+
     Texture::Texture(const Texture& other) :
-        IResource(other), m_width(other.m_width), m_height(other.m_height),
-        m_channels(other.m_channels)
+        IResource(other), m_width(other.m_width), m_height(other.m_height), m_channels(other.m_channels)
     {
         if (other.m_data != nullptr)
             m_data = stbi_load_from_memory(other.m_data, other.m_width * other.m_height * other.m_channels, &m_width, &m_height,
@@ -47,8 +86,7 @@ namespace LibGL::Rendering::Resources
     }
 
     Texture::Texture(Texture&& other) noexcept :
-        m_data(other.m_data), m_id(other.m_id), m_width(other.m_width),
-        m_height(other.m_height), m_channels(other.m_channels)
+        m_data(other.m_data), m_id(other.m_id), m_width(other.m_width), m_height(other.m_height), m_channels(other.m_channels)
     {
         other.m_id = 0;
         other.m_data = nullptr;
@@ -235,6 +273,21 @@ namespace LibGL::Rendering::Resources
     void Texture::setMagFilter(const ETextureFilter textureFilter)
     {
         m_magFilter = textureFilter;
+    }
+
+    void Texture::attachToFrameBuffer(const EFrameBufferAttachment attachmentMode) const
+    {
+        glFramebufferTexture2D(GL_FRAMEBUFFER, static_cast<GLenum>(attachmentMode), GL_TEXTURE_2D, m_id, 0);
+    }
+
+    int Texture::getWidth() const
+    {
+        return m_width;
+    }
+
+    int Texture::getHeight() const
+    {
+        return m_height;
     }
 
     uint32_t Texture::getGLFormat() const

@@ -1,20 +1,25 @@
 ﻿#pragma once
 #include <filesystem>
 
+#include "Enums/EFrameBufferAttachment.h"
+
 #include "Resources/IResource.h"
 
 #include "Enums/ETextureFilter.h"
+#include "Enums/ETextureFormat.h"
 #include "Enums/ETextureWrapMode.h"
 
 namespace LibGL::Rendering::Resources
 {
-class Texture final : public LibGL::Resources::IResource
+    class Texture final : public LibGL::Resources::IResource
     {
     public:
         using IResource::load;
 
         Texture() = default;
         explicit Texture(const std::filesystem::path& fileName);
+        Texture(int width, int height, int channels);
+        Texture(int width, int height, ETextureFormat format);
         Texture(const Texture& other);
         Texture(Texture&& other) noexcept;
         ~Texture() override;
@@ -76,6 +81,23 @@ class Texture final : public LibGL::Resources::IResource
          * \param textureFilter The texture's new magnification filter
          */
         void setMagFilter(ETextureFilter textureFilter);
+
+        /**
+         * \brief Attaches the texture to the current frame buffer
+         */
+        void attachToFrameBuffer(EFrameBufferAttachment attachmentMode) const;
+
+        /**
+         * \brief Provides read access to the texture's width
+         * \return The texture's width
+         */
+        int getWidth() const;
+
+        /**
+         * \brief Provides read access to the texture's height
+         * \return The texture's height
+         */
+        int getHeight() const;
 
     private:
         unsigned char*   m_data = nullptr;
