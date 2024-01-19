@@ -30,6 +30,17 @@ namespace LibGL::DataStructure
 		return m_children;
 	}
 
+	std::vector<Node::ConstNodePtr> Node::getChildren() const
+	{
+		std::vector<ConstNodePtr> nodes;
+		nodes.reserve(m_children.size());
+
+		for (const auto& node : m_children)
+			nodes.push_back(std::dynamic_pointer_cast<const Node>(node));
+
+		return nodes;
+	}
+
 	void Node::removeChild(Node& child)
 	{
 		const auto findFunc = [child](const NodePtr& ptr)

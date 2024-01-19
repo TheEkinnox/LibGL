@@ -11,7 +11,7 @@
 
 namespace LibGL::Rendering::Resources
 {
-    class Model : public LibGL::Resources::IResource
+    class Mesh : public LibGL::Resources::IResource
     {
     public:
         using IResource::load;

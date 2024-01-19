@@ -1,11 +1,11 @@
 #pragma once
-#include "Resources/Model.h"
+#include "Resources/Mesh.h"
 
 #include "Utility/ThreadPool.h"
 
 namespace LibGL::Rendering::Resources
 {
-    class ModelMulti : public Model
+    class MeshMulti : public Mesh
     {
     public:
         struct BatchData

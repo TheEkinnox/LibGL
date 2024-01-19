@@ -1,4 +1,4 @@
-#include "Resources/ModelMulti.h"
+#include "Resources/MeshMulti.h"
 
 #include <Arithmetic.h>
 #include <ranges>
@@ -16,7 +16,7 @@ using namespace LibGL::Utility;
 
 namespace LibGL::Rendering::Resources
 {
-    bool ModelMulti::load(const char* fileName)
+    bool MeshMulti::load(const char* fileName)
     {
         const std::vector<std::string> lines = readFile(fileName);
 
@@ -100,7 +100,7 @@ namespace LibGL::Rendering::Resources
         return true;
     }
 
-    std::future<void> ModelMulti::addBatch(const BatchData& batchData)
+    std::future<void> MeshMulti::addBatch(const BatchData& batchData)
     {
         auto& threadPool = LGL_SERVICE(ThreadPool);
 
@@ -110,7 +110,7 @@ namespace LibGL::Rendering::Resources
         });
     }
 
-    void ModelMulti::parseLines(const BatchData& batchData)
+    void MeshMulti::parseLines(const BatchData& batchData)
     {
         if (batchData.m_lines.empty())
             return;

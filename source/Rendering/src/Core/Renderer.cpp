@@ -32,8 +32,7 @@ namespace LibGL::Rendering
 		glGetFloatv(GL_COLOR_CLEAR_VALUE, &currentClearColor.m_r);
 
 		setClearColor(camera.getClearColor());
-		clear(camera.getClearColorBuffer(), camera.getClearDepthBuffer(),
-			camera.getClearStencilBuffer());
+		clear(camera.getClearColorBuffer(), camera.getClearDepthBuffer(), camera.getClearStencilBuffer());
 
 		setClearColor(currentClearColor);
 	}

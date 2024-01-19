@@ -1,4 +1,4 @@
-﻿#include "Resources/Model.h"
+﻿#include "Resources/Mesh.h"
 
 #include <sstream>
 
@@ -15,9 +15,9 @@ using namespace LibMath;
 
 namespace LibGL::Rendering::Resources
 {
-    REGISTER_RESOURCE_TYPE(Model);
+    REGISTER_RESOURCE_TYPE(Mesh);
 
-    bool Model::load(const char* fileName)
+    bool Mesh::load(const char* fileName)
     {
         std::vector<std::string> lines = LibGL::Utility::readFile(fileName);
 
@@ -47,7 +47,7 @@ namespace LibGL::Rendering::Resources
         return true;
     }
 
-    bool Model::init()
+    bool Mesh::init()
     {
         m_vbo = VertexBuffer(m_vertices);
         m_ebo = IndexBuffer(m_indices);
@@ -56,7 +56,7 @@ namespace LibGL::Rendering::Resources
         return true;
     }
 
-    void Model::draw() const
+    void Mesh::draw() const
     {
         m_vao.bind();
         m_vbo.bind();
@@ -66,7 +66,7 @@ namespace LibGL::Rendering::Resources
             GL_UNSIGNED_INT, nullptr);
     }
 
-    Vector3 Model::parseVector3(const std::string& vec3Str)
+    Vector3 Mesh::parseVector3(const std::string& vec3Str)
     {
         std::istringstream vec3Stream(vec3Str);
         Vector3            vec3;
@@ -78,7 +78,7 @@ namespace LibGL::Rendering::Resources
         return vec3;
     }
 
-    Vector2 Model::parseVector2(const std::string& vec2Str)
+    Vector2 Mesh::parseVector2(const std::string& vec2Str)
     {
         std::istringstream vec2Stream(vec2Str);
         Vector2            vec2;
@@ -89,7 +89,7 @@ namespace LibGL::Rendering::Resources
         return vec2;
     }
 
-    std::vector<size_t> Model::getIndices(const size_t vertexCount)
+    std::vector<size_t> Mesh::getIndices(const size_t vertexCount)
     {
         ASSERT(vertexCount >= 3);
 
@@ -106,7 +106,7 @@ namespace LibGL::Rendering::Resources
         return faceIndices;
     }
 
-    Vertex Model::parseVertex(const std::string& str, const std::vector<Vector3>& positions, const std::vector<Vector3>& normals,
+    Vertex Mesh::parseVertex(const std::string& str, const std::vector<Vector3>& positions, const std::vector<Vector3>& normals,
                               const std::vector<Vector2>& uvs)
     {
         size_t posIdx = 0, uvIdx = 0, normalIdx = 0;
@@ -144,7 +144,7 @@ namespace LibGL::Rendering::Resources
         };
     }
 
-    uint32_t Model::addVertex(Vertex vertex)
+    uint32_t Mesh::addVertex(Vertex vertex)
     {
         uint32_t vertexIdx;
 
@@ -170,7 +170,7 @@ namespace LibGL::Rendering::Resources
         return vertexIdx;
     }
 
-    void Model::parseFace(const std::string& line, const std::vector<Vector3>& positions, const std::vector<Vector3>& normals,
+    void Mesh::parseFace(const std::string& line, const std::vector<Vector3>& positions, const std::vector<Vector3>& normals,
                           const std::vector<Vector2>& uvs)
     {
         const auto faceStrings = LibGL::Utility::splitString(line, " ", true);
