@@ -105,17 +105,6 @@ namespace LibGL::Demo
         void createScene();
 
         /**
-         * \brief Loads or creates a new shader from the given file
-         */
-        static Rendering::Resources::Shader* setupShader(const std::string& fileName);
-
-        /**
-         * \brief Initializes the given shader
-         * \param shader The shader to initialize
-         */
-        static void initShader(Rendering::Resources::Shader* shader);
-
-        /**
          * \brief Processes user's keyboard input
          */
         void handleKeyboard();

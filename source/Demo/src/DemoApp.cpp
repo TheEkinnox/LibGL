@@ -136,12 +136,12 @@ namespace LibGL::Demo
         ASSERT(resourceManager.load<Mesh>("assets/meshes/primitives/cube.obj") != nullptr);
         ASSERT(resourceManager.load<Mesh>("assets/meshes/bunny.obj") != nullptr);
 
-        ASSERT(setupShader("assets/shaders/Unlit.glsl") != nullptr);
-        ASSERT(setupShader("assets/shaders/Normal.glsl") != nullptr);
-        ASSERT(setupShader("assets/shaders/Basic.glsl") != nullptr);
-        ASSERT(setupShader("assets/shaders/Lit.glsl") != nullptr);
-        ASSERT(setupShader("assets/shaders/Depth.glsl") != nullptr);
-        ASSERT(setupShader("assets/shaders/DrawDepth.glsl") != nullptr);
+        ASSERT(resourceManager.load<Shader>("assets/shaders/Unlit.glsl") != nullptr);
+        ASSERT(resourceManager.load<Shader>("assets/shaders/Normal.glsl") != nullptr);
+        ASSERT(resourceManager.load<Shader>("assets/shaders/Basic.glsl") != nullptr);
+        ASSERT(resourceManager.load<Shader>("assets/shaders/Lit.glsl") != nullptr);
+        ASSERT(resourceManager.load<Shader>("assets/shaders/Depth.glsl") != nullptr);
+        ASSERT(resourceManager.load<Shader>("assets/shaders/DrawDepth.glsl") != nullptr);
 
         ASSERT(resourceManager.load<Texture>("assets/textures/container.jpg") != nullptr);
         ASSERT(resourceManager.load<Texture>("assets/textures/container2.png") != nullptr);
@@ -168,20 +168,17 @@ namespace LibGL::Demo
         tasks.emplace_back(resourceManager.loadInBackground<MeshMulti, IResource>("assets/meshes/primitives/cube.obj"));
         tasks.emplace_back(resourceManager.loadInBackground<MeshMulti, IResource>("assets/meshes/bunny.obj"));
 
-        shaderTasks.emplace_back(resourceManager.loadInBackground<Shader>("assets/shaders/Unlit.glsl"));
-        shaderTasks.emplace_back(resourceManager.loadInBackground<Shader>("assets/shaders/Normal.glsl"));
-        shaderTasks.emplace_back(resourceManager.loadInBackground<Shader>("assets/shaders/Basic.glsl"));
-        shaderTasks.emplace_back(resourceManager.loadInBackground<Shader>("assets/shaders/Lit.glsl"));
-        shaderTasks.emplace_back(resourceManager.loadInBackground<Shader>("assets/shaders/Depth.glsl"));
-        shaderTasks.emplace_back(resourceManager.loadInBackground<Shader>("assets/shaders/DrawDepth.glsl"));
+        tasks.emplace_back(resourceManager.loadInBackground<Shader, IResource>("assets/shaders/Unlit.glsl"));
+        tasks.emplace_back(resourceManager.loadInBackground<Shader, IResource>("assets/shaders/Normal.glsl"));
+        tasks.emplace_back(resourceManager.loadInBackground<Shader, IResource>("assets/shaders/Basic.glsl"));
+        tasks.emplace_back(resourceManager.loadInBackground<Shader, IResource>("assets/shaders/Lit.glsl"));
+        tasks.emplace_back(resourceManager.loadInBackground<Shader, IResource>("assets/shaders/Depth.glsl"));
+        tasks.emplace_back(resourceManager.loadInBackground<Shader, IResource>("assets/shaders/DrawDepth.glsl"));
 
         tasks.emplace_back(resourceManager.loadInBackground<Texture, IResource>("assets/textures/container.jpg"));
         tasks.emplace_back(resourceManager.loadInBackground<Texture, IResource>("assets/textures/container2.png"));
         tasks.emplace_back(resourceManager.loadInBackground<Texture, IResource>("assets/textures/container2_specular.png"));
         tasks.emplace_back(resourceManager.loadInBackground<Texture, IResource>("assets/textures/grid.tga"));
-
-        for (auto& task : shaderTasks)
-            initShader(task.get());
 
         for (auto& task : tasks)
         {
@@ -320,24 +317,6 @@ namespace LibGL::Demo
         m_lightMatrices.emplace_back(PointLight(Light{ Color::magenta }, Vector3{ -1, 1, 1 }, AttenuationData(16)).getMatrix());
         m_lightMatrices.emplace_back(PointLight(Light{ Color::magenta }, Vector3{ 1, 1, 1 }, AttenuationData(16)).getMatrix());
         m_lightMatrices.emplace_back(PointLight(Light{ Color::magenta }, Vector3{ 0, 1, -1 }, AttenuationData(16)).getMatrix());
-    }
-
-    Shader* DemoApp::setupShader(const std::string& fileName)
-    {
-        auto& resourceManager = LGL_SERVICE(ResourceManager);
-        auto* shader = resourceManager.load<Shader>(fileName);
-
-        initShader(shader);
-
-        return shader;
-    }
-
-    void DemoApp::initShader(Shader* shader)
-    {
-        ASSERT(shader != nullptr);
-        ASSERT(shader->setVertexShader());
-        ASSERT(shader->setFragmentShader());
-        ASSERT(shader->link());
     }
 
     void DemoApp::handleKeyboard()

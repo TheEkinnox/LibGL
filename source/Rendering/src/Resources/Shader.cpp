@@ -9,6 +9,8 @@
 
 #include <Utility/utility.h>
 
+using namespace LibGL::Utility;
+
 namespace LibGL::Rendering::Resources
 {
     REGISTER_RESOURCE_TYPE(Shader);
@@ -16,24 +18,18 @@ namespace LibGL::Rendering::Resources
     Shader::Shader(const Shader& other) :
         IResource(other), m_source(other.m_source)
     {
-        if (other.m_vertexShader != 0)
-            ASSERT(setVertexShader());
-
-        if (other.m_fragmentShader != 0)
-            ASSERT(setFragmentShader());
+        if (other.m_program != 0)
+        ASSERT(parseSource());
     }
 
     Shader::Shader(Shader&& other) noexcept :
-        m_source(std::move(other.m_source)), m_vertexShader(other.m_vertexShader),
-        m_fragmentShader(other.m_fragmentShader), m_program(other.m_program)
+        m_source(std::move(other.m_source)), m_program(other.m_program)
     {
-        other.m_vertexShader = other.m_fragmentShader = other.m_program = 0;
+        other.m_program = 0;
     }
 
     Shader::~Shader()
     {
-        glDeleteShader(m_vertexShader);
-        glDeleteShader(m_fragmentShader);
         glDeleteProgram(m_program);
     }
 
@@ -44,11 +40,8 @@ namespace LibGL::Rendering::Resources
 
         m_source = other.m_source;
 
-        if (other.m_vertexShader != 0)
-            ASSERT(setVertexShader());
-
-        if (other.m_fragmentShader != 0)
-            ASSERT(setFragmentShader());
+        if (other.m_program != 0)
+        ASSERT(parseSource());
 
         return *this;
     }
@@ -59,11 +52,9 @@ namespace LibGL::Rendering::Resources
             return *this;
 
         m_source = other.m_source;
-        m_vertexShader = other.m_vertexShader;
-        m_fragmentShader = other.m_fragmentShader;
         m_program = other.m_program;
 
-        other.m_vertexShader = other.m_fragmentShader = other.m_program = 0;
+        other.m_program = 0;
 
         return *this;
     }
@@ -86,142 +77,13 @@ namespace LibGL::Rendering::Resources
         return true;
     }
 
-    std::string Shader::getSource(const uint32_t shaderType)
+    bool Shader::init()
     {
-        const auto sources = LibGL::Utility::splitString(m_source, "#shader ", true);
+        if (parseSource())
+            return true;
 
-        if (sources.size() < 2)
-            return m_source;
-
-        std::string typeToken;
-
-        switch (shaderType)
-        {
-        case GL_VERTEX_SHADER:
-            typeToken = "vertex";
-            break;
-        case GL_FRAGMENT_SHADER:
-            typeToken = "fragment";
-            break;
-        default:
-            return m_source;
-        }
-
-        for (const auto& source : sources)
-        {
-            std::istringstream isStream(source);
-            std::string        token;
-
-            isStream >> token;
-
-            if (token == typeToken)
-            {
-                std::string firstLine;
-                std::getline(isStream, firstLine);
-
-                // Return source without the shader type line
-                return source.substr(token.size() + firstLine.size());
-            }
-        }
-
-        return "";
-    }
-
-    bool Shader::setVertexShader()
-    {
-        if (m_vertexShader != 0)
-        {
-            glDetachShader(m_program, m_vertexShader);
-            glDeleteShader(m_vertexShader);
-        }
-
-        m_vertexShader = glCreateShader(GL_VERTEX_SHADER);
-
-        const std::string vertexSource = getSource(GL_VERTEX_SHADER);
-        const char*       shaderSource = vertexSource.c_str();
-        const auto       sourceSize = static_cast<GLint>(vertexSource.size());
-
-        glShaderSource(m_vertexShader, 1, &shaderSource, &sourceSize);
-        glCompileShader(m_vertexShader);
-
-        int success;
-        glGetShaderiv(m_vertexShader, GL_COMPILE_STATUS, &success);
-
-        if (!success)
-        {
-            char infoLog[INFO_LOG_SIZE];
-            glGetShaderInfoLog(m_vertexShader, INFO_LOG_SIZE, nullptr, infoLog);
-            DEBUG_LOG("ERROR::SHADER::VERTEX::COMPILATION_FAILED\n%s\n", infoLog);
-            glDeleteShader(m_vertexShader);
-            m_vertexShader = 0;
-            return false;
-        }
-
-        if (m_program == 0)
-            m_program = glCreateProgram();
-
-        glAttachShader(m_program, m_vertexShader);
-
-        return true;
-    }
-
-    bool Shader::setFragmentShader()
-    {
-        if (m_fragmentShader != 0)
-        {
-            glDetachShader(m_program, m_fragmentShader);
-            glDeleteShader(m_fragmentShader);
-        }
-
-        m_fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-
-        const std::string fragmentSource = getSource(GL_FRAGMENT_SHADER);
-        const char*       shaderSource = fragmentSource.c_str();
-        const auto       sourceSize = static_cast<GLint>(fragmentSource.size());
-
-        glShaderSource(m_fragmentShader, 1, &shaderSource, &sourceSize);
-        glCompileShader(m_fragmentShader);
-
-        int success;
-        glGetShaderiv(m_fragmentShader, GL_COMPILE_STATUS, &success);
-
-        if (!success)
-        {
-            char infoLog[INFO_LOG_SIZE];
-            glGetShaderInfoLog(m_fragmentShader, INFO_LOG_SIZE, nullptr, infoLog);
-            DEBUG_LOG("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n%s\n", infoLog);
-            glDeleteShader(m_fragmentShader);
-            m_fragmentShader = 0;
-            return false;
-        }
-
-        if (m_program == 0)
-            m_program = glCreateProgram();
-
-        glAttachShader(m_program, m_fragmentShader);
-
-        return true;
-    }
-
-    bool Shader::link() const
-    {
-        if (m_program == 0)
-            return false;
-
-        glLinkProgram(m_program);
-
-        int success;
-        glGetProgramiv(m_program, GL_LINK_STATUS, &success);
-
-        if (!success)
-        {
-            char infoLog[INFO_LOG_SIZE];
-            glGetProgramInfoLog(m_program, INFO_LOG_SIZE, nullptr, infoLog);
-            DEBUG_LOG("ERROR::SHADER::PROGRAM::LINKING_FAILED\n%s\n", infoLog);
-            return false;
-        }
-
-        return true;
+        DEBUG_LOG("Unable to initialize shader - Couldn't pare source");
+        return false;
     }
 
     void Shader::use() const
@@ -304,6 +166,153 @@ namespace LibGL::Rendering::Resources
         GLfloat values[16];
         glGetUniformfv(m_program, getUniformLocation(name), values);
         return reinterpret_cast<LibMath::Matrix4&>(values);
+    }
+
+    std::string Shader::getTokenFromType(const uint32_t shaderType)
+    {
+        switch (shaderType)
+        {
+        case GL_VERTEX_SHADER:
+            return "vertex";
+        case GL_FRAGMENT_SHADER:
+            return "fragment";
+        case GL_GEOMETRY_SHADER:
+            return "geometry";
+        case GL_TESS_EVALUATION_SHADER:
+            return "tess_evaluation";
+        case GL_TESS_CONTROL_SHADER:
+            return "tess_control";
+        case GL_COMPUTE_SHADER:
+            return "compute";
+        default:
+            return {};
+        }
+    }
+
+    uint32_t Shader::getTypeFromToken(const std::string& shaderType)
+    {
+        if (shaderType == "vertex")
+            return GL_VERTEX_SHADER;
+
+        if (shaderType == "fragment")
+            return GL_FRAGMENT_SHADER;
+
+        if (shaderType == "geometry")
+            return GL_GEOMETRY_SHADER;
+
+        if (shaderType == "tess_evaluation")
+            return GL_TESS_EVALUATION_SHADER;
+
+        if (shaderType == "tess_control")
+            return GL_TESS_CONTROL_SHADER;
+
+        if (shaderType == "compute")
+            return GL_COMPUTE_SHADER;
+
+        return GL_INVALID_VALUE;
+    }
+
+    GLuint Shader::compileSource(const GLenum shaderType, const std::string& source)
+    {
+        const GLuint shaderId = glCreateShader(shaderType);
+
+        const char* shaderSource = source.c_str();
+        const auto  sourceSize = static_cast<GLint>(source.size());
+
+        glShaderSource(shaderId, 1, &shaderSource, &sourceSize);
+        glCompileShader(shaderId);
+
+        int success;
+        glGetShaderiv(shaderId, GL_COMPILE_STATUS, &success);
+
+        if (!success)
+        {
+            char infoLog[INFO_LOG_SIZE];
+            glGetShaderInfoLog(shaderId, INFO_LOG_SIZE, nullptr, infoLog);
+            DEBUG_LOG("ERROR::SHADER::%s::COMPILATION_FAILED\n%s", getTokenFromType(shaderType).c_str(), infoLog);
+            glDeleteShader(shaderId);
+            return 0;
+        }
+
+        return shaderId;
+    }
+
+    bool Shader::parseSource()
+    {
+        glDeleteProgram(m_program);
+        m_program = 0;
+
+        if (m_source.empty())
+            return false;
+
+        m_program = glCreateProgram();
+
+        const std::vector<std::string> sources = splitString(m_source, "#shader ", true);
+
+        std::vector<GLuint> shaderIds;
+        shaderIds.reserve(sources.size());
+
+        for (const auto& source : sources)
+        {
+            if (source.empty())
+                continue;
+
+            std::istringstream iStrStream(source);
+            std::string        token;
+
+            iStrStream >> token;
+            const GLuint shaderType = getTypeFromToken(token);
+
+            if (shaderType != GL_INVALID_VALUE)
+            {
+                std::string firstLine;
+                std::getline(iStrStream, firstLine);
+
+                if (const GLuint shaderId = compileSource(shaderType, source.substr(token.size() + firstLine.size())))
+                {
+                    shaderIds.emplace_back(shaderId);
+                    glAttachShader(m_program, shaderId);
+                }
+            }
+        }
+
+        const bool isSuccess = link();
+
+        for (const GLuint shaderId : shaderIds)
+            glDeleteShader(shaderId);
+
+        return isSuccess;
+    }
+
+    bool Shader::link() const
+    {
+        if (m_program == 0)
+            return false;
+
+        int success;
+        glLinkProgram(m_program);
+        glGetProgramiv(m_program, GL_LINK_STATUS, &success);
+
+        if (!success)
+        {
+            char infoLog[INFO_LOG_SIZE];
+            glGetProgramInfoLog(m_program, INFO_LOG_SIZE, nullptr, infoLog);
+            DEBUG_LOG("ERROR::SHADER::PROGRAM::LINKING_FAILED\n%s", infoLog);
+            return false;
+        }
+
+        glValidateProgram(m_program);
+        glGetProgramiv(m_program, GL_VALIDATE_STATUS, &success);
+
+        if (!success)
+        {
+            char infoLog[INFO_LOG_SIZE];
+            glGetProgramInfoLog(m_program, INFO_LOG_SIZE, nullptr, infoLog);
+            DEBUG_LOG("ERROR::SHADER::PROGRAM::VALIDATION_FAILED\n%s", infoLog);
+            return false;
+        }
+
+        return true;
     }
 
     GLint Shader::getUniformLocation(const std::string& uniformName) const

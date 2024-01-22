@@ -1,9 +1,9 @@
 ﻿#pragma once
+#include <Matrix.h>
 #include <string>
+#include <Vector.h>
 
-#include "Matrix.h"
-#include "Resources/IResource.h"
-#include "Vector.h"
+#include <Resources/IResource.h>
 
 namespace LibGL::Rendering::Resources
 {
@@ -28,25 +28,10 @@ namespace LibGL::Rendering::Resources
         bool load(const char* fileName) override;
 
         /**
-         * \brief Compiles the vertex shader from the current source
-         * and attaches it to the shader program.
-         * \return True if the vertex shader could be compiled. False otherwise.
+         * \brief Initializes the shader
+         * \return True on success. False otherwise
          */
-        bool setVertexShader();
-
-        /**
-         * \brief Compiles the fragment shader from the current source
-         * and attaches it to the shader program.
-         * \return True if the fragment shader could be compiled. False otherwise.
-         */
-        bool setFragmentShader();
-
-        /**
-         * \brief Links the shader program.\n
-         * IMPORTANT: setVertexShader and/or setFragmentShader MUST have been called
-         * \return True if the shader is linked successfully. False otherwise
-         */
-        bool link() const;
+        bool init() override;
 
         /**
          * \brief Uses the shader program.\n
@@ -145,18 +130,43 @@ namespace LibGL::Rendering::Resources
 
     private:
         std::string m_source;
-        uint32_t    m_vertexShader = 0;
-        uint32_t    m_fragmentShader = 0;
         uint32_t    m_program = 0;
 
         static constexpr int INFO_LOG_SIZE = 512;
 
         /**
-         * \brief Extracts the code for a given shader type from the raw source
-         * \param shaderType The shader type for which source should be extracted
-         * \return The source code for the given shader type
+         * \brief Converts a shader type enum value to its corresponding token string
+         * \param shaderType The target shader type
+         * \return The token string corresponding to the given shader type
          */
-        std::string getSource(uint32_t shaderType);
+        static std::string getTokenFromType(uint32_t shaderType);
+
+        /**
+         * \brief Converts a shader type token string to its corresponding enum value
+         * \param shaderType The target shader type
+         * \return The type enum value corresponding to the given shader type token
+         */
+        static uint32_t getTypeFromToken(const std::string& shaderType);
+
+        /**
+         * \brief Compiles the given shader source
+         * \param shaderType The type of shader to compile
+         * \param source The source of the shader to compile
+         * \return The compiled shader's handle
+         */
+        static uint32_t compileSource(uint32_t shaderType, const std::string& source);
+
+        /**
+         * \brief Parses the shader's source and create the appropriate shader types
+         * \return True if at least one type of shader was extracted. False otherwise
+         */
+        bool parseSource();
+
+        /**
+         * \brief Links the shader program.\n
+         * \return True if the shader is linked successfully. False otherwise
+         */
+        bool link() const;
 
         /**
          * \brief Gets the location of a given uniform variable
