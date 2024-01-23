@@ -15,7 +15,7 @@ namespace LibGL::Rendering
         SceneRenderer() = default;
 
         void init(const LibGL::Resources::Scene& scene);
-        void render(const LibMath::Matrix4x4& viewProjMat, const Resources::Shader* shaderOverride) const;
+        void render(const LibMath::Matrix4x4& viewProjMat, Resources::Shader* shaderOverride) const;
 
     private:
         std::vector<const IDrawable*> m_drawables;

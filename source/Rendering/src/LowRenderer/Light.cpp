@@ -10,7 +10,7 @@ namespace LibGL::Rendering
     {
     }
 
-    void Light::setupUniform(const std::string& uniformName, const Resources::Shader& shader) const
+    void Light::setupUniform(const std::string& uniformName, Resources::Shader& shader) const
     {
         shader.setUniformVec4(uniformName + ".color", m_color.rgba());
     }
@@ -34,7 +34,7 @@ namespace LibGL::Rendering
     {
     }
 
-    void DirectionalLight::setupUniform(const std::string& uniformName, const Resources::Shader& shader) const
+    void DirectionalLight::setupUniform(const std::string& uniformName, Resources::Shader& shader) const
     {
         Light::setupUniform(uniformName, shader);
 
@@ -70,7 +70,7 @@ namespace LibGL::Rendering
     {
     }
 
-    void PointLight::setupUniform(const std::string& uniformName, const Resources::Shader& shader) const
+    void PointLight::setupUniform(const std::string& uniformName, Resources::Shader& shader) const
     {
         Light::setupUniform(uniformName, shader);
 
@@ -106,7 +106,7 @@ namespace LibGL::Rendering
     {
     }
 
-    void SpotLight::setupUniform(const std::string& uniformName, const Resources::Shader& shader) const
+    void SpotLight::setupUniform(const std::string& uniformName, Resources::Shader& shader) const
     {
         Light::setupUniform(uniformName, shader);
 

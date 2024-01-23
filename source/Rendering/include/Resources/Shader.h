@@ -49,88 +49,89 @@ namespace LibGL::Rendering::Resources
          * \param name The name of the uniform
          * \param value The value of the uniform
          */
-        void setUniformInt(const std::string& name, int value) const;
+        void setUniformInt(const std::string& name, int value);
 
         /**
          * \brief Sets the value of the float uniform with the given name
          * \param name The name of the uniform
          * \param value The value of the uniform
          */
-        void setUniformFloat(const std::string& name, float value) const;
+        void setUniformFloat(const std::string& name, float value);
 
         /**
          * \brief Sets the value of the Vector2 uniform with the given name
          * \param name The name of the uniform
          * \param value The value of the uniform
          */
-        void setUniformVec2(const std::string& name, const LibMath::Vector2& value) const;
+        void setUniformVec2(const std::string& name, const LibMath::Vector2& value);
 
         /**
          * \brief Sets the value of the Vector3 uniform with the given name
          * \param name The name of the uniform
          * \param value The value of the uniform
          */
-        void setUniformVec3(const std::string& name, const LibMath::Vector3& value) const;
+        void setUniformVec3(const std::string& name, const LibMath::Vector3& value);
 
         /**
          * \brief Sets the value of the Vector4 uniform with the given name
          * \param name The name of the uniform
          * \param value The value of the uniform
          */
-        void setUniformVec4(const std::string& name, const LibMath::Vector4& value) const;
+        void setUniformVec4(const std::string& name, const LibMath::Vector4& value);
 
         /**
          * \brief Sets the value of the Matrix4 uniform with the given name
          * \param name The name of the uniform
          * \param value The value of the uniform
          */
-        void setUniformMat4(const std::string& name, const LibMath::Matrix4& value) const;
+        void setUniformMat4(const std::string& name, const LibMath::Matrix4& value);
 
         /**
          * \brief Gets the value of the int uniform with the given name
          * \param name The name of the uniform
          * \return The value of the uniform
          */
-        int getUniformInt(const std::string& name) const;
+        int getUniformInt(const std::string& name);
 
         /**
          * \brief Gets the value of the float uniform with the given name
          * \param name The name of the uniform
          * \return The value of the uniform
          */
-        float getUniformFloat(const std::string& name) const;
+        float getUniformFloat(const std::string& name);
 
         /**
          * \brief Gets the value of the Vector2 uniform with the given name
          * \param name The name of the uniform
          * \return The value of the uniform
          */
-        LibMath::Vector2 getUniformVec2(const std::string& name) const;
+        LibMath::Vector2 getUniformVec2(const std::string& name);
 
         /**
          * \brief Gets the value of the Vector3 uniform with the given name
          * \param name The name of the uniform
          * \return The value of the uniform
          */
-        LibMath::Vector3 getUniformVec3(const std::string& name) const;
+        LibMath::Vector3 getUniformVec3(const std::string& name);
 
         /**
          * \brief Gets the value of the Vector4 uniform with the given name
          * \param name The name of the uniform
          * \return The value of the uniform
          */
-        LibMath::Vector4 getUniformVec4(const std::string& name) const;
+        LibMath::Vector4 getUniformVec4(const std::string& name);
 
         /**
          * \brief Gets the value of the Matrix4 uniform with the given name
          * \param name The name of the uniform
          * \return The value of the uniform
          */
-        LibMath::Matrix4 getUniformMat4(const std::string& name) const;
+        LibMath::Matrix4 getUniformMat4(const std::string& name);
 
     private:
-        std::string m_source;
-        uint32_t    m_program = 0;
+        std::unordered_map<std::string, int> m_uniformLocationsCache;
+        std::string                          m_source;
+        uint32_t                             m_program = 0;
 
         static constexpr int INFO_LOG_SIZE = 512;
 
@@ -174,6 +175,6 @@ namespace LibGL::Rendering::Resources
          * \param uniformName The searched uniform variable's name
          * \return The location of the searched uniform variable
          */
-        int getUniformLocation(const std::string& uniformName) const;
+        int getUniformLocation(const std::string& uniformName);
     };
 }

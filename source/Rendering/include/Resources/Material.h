@@ -31,8 +31,7 @@ namespace LibGL::Rendering::Resources
 		};
 
 		Material() = delete;
-		Material(const Shader& shader, const Maps& matMaps,
-			const UVModifiers& uvModifiers, const ColorData& colors, float shininess);
+		Material(Shader& shader, const Maps& matMaps, const UVModifiers& uvModifiers, const ColorData& colors, float shininess);
 
 		Material(const Material& other) = default;
 		Material(Material&& other) = default;
@@ -45,7 +44,7 @@ namespace LibGL::Rendering::Resources
 		 * \brief Gets the material's shader
 		 * \return A reference to the material's shader
 		 */
-		const Shader& getShader() const;
+		Shader& getShader() const;
 
 		/**
 		 * \brief Gets the material's diffuse map
@@ -93,7 +92,7 @@ namespace LibGL::Rendering::Resources
 		 * \brief Sets the material's shader to the given value
 		 * \param shader The material's new shader
 		 */
-		void setShader(const Shader& shader);
+		void setShader(Shader& shader);
 
 		/**
 		 * \brief Sets the material's diffuse map to the given value
@@ -147,7 +146,7 @@ namespace LibGL::Rendering::Resources
 		Maps			m_maps;
 		UVModifiers		m_uvModifiers;
 		ColorData		m_colors;
-		const Shader*	m_shader;
+		Shader*			m_shader;
 		float			m_shininess;
 	};
 }

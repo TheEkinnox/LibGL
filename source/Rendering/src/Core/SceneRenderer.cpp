@@ -17,7 +17,7 @@ namespace LibGL::Rendering
             init(*entity);
     }
 
-    void SceneRenderer::render(const Matrix4x4& viewProjMat, const Resources::Shader* shaderOverride) const
+    void SceneRenderer::render(const Matrix4x4& viewProjMat, Resources::Shader* shaderOverride) const
     {
         if (m_drawables.empty())
             return;

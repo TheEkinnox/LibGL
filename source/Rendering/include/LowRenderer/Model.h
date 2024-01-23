@@ -51,7 +51,7 @@ namespace LibGL::Rendering
          * \param viewProjMat The target view-projection matrix
          * \param shaderOverride The (optional) shader override to use
          */
-        void draw(const LibMath::Matrix4x4& viewProjMat, const Resources::Shader* shaderOverride) const override;
+        void draw(const LibMath::Matrix4x4& viewProjMat, Resources::Shader* shaderOverride) const override;
 
     private:
         const Resources::Mesh* m_mesh = nullptr;

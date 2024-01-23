@@ -203,7 +203,7 @@ namespace LibGL::Demo
         //const Shader* shader = resourceManager.get<Shader>("assets/shaders/Unlit.glsl");
         //const Shader* shader = resourceManager.get<Shader>("assets/shaders/Normal.glsl");
         //const Shader* shader = resourceManager.get<Shader>("assets/shaders/Basic.glsl");
-        const Shader* shader = resourceManager.get<Shader>("assets/shaders/Lit.glsl");
+        Shader* shader = resourceManager.get<Shader>("assets/shaders/Lit.glsl");
         ASSERT(shader != nullptr);
 
         // Load the models
@@ -515,7 +515,7 @@ namespace LibGL::Demo
         renderer.clear(false, true, false);
 
         const ResourceManager& resourceManager = LGL_SERVICE(ResourceManager);
-        const Shader*          shadowMapShader = resourceManager.get<Shader>("assets/shaders/Depth.glsl");
+        Shader*          shadowMapShader = resourceManager.get<Shader>("assets/shaders/Depth.glsl");
         sceneRenderer.render(m_lightViewProjection, shadowMapShader);
 
         FrameBuffer::unbind();
@@ -536,7 +536,7 @@ namespace LibGL::Demo
 
     void DemoApp::updateLitShader(const std::string& fileName) const
     {
-        const Shader* shader = LGL_SERVICE(ResourceManager).get<Shader>(fileName);
+        Shader* shader = LGL_SERVICE(ResourceManager).get<Shader>(fileName);
 
         if (shader == nullptr)
             return;

@@ -33,7 +33,7 @@ namespace LibGL::Rendering
 		 / in the given shader
 		 * \param shader The shader for which the uniform should be set
 		 */
-		virtual void setupUniform(const std::string& uniformName, const Resources::Shader& shader) const;
+		virtual void setupUniform(const std::string& uniformName, Resources::Shader& shader) const;
 
 		/**
 		 * \brief Creates a matrix storing the light's color in the first column,\n
@@ -64,7 +64,7 @@ namespace LibGL::Rendering
 		 / in the given shader
 		 * \param shader The shader for which the uniform should be set
 		 */
-		void setupUniform(const std::string& uniformName, const Resources::Shader& shader) const override;
+		void setupUniform(const std::string& uniformName, Resources::Shader& shader) const override;
 
 		/**
 		 * \brief Creates a matrix storing the light's color in the first column,\n
@@ -109,7 +109,7 @@ namespace LibGL::Rendering
 		 * in the given shader
 		 * \param shader The shader for which the uniform should be set
 		 */
-		void setupUniform(const std::string& uniformName, const Resources::Shader& shader) const override;
+		void setupUniform(const std::string& uniformName, Resources::Shader& shader) const override;
 
 		/**
 		 * \brief Creates a matrix storing the light's color in the first column,\n
@@ -154,7 +154,7 @@ namespace LibGL::Rendering
 		 / in the given shader
 		 * \param shader The shader for which the uniform should be set
 		 */
-		void setupUniform(const std::string& uniformName, const Resources::Shader& shader) const override;
+		void setupUniform(const std::string& uniformName, Resources::Shader& shader) const override;
 
 		/**
 		 * \brief Creates a matrix storing the light's color in the first column,\n

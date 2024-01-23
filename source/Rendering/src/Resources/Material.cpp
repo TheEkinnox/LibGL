@@ -8,14 +8,13 @@ using namespace LibMath;
 
 namespace LibGL::Rendering::Resources
 {
-	Material::Material(const Shader& shader, const Maps& matMaps,
+	Material::Material(Shader& shader, const Maps& matMaps,
 		const UVModifiers& uvModifiers, const ColorData& colors, const float shininess) :
-		m_maps(matMaps), m_uvModifiers(uvModifiers), m_colors(colors),
-		m_shader(&shader), m_shininess(shininess)
+		m_maps(matMaps), m_uvModifiers(uvModifiers), m_colors(colors), m_shader(&shader), m_shininess(shininess)
 	{
 	}
 
-	const Shader& Material::getShader() const
+	Shader& Material::getShader() const
 	{
 		return *m_shader;
 	}
@@ -64,7 +63,7 @@ namespace LibGL::Rendering::Resources
 		return m_colors.m_specular;
 	}
 
-	void Material::setShader(const Shader& shader)
+	void Material::setShader(Shader& shader)
 	{
 		m_shader = &shader;
 	}

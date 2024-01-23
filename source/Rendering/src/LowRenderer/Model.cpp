@@ -35,11 +35,11 @@ namespace LibGL::Rendering
         return m_material;
     }
 
-    void Model::draw(const Matrix4x4& viewProjMat, const Shader* shaderOverride) const
+    void Model::draw(const Matrix4x4& viewProjMat, Shader* shaderOverride) const
     {
         m_material.use();
 
-        const Shader& shader = shaderOverride ? *shaderOverride : m_material.getShader();
+        Shader& shader = shaderOverride ? *shaderOverride : m_material.getShader();
         const Matrix4 modelMat = getWorldMatrix();
 
         shader.setUniformMat4("u_mvp", viewProjMat * modelMat);
