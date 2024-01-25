@@ -295,7 +295,7 @@ namespace LibGL::Demo
         m_dirLight =
         {
             Color(1.f, .94f, .91f, 1.f),
-            Vector3::down()
+            Vector3(.6f, -.7f, -.4f)
         };
 
         m_spotLight =
@@ -378,7 +378,7 @@ namespace LibGL::Demo
         static const Matrix4 frontToUpMat = rotationFromTo(Vector3::front(), Vector3::up());
 
         const Vector3 lightUp = (frontToUpMat * Vector4(m_dirLight.m_direction, 0.f)).xyz();
-        const Matrix4 lightView = lookAt(m_dirLight.m_direction * -10.f, Vector3::zero(), lightUp);
+        const Matrix4 lightView = lookAt(m_dirLight.m_direction * -8.f, Vector3::zero(), lightUp);
         m_lightViewProjection = lightProjection * lightView;
 
         // Movement
@@ -387,26 +387,26 @@ namespace LibGL::Demo
         if (inputManager.isKeyDown(EKey::KEY_LEFT_CONTROL) || inputManager.isKeyDown(EKey::KEY_RIGHT_CONTROL))
             moveSpeed *= 1.5f;
 
-        Vector3 rotation;
-
-        // Rotation
-        if (inputManager.isKeyDown(EKey::KEY_UP))
-            rotation.m_x += deltaTime;
-
-        if (inputManager.isKeyDown(EKey::KEY_DOWN))
-            rotation.m_x -= deltaTime;
-
-        if (inputManager.isKeyDown(EKey::KEY_Q) || inputManager.isKeyDown(EKey::KEY_LEFT))
-            rotation.m_y += deltaTime;
-
-        if (inputManager.isKeyDown(EKey::KEY_E) || inputManager.isKeyDown(EKey::KEY_RIGHT))
-            rotation.m_y -= deltaTime;
-
         const bool shouldControlModel = m_controllableModel && inputManager.isKeyDown(EKey::KEY_LEFT_ALT);
         Entity*    target = shouldControlModel ? static_cast<Entity*>(m_controllableModel) : static_cast<Entity*>(&camera);
 
-        const TVector3<Radian> euler(ROTATION_SPEED * rotation.m_x, ROTATION_SPEED * rotation.m_y, ROTATION_SPEED * rotation.m_z);
-        target->rotate(Quaternion::fromEuler(euler, ERotationOrder::ZXY));
+        TVector3<Degree> angles = target->getRotation().toYawPitchRoll();
+
+        // Rotation
+        if (inputManager.isKeyDown(EKey::KEY_UP))
+            angles.m_y += ROTATION_SPEED * deltaTime;
+
+        if (inputManager.isKeyDown(EKey::KEY_DOWN))
+            angles.m_y -= ROTATION_SPEED * deltaTime;
+
+        if (inputManager.isKeyDown(EKey::KEY_Q) || inputManager.isKeyDown(EKey::KEY_LEFT))
+            angles.m_x += ROTATION_SPEED * deltaTime;
+
+        if (inputManager.isKeyDown(EKey::KEY_E) || inputManager.isKeyDown(EKey::KEY_RIGHT))
+            angles.m_x -= ROTATION_SPEED * deltaTime;
+
+        angles.m_y = clamp(angles.m_y, -90_deg, 90_deg);
+        target->setRotation(Quaternion(angles));
 
         Vector3 direction;
 
@@ -493,15 +493,15 @@ namespace LibGL::Demo
             return;
 
         Camera&          camera = Camera::getCurrent();
-        TVector3<Degree> euler = camera.getEuler(ERotationOrder::ZXY);
+        TVector3<Degree> angles = camera.getRotation().toYawPitchRoll();
 
-        euler.m_y += rotationSpeed * mouseDelta.m_x;
-        euler.m_x -= rotationSpeed * mouseDelta.m_y;
+        angles.m_x -= rotationSpeed * mouseDelta.m_x;
+        angles.m_x.wrap();
 
-        euler.m_x = clamp(euler.m_x, -90_deg, 90_deg);
+        angles.m_y -= rotationSpeed * mouseDelta.m_y;
+        angles.m_y = clamp(angles.m_y, -90_deg, 90_deg);
 
-        camera.setEuler(euler, ERotationOrder::ZXY);
-        euler = camera.getEuler(ERotationOrder::ZXY);
+        camera.setRotation(Quaternion(angles));
     }
 
     void DemoApp::render()
