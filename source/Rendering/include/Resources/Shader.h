@@ -150,12 +150,19 @@ namespace LibGL::Rendering::Resources
         static uint32_t getTypeFromToken(const std::string& shaderType);
 
         /**
+         * \brief Processes includes for the given shader source
+         * \param source The shader source for which includes should be processed
+         * \return True on success. False otherwise
+         */
+        static bool processIncludes(std::string& source);
+
+        /**
          * \brief Compiles the given shader source
          * \param shaderType The type of shader to compile
          * \param source The source of the shader to compile
          * \return The compiled shader's handle
          */
-        static uint32_t compileSource(uint32_t shaderType, const std::string& source);
+        static uint32_t compileSource(uint32_t shaderType, std::string& source);
 
         /**
          * \brief Parses the shader's source and create the appropriate shader types

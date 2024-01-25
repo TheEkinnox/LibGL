@@ -140,6 +140,7 @@ namespace LibGL::Demo
         ASSERT(resourceManager.load<Shader>("assets/shaders/Normal.glsl") != nullptr);
         ASSERT(resourceManager.load<Shader>("assets/shaders/Basic.glsl") != nullptr);
         ASSERT(resourceManager.load<Shader>("assets/shaders/Lit.glsl") != nullptr);
+        ASSERT(resourceManager.load<Shader>("assets/shaders/Split.glsl") != nullptr);
         ASSERT(resourceManager.load<Shader>("assets/shaders/Depth.glsl") != nullptr);
         ASSERT(resourceManager.load<Shader>("assets/shaders/DrawDepth.glsl") != nullptr);
 
@@ -172,6 +173,7 @@ namespace LibGL::Demo
         tasks.emplace_back(resourceManager.loadInBackground<Shader, IResource>("assets/shaders/Normal.glsl"));
         tasks.emplace_back(resourceManager.loadInBackground<Shader, IResource>("assets/shaders/Basic.glsl"));
         tasks.emplace_back(resourceManager.loadInBackground<Shader, IResource>("assets/shaders/Lit.glsl"));
+        tasks.emplace_back(resourceManager.loadInBackground<Shader, IResource>("assets/shaders/Split.glsl"));
         tasks.emplace_back(resourceManager.loadInBackground<Shader, IResource>("assets/shaders/Depth.glsl"));
         tasks.emplace_back(resourceManager.loadInBackground<Shader, IResource>("assets/shaders/DrawDepth.glsl"));
 
@@ -203,7 +205,7 @@ namespace LibGL::Demo
         //const Shader* shader = resourceManager.get<Shader>("assets/shaders/Unlit.glsl");
         //const Shader* shader = resourceManager.get<Shader>("assets/shaders/Normal.glsl");
         //const Shader* shader = resourceManager.get<Shader>("assets/shaders/Basic.glsl");
-        Shader* shader = resourceManager.get<Shader>("assets/shaders/Lit.glsl");
+        Shader* shader = resourceManager.get<Shader>("assets/shaders/Split.glsl");
         ASSERT(shader != nullptr);
 
         // Load the models
@@ -515,7 +517,7 @@ namespace LibGL::Demo
         renderer.clear(false, true, false);
 
         const ResourceManager& resourceManager = LGL_SERVICE(ResourceManager);
-        Shader*          shadowMapShader = resourceManager.get<Shader>("assets/shaders/Depth.glsl");
+        Shader*                shadowMapShader = resourceManager.get<Shader>("assets/shaders/Depth.glsl");
         sceneRenderer.render(m_lightViewProjection, shadowMapShader);
 
         FrameBuffer::unbind();
@@ -530,7 +532,7 @@ namespace LibGL::Demo
         m_lightMatrices[2] = m_spotLight.getMatrix();
 
         m_lightsSSBO.sendBlocks(m_lightMatrices.data(), m_lightMatrices.size());
-        updateLitShader("assets/shaders/Lit.glsl");
+        updateLitShader("assets/shaders/Split.glsl");
         sceneRenderer.render(cam.getViewProjectionMatrix(), nullptr);
     }
 

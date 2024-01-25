@@ -212,10 +212,66 @@ namespace LibGL::Rendering::Resources
         return GL_INVALID_VALUE;
     }
 
-    GLuint Shader::compileSource(const GLenum shaderType, const std::string& source)
+    bool Shader::processIncludes(std::string& source)
+    {
+        if (source.empty())
+            return true;
+
+        std::string        line;
+        std::istringstream sourceStream(source);
+
+        while (std::getline(sourceStream, line))
+        {
+            if (!line.starts_with("#include "))
+                continue;
+
+            const size_t lineSize = line.size();
+            const size_t curPos = !sourceStream.eof() ? static_cast<size_t>(sourceStream.tellg()) - 1 : source.size();
+            const size_t startPos = curPos - lineSize;
+
+            line.erase(0, 9); // Remove the #include
+            const auto trimCallback = [](const char c)
+            {
+                return std::isspace(c) || c == '"' || c == '<' || c == '>';
+            };
+
+            trimString(line, trimCallback);
+
+            if (line.empty())
+            {
+                DEBUG_LOG("Empty shader include path", line.c_str());
+                return false;
+            }
+
+            std::ifstream sourceFile(line, std::ios::binary | std::ios::ate);
+
+            if (!sourceFile.is_open())
+            {
+                DEBUG_LOG("Invalid shader include path: \"%s\"", line.c_str());
+                return false;
+            }
+
+            const std::ifstream::pos_type length = sourceFile.tellg();
+            sourceFile.seekg(0, std::ios::beg);
+
+            std::string includedShader(length, 0);
+            sourceFile.read(includedShader.data(), length);
+            sourceFile.close();
+
+            if (!processIncludes(includedShader))
+                return false;
+
+            source.replace(startPos, lineSize, includedShader);
+        }
+
+        return true;
+    }
+
+    GLuint Shader::compileSource(const GLenum shaderType, std::string& source)
     {
         const GLuint shaderId = glCreateShader(shaderType);
 
+        processIncludes(source);
         const char* shaderSource = source.c_str();
         const auto  sourceSize = static_cast<GLint>(source.size());
 
@@ -247,12 +303,12 @@ namespace LibGL::Rendering::Resources
 
         m_program = glCreateProgram();
 
-        const std::vector<std::string> sources = splitString(m_source, "#shader ", true);
+        std::vector<std::string> sources = splitString(m_source, "#shader ", true);
 
         std::vector<GLuint> shaderIds;
         shaderIds.reserve(sources.size());
 
-        for (const auto& source : sources)
+        for (std::string& source : sources)
         {
             if (source.empty())
                 continue;
@@ -267,8 +323,9 @@ namespace LibGL::Rendering::Resources
             {
                 std::string firstLine;
                 std::getline(iStrStream, firstLine);
+                source.erase(0, token.size() + firstLine.size());
 
-                if (const GLuint shaderId = compileSource(shaderType, source.substr(token.size() + firstLine.size())))
+                if (const GLuint shaderId = compileSource(shaderType, source))
                 {
                     shaderIds.emplace_back(shaderId);
                     glAttachShader(m_program, shaderId);
