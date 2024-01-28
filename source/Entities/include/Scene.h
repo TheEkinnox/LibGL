@@ -4,9 +4,9 @@
 
 namespace LibGL::Resources
 {
-	class Scene : public DataStructure::Graph<Entity>
-	{
-	public:
-		virtual void update();
-	};
+    class Scene : public DataStructure::Graph<Entity>
+    {
+    public:
+        virtual void update();
+    };
 }

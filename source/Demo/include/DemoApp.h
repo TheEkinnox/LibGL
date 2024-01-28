@@ -1,13 +1,14 @@
 #pragma once
+#include <IApplication.h>
+#include <Scene.h>
+
 #include <Core/Buffers/FrameBuffer.h>
 #include <Core/Buffers/ShaderStorageBuffer.h>
 
-#include <Resources/Texture.h>
+#include <LowRenderer/Camera.h>
+#include <LowRenderer/Light.h>
 
-#include "Scene.h"
-#include "LowRenderer/Camera.h"
-#include "LowRenderer/Light.h"
-#include "IApplication.h"
+#include <Resources/Texture.h>
 
 namespace LibGL::Rendering
 {

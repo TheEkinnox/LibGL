@@ -1,11 +1,13 @@
 #pragma once
+#include <IContext.h>
+#include <InputManager.h>
+
+#include <Core/Renderer.h>
 #include <Core/SceneRenderer.h>
 
-#include "IContext.h"
-#include "InputManager.h"
-#include "Resources/ResourceManager.h"
-#include "Core/Renderer.h"
-#include "Utility/ThreadPool.h"
+#include <Resources/ResourceManager.h>
+
+#include <Utility/ThreadPool.h>
 
 namespace LibGL::Demo
 {

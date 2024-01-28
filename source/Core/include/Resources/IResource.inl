@@ -1,9 +1,8 @@
 #pragma once
-#include <type_traits>
-
-#include <Debug/Assertion.h>
-
 #include "Resources/IResource.h"
+
+#include <type_traits>
+#include <Debug/Assertion.h>
 
 namespace LibGL::Resources
 {

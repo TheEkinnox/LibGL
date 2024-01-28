@@ -5,8 +5,8 @@ using namespace LibMath;
 
 namespace LibGL::Rendering
 {
-    Light::Light(const Color& color) :
-        m_color(color)
+    Light::Light(const Color& color)
+        : m_color(color)
     {
     }
 
@@ -54,13 +54,13 @@ namespace LibGL::Rendering
         return lightMat;
     }
 
-    AttenuationData::AttenuationData(const float range) :
-        AttenuationData(1.f, 4.5f / range, 75.f / (range * range))
+    AttenuationData::AttenuationData(const float range)
+        : AttenuationData(1.f, 4.5f / range, 75.f / (range * range))
     {
     }
 
-    AttenuationData::AttenuationData(const float constant, const float linear, const float quadratic) :
-        m_constant(constant), m_linear(linear), m_quadratic(quadratic)
+    AttenuationData::AttenuationData(const float constant, const float linear, const float quadratic)
+        : m_constant(constant), m_linear(linear), m_quadratic(quadratic)
     {
     }
 

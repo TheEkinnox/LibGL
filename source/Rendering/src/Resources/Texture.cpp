@@ -1,14 +1,14 @@
-﻿#include <Debug/Log.h>
-#include <Debug/Assertion.h>
-#include "Resources/Texture.h"
+﻿#include "Resources/Texture.h"
+
+#include "Debug/Assertion.h"
+#include "Debug/Log.h"
+#include "Vector/Vector4.h"
 
 #include <glad/gl.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_ASSERT(x) ASSERT(x)
 #include <stb_image.h>
-
-#include <Vector/Vector4.h>
 
 namespace LibGL::Rendering::Resources
 {
@@ -59,8 +59,8 @@ namespace LibGL::Rendering::Resources
         }
     }
 
-    Texture::Texture(const Texture& other) :
-        IResource(other), m_width(other.m_width), m_height(other.m_height), m_channels(other.m_channels)
+    Texture::Texture(const Texture& other)
+        : IResource(other), m_width(other.m_width), m_height(other.m_height), m_channels(other.m_channels)
     {
         if (other.m_data != nullptr)
             m_data = stbi_load_from_memory(other.m_data, other.m_width * other.m_height * other.m_channels, &m_width, &m_height,
@@ -85,10 +85,10 @@ namespace LibGL::Rendering::Resources
         }
     }
 
-    Texture::Texture(Texture&& other) noexcept :
-        m_data(other.m_data), m_id(other.m_id), m_width(other.m_width), m_height(other.m_height), m_channels(other.m_channels)
+    Texture::Texture(Texture&& other) noexcept
+        : m_data(other.m_data), m_id(other.m_id), m_width(other.m_width), m_height(other.m_height), m_channels(other.m_channels)
     {
-        other.m_id = 0;
+        other.m_id   = 0;
         other.m_data = nullptr;
     }
 
@@ -106,8 +106,8 @@ namespace LibGL::Rendering::Resources
         if (&other == this)
             return *this;
 
-        m_width = other.m_width;
-        m_height = other.m_height;
+        m_width    = other.m_width;
+        m_height   = other.m_height;
         m_channels = other.m_channels;
 
         if (m_id != 0)
@@ -150,13 +150,13 @@ namespace LibGL::Rendering::Resources
         if (m_data != nullptr)
             stbi_image_free(m_data);
 
-        m_id = other.m_id;
-        m_width = other.m_width;
-        m_height = other.m_height;
+        m_id       = other.m_id;
+        m_width    = other.m_width;
+        m_height   = other.m_height;
         m_channels = other.m_channels;
-        m_data = other.m_data;
+        m_data     = other.m_data;
 
-        other.m_id = 0;
+        other.m_id   = 0;
         other.m_data = nullptr;
 
         return *this;
@@ -168,8 +168,8 @@ namespace LibGL::Rendering::Resources
 
         if (texture.m_id == 0)
         {
-            texture.m_width = 1;
-            texture.m_height = 1;
+            texture.m_width    = 1;
+            texture.m_height   = 1;
             texture.m_channels = 4;
 
             glGenTextures(1, &texture.m_id);

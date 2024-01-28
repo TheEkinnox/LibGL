@@ -2,29 +2,29 @@
 
 namespace LibGL::Application
 {
-	using namespace Exceptions;
+    using namespace Exceptions;
 
-	void IApplication::run()
-	{
-		onStart();
+    void IApplication::run()
+    {
+        onStart();
 
-		// Run main loop
-		while (isRunning())
-		{
-			m_context->update();
-			onUpdate();
-		}
+        // Run main loop
+        while (isRunning())
+        {
+            m_context->update();
+            onUpdate();
+        }
 
-		onStop();
-	}
+        onStop();
+    }
 
-	bool IApplication::isRunning() const
-	{
-		return !m_context->m_window->shouldClose();
-	}
+    bool IApplication::isRunning() const
+    {
+        return !m_context->m_window->shouldClose();
+    }
 
-	IApplication::IApplication(std::unique_ptr<IContext> context) :
-		m_context(std::move(context))
-	{
-	}
+    IApplication::IApplication(std::unique_ptr<IContext> context)
+        : m_context(std::move(context))
+    {
+    }
 }

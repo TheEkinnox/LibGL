@@ -1,6 +1,5 @@
 #pragma once
 #include "Resources/Mesh.h"
-
 #include "Utility/ThreadPool.h"
 
 namespace LibGL::Rendering::Resources

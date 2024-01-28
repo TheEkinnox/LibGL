@@ -1,5 +1,4 @@
 #pragma once
-
 #include "Utility/utility.h"
 
 #include <algorithm>
@@ -13,7 +12,9 @@ namespace LibGL::Utility
         // If no template parameters are passed
         // return the format string as is to avoid unnecessary allocation
         if constexpr (sizeof...(Args) == 0)
+        {
             return format;
+        }
         else
         {
             // get the formatted text's size
@@ -24,7 +25,7 @@ namespace LibGL::Utility
 
             // Create a buffer of the computed size
             const size_t bufferSize = intSize;
-            char* const  buffer = static_cast<char*>(alloca(bufferSize * sizeof(char)));
+            const auto   buffer = static_cast<char*>(alloca(bufferSize * sizeof(char)));
 
             // Write the formatted string in the buffer
             std::snprintf(buffer, bufferSize, format, args...);

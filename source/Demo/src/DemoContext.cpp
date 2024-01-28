@@ -1,7 +1,8 @@
 #include "DemoContext.h"
 
-#include "Utility/ServiceLocator.h"
 #include <Angle.h>
+
+#include <Utility/ServiceLocator.h>
 
 using namespace LibGL::Application;
 using namespace LibGL::Rendering;
@@ -18,14 +19,14 @@ namespace LibGL::Demo
 {
     DemoContext::DemoContext(const int windowWidth, const int windowHeight, const char* title)
         : IContext(windowWidth, windowHeight, title),
-          m_threadPool(std::make_unique<ThreadPool>()),
-          m_inputManager(std::make_unique<InputManager>(*m_window)),
-          m_resourceManager(std::make_unique<ResourceManager>()),
-          m_renderer(std::make_unique<Renderer>()),
-          m_sceneRenderer(std::make_unique<SceneRenderer>()),
-          m_camera(std::make_unique<Camera>(nullptr, Transform(),
-              perspectiveProjection(90_deg, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), CAM_NEAR,
-                  CAM_FAR)))
+        m_threadPool(std::make_unique<ThreadPool>()),
+        m_inputManager(std::make_unique<InputManager>(*m_window)),
+        m_resourceManager(std::make_unique<ResourceManager>()),
+        m_renderer(std::make_unique<Renderer>()),
+        m_sceneRenderer(std::make_unique<SceneRenderer>()),
+        m_camera(std::make_unique<Camera>(nullptr, Transform(),
+            perspectiveProjection(90_deg, static_cast<float>(windowWidth) / static_cast<float>(windowHeight), CAM_NEAR,
+                CAM_FAR)))
     {
         const auto resizeFunc = [&](const Window::dimensions_t size)
         {

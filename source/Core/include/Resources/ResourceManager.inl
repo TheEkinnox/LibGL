@@ -1,7 +1,6 @@
 ﻿#pragma once
-#include "Resources/ResourceManager.h"
 #include "Resources/IResource.h"
-
+#include "Resources/ResourceManager.h"
 #include "Utility/ServiceLocator.h"
 #include "Utility/ThreadPool.h"
 

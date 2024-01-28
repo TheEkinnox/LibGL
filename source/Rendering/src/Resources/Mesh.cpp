@@ -1,13 +1,11 @@
 ﻿#include "Resources/Mesh.h"
 
+#include "Debug/Assertion.h"
+#include "Debug/Log.h"
+#include "Utility/utility.h"
+
 #include <sstream>
-
-#include <Debug/Assertion.h>
-#include <Debug/Log.h>
-
 #include <glad/gl.h>
-
-#include <Utility/utility.h>
 
 #define IGNORE_DUPLICATES 1
 
@@ -107,7 +105,7 @@ namespace LibGL::Rendering::Resources
     }
 
     Vertex Mesh::parseVertex(const std::string& str, const std::vector<Vector3>& positions, const std::vector<Vector3>& normals,
-                              const std::vector<Vector2>& uvs)
+                             const std::vector<Vector2>& uvs)
     {
         size_t posIdx = 0, uvIdx = 0, normalIdx = 0;
 
@@ -171,7 +169,7 @@ namespace LibGL::Rendering::Resources
     }
 
     void Mesh::parseFace(const std::string& line, const std::vector<Vector3>& positions, const std::vector<Vector3>& normals,
-                          const std::vector<Vector2>& uvs)
+                         const std::vector<Vector2>& uvs)
     {
         const auto faceStrings = LibGL::Utility::splitString(line, " ", true);
 

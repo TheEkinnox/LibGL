@@ -1,12 +1,11 @@
 #include "Resources/MeshMulti.h"
 
-#include <Arithmetic.h>
-#include <ranges>
-
-#include <Utility/ServiceLocator.h>
-#include <Utility/utility.h>
-
+#include "Arithmetic.h"
+#include "Utility/ServiceLocator.h"
 #include "Utility/ThreadPool.h"
+#include "Utility/utility.h"
+
+#include <ranges>
 
 #define MIN_BATCH_SIZE 0LLU
 #define MAX_BATCH_SIZE ~0LLU
@@ -38,7 +37,7 @@ namespace LibGL::Rendering::Resources
         size_t                         posCount = 0, uvCount = 0, normalCount = 0, linesCount = 0;
 
         const double tmpBatchSize = ceil(static_cast<double>(lines.size()) / LGL_SERVICE(ThreadPool).getWorkersCount());
-        const size_t batchSize = clamp(static_cast<size_t>(tmpBatchSize), MIN_BATCH_SIZE, MAX_BATCH_SIZE);
+        const size_t batchSize    = clamp(static_cast<size_t>(tmpBatchSize), MIN_BATCH_SIZE, MAX_BATCH_SIZE);
         batchData.m_lines.reserve(batchSize);
 
         for (size_t i = 0; i < lines.size(); ++i)
@@ -86,8 +85,8 @@ namespace LibGL::Rendering::Resources
             tasks.emplace_back(addBatch(batchData));
 
             batchData.m_lines.clear();
-            batchData.m_posOffset = posCount;
-            batchData.m_uvOffset = uvCount;
+            batchData.m_posOffset    = posCount;
+            batchData.m_uvOffset     = uvCount;
             batchData.m_normalOffset = normalCount;
         }
 

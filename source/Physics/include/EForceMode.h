@@ -2,11 +2,11 @@
 
 namespace LibGL::Physics
 {
-	enum class EForceMode
-	{
-		FORCE,
-		ACCELERATION,
-		IMPULSE,
-		VELOCITY_CHANGE
-	};
+    enum class EForceMode
+    {
+        FORCE,
+        ACCELERATION,
+        IMPULSE,
+        VELOCITY_CHANGE
+    };
 }

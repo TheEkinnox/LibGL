@@ -1,13 +1,12 @@
 ﻿#pragma once
-#include <filesystem>
-
 #include "Enums/EFrameBufferAttachment.h"
-
-#include "Resources/IResource.h"
-
 #include "Enums/ETextureFilter.h"
 #include "Enums/ETextureFormat.h"
 #include "Enums/ETextureWrapMode.h"
+
+#include "Resources/IResource.h"
+
+#include <filesystem>
 
 namespace LibGL::Rendering::Resources
 {
@@ -100,11 +99,11 @@ namespace LibGL::Rendering::Resources
         int getHeight() const;
 
     private:
-        unsigned char*   m_data = nullptr;
-        uint32_t         m_id = 0;
-        int              m_width = 0;
-        int              m_height = 0;
-        int              m_channels = 0;
+        unsigned char*   m_data      = nullptr;
+        uint32_t         m_id        = 0;
+        int              m_width     = 0;
+        int              m_height    = 0;
+        int              m_channels  = 0;
         ETextureFilter   m_minFilter = ETextureFilter::LINEAR;
         ETextureFilter   m_magFilter = ETextureFilter::LINEAR;
         ETextureWrapMode m_wrapModeU = ETextureWrapMode::REPEAT;

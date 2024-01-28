@@ -39,7 +39,7 @@ namespace LibGL::Rendering
     {
         m_material.use();
 
-        Shader& shader = shaderOverride ? *shaderOverride : m_material.getShader();
+        Shader&       shader   = shaderOverride ? *shaderOverride : m_material.getShader();
         const Matrix4 modelMat = getWorldMatrix();
 
         shader.setUniformMat4("u_mvp", viewProjMat * modelMat);

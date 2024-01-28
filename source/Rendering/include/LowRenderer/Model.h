@@ -1,8 +1,6 @@
 #pragma once
-#include <Entity.h>
-
+#include "Entity.h"
 #include "Core/IDrawable.h"
-
 #include "Resources/Material.h"
 #include "Resources/Mesh.h"
 
@@ -14,12 +12,12 @@ namespace LibGL::Rendering
         Model() = delete;
         explicit Model(Entity* parent, const Resources::Mesh& mesh, Resources::Material material);
 
-        Model(const Model& other) = default;
+        Model(const Model& other)     = default;
         Model(Model&& other) noexcept = default;
 
         ~Model() override = default;
 
-        Model& operator=(const Model& other) = default;
+        Model& operator=(const Model& other)     = default;
         Model& operator=(Model&& other) noexcept = default;
 
         /**

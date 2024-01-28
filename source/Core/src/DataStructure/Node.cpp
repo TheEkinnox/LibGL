@@ -2,70 +2,69 @@
 
 namespace LibGL::DataStructure
 {
-	Node::Node(Node* parent)
-		: m_parent(parent)
-	{
-	}
+    Node::Node(Node* parent) : m_parent(parent)
+    {
+    }
 
-	Node::~Node()
-	{
-		if (m_parent != nullptr)
-			m_parent->removeChild(*this);
+    Node::~Node()
+    {
+        if (m_parent != nullptr)
+            m_parent->removeChild(*this);
 
-		clearChildren();
-	}
+        clearChildren();
+    }
 
-	Node* Node::getParent()
-	{
-		return m_parent;
-	}
+    Node* Node::getParent()
+    {
+        return m_parent;
+    }
 
-	const Node* Node::getParent() const
-	{
-		return m_parent;
-	}
+    const Node* Node::getParent() const
+    {
+        return m_parent;
+    }
 
-	std::vector<Node::NodePtr> Node::getChildren()
-	{
-		return m_children;
-	}
+    std::vector<Node::NodePtr> Node::getChildren()
+    {
+        return m_children;
+    }
 
-	std::vector<Node::ConstNodePtr> Node::getChildren() const
-	{
-		std::vector<ConstNodePtr> nodes;
-		nodes.reserve(m_children.size());
+    std::vector<Node::ConstNodePtr> Node::getChildren() const
+    {
+        std::vector<ConstNodePtr> nodes;
+        nodes.reserve(m_children.size());
 
-		for (const auto& node : m_children)
-			nodes.push_back(std::dynamic_pointer_cast<const Node>(node));
+        for (const auto& node : m_children)
+            nodes.push_back(std::dynamic_pointer_cast<const Node>(node));
 
-		return nodes;
-	}
+        return nodes;
+    }
 
-	void Node::removeChild(Node& child)
-	{
-		const auto findFunc = [child](const NodePtr& ptr)
-		{
-			return ptr.get() == &child;
-		};
+    void Node::removeChild(Node& child)
+    {
+        const auto findFunc = [child](const NodePtr& ptr)
+        {
+            return ptr.get() == &child;
+        };
 
-		auto childIter = std::find_if(m_children.begin(), m_children.end(), findFunc);
+        auto childIter = std::find_if(m_children.begin(), m_children.end(), findFunc);
 
-		if (childIter != m_children.end())
-		{
-			onRemoveChild(**childIter);
-			(*childIter)->m_parent = nullptr;
-			m_children.erase(childIter);
-		}
-	}
+        if (childIter != m_children.end())
+        {
+            onRemoveChild(**childIter);
+            (*childIter)->m_parent = nullptr;
+            m_children.erase(childIter);
+        }
+    }
 
-	void Node::clearChildren()
-	{
-		for (NodePtr& child : m_children)
-		{
-			onRemoveChild(*child);
-			child->m_parent = nullptr;
-		}
+    void Node::clearChildren()
+    {
+        for (NodePtr& child : m_children)
+        {
+            onRemoveChild(*child);
+            child->m_parent = nullptr;
+        }
 
-		m_children.clear();
-	}
+        m_children.clear();
+    }
 }

@@ -12,249 +12,252 @@ using namespace LibGL::Utility;
 
 namespace LibGL::Physics
 {
-	Rigidbody::Rigidbody(Entity& owner) :
-		Component(owner)
-	{
-	}
+    Rigidbody::Rigidbody(Entity& owner)
+        : Component(owner)
+    {
+    }
 
-	void Rigidbody::update()
-	{
-		Component::update();
+    void Rigidbody::update()
+    {
+        Component::update();
 
-		simulate();
-	}
+        simulate();
+    }
 
-	void Rigidbody::addForce(const Vector3& force, const EForceMode forceMode)
-	{
-		if (!isActive() || m_isKinematic)
-			return;
+    void Rigidbody::addForce(const Vector3& force, const EForceMode forceMode)
+    {
+        if (!isActive() || m_isKinematic)
+            return;
 
-		switch (forceMode)
-		{
-		case EForceMode::FORCE:
-			m_velocity += force * LGL_SERVICE(Timer).getDeltaTime() / m_mass;
-			break;
-		case EForceMode::ACCELERATION:
-			m_velocity += force * LGL_SERVICE(Timer).getDeltaTime();
-			break;
-		case EForceMode::IMPULSE:
-			m_velocity += force / m_mass;
-			break;
-		case EForceMode::VELOCITY_CHANGE:
-			m_velocity += force;
-			break;
-		default:
-			const std::string msg = formatString("Invalid force mode: %u\n", forceMode);
-			DEBUG_LOG(msg.c_str());
-			throw std::out_of_range(msg);
-		}
-	}
+        switch (forceMode)
+        {
+        case EForceMode::FORCE:
+            m_velocity += force * LGL_SERVICE(Timer).getDeltaTime() / m_mass;
+            break;
+        case EForceMode::ACCELERATION:
+            m_velocity += force * LGL_SERVICE(Timer).getDeltaTime();
+            break;
+        case EForceMode::IMPULSE:
+            m_velocity += force / m_mass;
+            break;
+        case EForceMode::VELOCITY_CHANGE:
+            m_velocity += force;
+            break;
+        default:
+            const std::string msg = formatString("Invalid force mode: %u\n", forceMode);
+            DEBUG_LOG(msg.c_str());
+            throw std::out_of_range(msg);
+        }
+    }
 
-	void Rigidbody::sleep()
-	{
-		m_isSleeping = true;
-	}
+    void Rigidbody::sleep()
+    {
+        m_isSleeping = true;
+    }
 
-	void Rigidbody::wakeUp()
-	{
-		m_isSleeping = false;
-	}
+    void Rigidbody::wakeUp()
+    {
+        m_isSleeping = false;
+    }
 
-	bool Rigidbody::isSleeping() const
-	{
-		return m_isSleeping;
-	}
+    bool Rigidbody::isSleeping() const
+    {
+        return m_isSleeping;
+    }
 
-	Vector3 Rigidbody::getDraggedVelocity() const
-	{
-		const float deltaTime = LGL_SERVICE(Timer).getDeltaTime();
-		return deltaTime > 0.f ? m_velocity * clamp(1.f - m_drag * deltaTime, 0.f, 1.f) : Vector3::zero();
-	}
+    Vector3 Rigidbody::getDraggedVelocity() const
+    {
+        const float deltaTime = LGL_SERVICE(Timer).getDeltaTime();
+        return deltaTime > 0.f ? m_velocity * clamp(1.f - m_drag * deltaTime, 0.f, 1.f) : Vector3::zero();
+    }
 
-	void Rigidbody::simulate()
-	{
-		if (!isActive())
-			return;
+    void Rigidbody::simulate()
+    {
+        if (!isActive())
+            return;
 
-		if (m_isKinematic)
-		{
-			move();
-			return;
-		}
+        if (m_isKinematic)
+        {
+            move();
+            return;
+        }
 
-		if (m_useGravity)
-			addForce(g_gravity, EForceMode::ACCELERATION);
+        if (m_useGravity)
+            addForce(g_gravity, EForceMode::ACCELERATION);
 
-		if (isSleeping())
-		{
-			if (m_velocity.magnitudeSquared() >= m_sleepThreshold)
-				wakeUp();
+        if (isSleeping())
+        {
+            if (m_velocity.magnitudeSquared() >= m_sleepThreshold)
+                wakeUp();
 
-			return;
-		}
+            return;
+        }
 
-		if (floatEquals(getDraggedVelocity().magnitudeSquared(), 0.f))
-			return;
+        if (floatEquals(getDraggedVelocity().magnitudeSquared(), 0.f))
+            return;
 
-		move();
-	}
+        move();
+    }
 
-	Vector3 Rigidbody::getBoundsNormal(const ICollider& entityCollider, const ICollider& worldCollider)
-	{
-		const auto [center, size, _] = worldCollider.getBounds();
-		const auto minCorner = center - size;
-		const auto maxCorner = center + size;
+    void Rigidbody::move()
+    {
+        if (!isActive() || isSleeping())
+            return;
 
-		const auto entityCenter = entityCollider.getBounds().m_center;
+        const float deltaTime = LGL_SERVICE(Timer).getDeltaTime();
 
-		const Vector3 snappedX
-		{
-			snap(entityCenter.m_x, minCorner.m_x, maxCorner.m_x),
-			entityCenter.m_y,
-			entityCenter.m_z
-		};
+        if (m_isKinematic)
+            getOwner().translate(m_velocity * deltaTime);
 
-		const Vector3 snappedY
-		{
-			entityCenter.m_x,
-			snap(entityCenter.m_y, minCorner.m_y, maxCorner.m_y),
-			entityCenter.m_z
-		};
+        const auto ownerColliders = getOwner().getComponents<ICollider>();
 
-		const Vector3 snappedZ
-		{
-			entityCenter.m_x,
-			entityCenter.m_y,
-			snap(entityCenter.m_z, minCorner.m_z, maxCorner.m_z)
-		};
+        if (ownerColliders.empty())
+        {
+            getOwner().translate(getDraggedVelocity() * deltaTime);
+            return;
+        }
 
-		const float minDist = min(entityCenter.distanceSquaredFrom(snappedX),
-			min(entityCenter.distanceSquaredFrom(snappedY),
-				entityCenter.distanceSquaredFrom(snappedZ)));
+        const auto worldColliders = ICollider::getColliders();
 
-		if (floatEquals(minDist, entityCenter.distanceSquaredFrom(snappedX)))
-			return (Vector3::right() * sign(snappedX.m_x - center.m_x)).normalized();
+        int stepsCount;
 
-		if (floatEquals(minDist, entityCenter.distanceSquaredFrom(snappedY)))
-			return (Vector3::up() * sign(snappedY.m_y - center.m_y)).normalized();
+        switch (m_collisionDetectionMode)
+        {
+        case ECollisionDetectionMode::DISCRETE:
+            stepsCount = 1;
+            break;
+        case ECollisionDetectionMode::CONTINUOUS:
+            stepsCount = g_continuousCollisionSteps;
+            break;
+        case ECollisionDetectionMode::NONE:
+        default:
+            getOwner().translate(getDraggedVelocity() * deltaTime);
+            return;
+        }
 
-		if (floatEquals(minDist, entityCenter.distanceSquaredFrom(snappedZ)))
-			return (Vector3::front() * sign(snappedZ.m_z - center.m_z)).normalized();
+        std::unordered_map<ComponentId, std::vector<ComponentId>> checkedCollidersMap;
 
-		return Vector3::zero();
-	}
+        for (int i = 0; i < stepsCount; i++)
+        {
+            const Vector3 velocity = getDraggedVelocity();
 
-	void Rigidbody::move()
-	{
-		if (!isActive() || isSleeping())
-			return;
+            for (const auto& entityCollider : ownerColliders)
+            {
+                if (!entityCollider->isActive())
+                    continue;
 
-		const float deltaTime = LGL_SERVICE(Timer).getDeltaTime();
+                auto& checkedColliders = checkedCollidersMap[entityCollider->getId()];
 
-		if (m_isKinematic)
-			getOwner().translate(m_velocity * deltaTime);
+                for (const auto& worldCollider : worldColliders)
+                {
+                    if (worldCollider == nullptr || !worldCollider->isActive() ||
+                        &worldCollider->getOwner() == &getOwner() || *entityCollider == *worldCollider ||
+                        std::ranges::find(checkedColliders, worldCollider->getId()) != checkedColliders.end() ||
+                        !entityCollider->check(*worldCollider))
+                        continue;
 
-		const auto ownerColliders = getOwner().getComponents<ICollider>();
+                    const Vector3 normal = getBoundsNormal(*entityCollider, *worldCollider);
 
-		if (ownerColliders.empty())
-		{
-			getOwner().translate(getDraggedVelocity() * deltaTime);
-			return;
-		}
+                    const Vector3 normalMask
+                    {
+                        LibMath::abs(normal.m_x) > 0.f ? sign(normal.m_x) : 0.f,
+                        LibMath::abs(normal.m_y) > 0.f ? sign(normal.m_y) : 0.f,
+                        LibMath::abs(normal.m_z) > 0.f ? sign(normal.m_z) : 0.f
+                    };
 
-		const auto worldColliders = ICollider::getColliders();
+                    const Vector3 frictionMask
+                    {
+                        floatEquals(normalMask.m_x, 0.f) ? sign(normalMask.m_x) : 0.f,
+                        floatEquals(normalMask.m_y, 0.f) ? sign(normalMask.m_y) : 0.f,
+                        floatEquals(normalMask.m_z, 0.f) ? sign(normalMask.m_z) : 0.f
+                    };
 
-		int stepsCount;
+                    Rigidbody* otherRigidbody = worldCollider->getOwner().getComponent<Rigidbody>();
 
-		switch (m_collisionDetectionMode)
-		{
-		case ECollisionDetectionMode::DISCRETE:
-			stepsCount = 1;
-			break;
-		case ECollisionDetectionMode::CONTINUOUS:
-			stepsCount = g_continuousCollisionSteps;
-			break;
-		case ECollisionDetectionMode::NONE:
-		default:
-			getOwner().translate(getDraggedVelocity() * deltaTime);
-			return;
-		}
+                    // There is a collision, apply opposite forces
+                    if (otherRigidbody != nullptr && otherRigidbody != this && otherRigidbody->isActive())
+                    {
+                        const Vector3 otherVelocity = otherRigidbody->getDraggedVelocity();
 
-		std::unordered_map<ComponentId, std::vector<ComponentId>> checkedCollidersMap;
+                        if (!otherRigidbody->m_isKinematic)
+                        {
+                            if (normal.dot(otherVelocity) >= 0.f)
+                                otherRigidbody->addForce((otherVelocity * normalMask).magnitude() * -normal,
+                                    EForceMode::VELOCITY_CHANGE);
 
-		for (int i = 0; i < stepsCount; i++)
-		{
-			const Vector3 velocity = getDraggedVelocity();
+                            if (normal.dot(-velocity) >= 0.f)
+                                otherRigidbody->addForce((velocity * m_mass * normalMask).magnitude() * -normal,
+                                    EForceMode::IMPULSE);
+                        }
 
-			for (const auto& entityCollider : ownerColliders)
-			{
-				if (!entityCollider->isActive())
-					continue;
+                        if (normal.dot(-velocity) >= 0.f)
+                            addForce((velocity * normalMask).magnitude() * normal, EForceMode::VELOCITY_CHANGE);
 
-				auto& checkedColliders = checkedCollidersMap[entityCollider->getId()];
+                        if (normal.dot(otherVelocity) >= 0.f)
+                            addForce((otherVelocity * otherRigidbody->m_mass * normalMask).magnitude() * normal,
+                                EForceMode::IMPULSE);
+                    }
+                    else if (normal.dot(-velocity) >= 0.f)
+                    {
+                        addForce((velocity * normalMask).magnitude() * normal, EForceMode::VELOCITY_CHANGE);
+                    }
 
-				for (const auto& worldCollider : worldColliders)
-				{
-					if (worldCollider == nullptr || !worldCollider->isActive() ||
-						&worldCollider->getOwner() == &getOwner() || *entityCollider == *worldCollider ||
-						std::ranges::find(checkedColliders, worldCollider->getId()) != checkedColliders.end() ||
-						!entityCollider->check(*worldCollider))
-						continue;
+                    addForce(-velocity * frictionMask * g_friction * g_gravity.magnitude(), EForceMode::ACCELERATION);
 
-					const Vector3 normal = getBoundsNormal(*entityCollider, *worldCollider);
+                    checkedColliders.push_back(worldCollider->getId());
+                }
+            }
 
-					const Vector3 normalMask
-					{
-						LibMath::abs(normal.m_x) > 0.f ? sign(normal.m_x) : 0.f,
-						LibMath::abs(normal.m_y) > 0.f ? sign(normal.m_y) : 0.f,
-						LibMath::abs(normal.m_z) > 0.f ? sign(normal.m_z) : 0.f
-					};
+            const Vector3 step = getDraggedVelocity() * deltaTime / static_cast<float>(stepsCount);
+            getOwner().translate(step);
+        }
 
-					const Vector3 frictionMask
-					{
-						floatEquals(normalMask.m_x, 0.f) ? sign(normalMask.m_x) : 0.f,
-						floatEquals(normalMask.m_y, 0.f) ? sign(normalMask.m_y) : 0.f,
-						floatEquals(normalMask.m_z, 0.f) ? sign(normalMask.m_z) : 0.f
-					};
+        if (getDraggedVelocity().magnitudeSquared() < m_sleepThreshold * m_sleepThreshold)
+            sleep();
+    }
 
-					Rigidbody* otherRigidbody = worldCollider->getOwner().getComponent<Rigidbody>();
+    Vector3 Rigidbody::getBoundsNormal(const ICollider& entityCollider, const ICollider& worldCollider)
+    {
+        const auto [center, size, _] = worldCollider.getBounds();
+        const auto minCorner = center - size;
+        const auto maxCorner = center + size;
 
-					// There is a collision, apply opposite forces
-					if (otherRigidbody != nullptr && otherRigidbody != this && otherRigidbody->isActive())
-					{
-						const Vector3 otherVelocity = otherRigidbody->getDraggedVelocity();
+        const auto entityCenter = entityCollider.getBounds().m_center;
 
-						if (!otherRigidbody->m_isKinematic)
-						{
-							if (normal.dot(otherVelocity) >= 0.f)
-								otherRigidbody->addForce((otherVelocity * normalMask).magnitude() * -normal, EForceMode::VELOCITY_CHANGE);
+        const Vector3 snappedX
+        {
+            snap(entityCenter.m_x, minCorner.m_x, maxCorner.m_x),
+            entityCenter.m_y,
+            entityCenter.m_z
+        };
 
-							if (normal.dot(-velocity) >= 0.f)
-								otherRigidbody->addForce((velocity * m_mass * normalMask).magnitude() * -normal, EForceMode::IMPULSE);
-						}
+        const Vector3 snappedY
+        {
+            entityCenter.m_x,
+            snap(entityCenter.m_y, minCorner.m_y, maxCorner.m_y),
+            entityCenter.m_z
+        };
 
-						if (normal.dot(-velocity) >= 0.f)
-							addForce((velocity * normalMask).magnitude() * normal, EForceMode::VELOCITY_CHANGE);
+        const Vector3 snappedZ
+        {
+            entityCenter.m_x,
+            entityCenter.m_y,
+            snap(entityCenter.m_z, minCorner.m_z, maxCorner.m_z)
+        };
 
-						if (normal.dot(otherVelocity) >= 0.f)
-							addForce((otherVelocity * otherRigidbody->m_mass * normalMask).magnitude() * normal, EForceMode::IMPULSE);
-					}
-					else if (normal.dot(-velocity) >= 0.f)
-					{
-						addForce((velocity * normalMask).magnitude() * normal, EForceMode::VELOCITY_CHANGE);
-					}
+        const float minDist = min(entityCenter.distanceSquaredFrom(snappedX),
+            min(entityCenter.distanceSquaredFrom(snappedY),
+                entityCenter.distanceSquaredFrom(snappedZ)));
 
-					addForce(-velocity * frictionMask * g_friction * g_gravity.magnitude(), EForceMode::ACCELERATION);
+        if (floatEquals(minDist, entityCenter.distanceSquaredFrom(snappedX)))
+            return (Vector3::right() * sign(snappedX.m_x - center.m_x)).normalized();
 
-					checkedColliders.push_back(worldCollider->getId());
-				}
-			}
+        if (floatEquals(minDist, entityCenter.distanceSquaredFrom(snappedY)))
+            return (Vector3::up() * sign(snappedY.m_y - center.m_y)).normalized();
 
-			const Vector3 step = getDraggedVelocity() * deltaTime / static_cast<float>(stepsCount);
-			getOwner().translate(step);
-		}
+        if (floatEquals(minDist, entityCenter.distanceSquaredFrom(snappedZ)))
+            return (Vector3::front() * sign(snappedZ.m_z - center.m_z)).normalized();
 
-		if (getDraggedVelocity().magnitudeSquared() < m_sleepThreshold * m_sleepThreshold)
-			sleep();
-	}
+        return Vector3::zero();
+    }
 }

@@ -1,8 +1,6 @@
 #pragma once
 #include "Scene.h"
-
 #include "Core/Renderer.h"
-
 #include "Resources/Shader.h"
 
 namespace LibGL::Rendering

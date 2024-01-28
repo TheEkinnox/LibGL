@@ -26,7 +26,7 @@ namespace LibGL::Rendering
             return *this;
 
         glDeleteFramebuffers(1, &m_bufferIndex);
-        m_bufferIndex = other.m_bufferIndex;
+        m_bufferIndex       = other.m_bufferIndex;
         other.m_bufferIndex = 0;
 
         return *this;

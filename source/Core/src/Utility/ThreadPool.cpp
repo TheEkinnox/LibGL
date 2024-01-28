@@ -2,8 +2,7 @@
 
 namespace LibGL::Utility
 {
-    ThreadPool::ThreadPool()
-        : ThreadPool(std::thread::hardware_concurrency() - 1)
+    ThreadPool::ThreadPool() : ThreadPool(std::thread::hardware_concurrency() - 1)
     {
     }
 

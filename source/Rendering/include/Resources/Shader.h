@@ -1,9 +1,9 @@
 ﻿#pragma once
-#include <Matrix.h>
-#include <string>
-#include <Vector.h>
+#include "Matrix.h"
+#include "Vector.h"
+#include "Resources/IResource.h"
 
-#include <Resources/IResource.h>
+#include <string>
 
 namespace LibGL::Rendering::Resources
 {

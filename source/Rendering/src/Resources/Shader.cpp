@@ -1,13 +1,11 @@
 ﻿#include "Resources/Shader.h"
 
+#include "Debug/Assertion.h"
+#include "Debug/Log.h"
+#include "Utility/utility.h"
+
 #include <sstream>
-
-#include <Debug/Assertion.h>
-#include <Debug/Log.h>
-
 #include <glad/gl.h>
-
-#include <Utility/utility.h>
 
 using namespace LibGL::Utility;
 
@@ -15,15 +13,15 @@ namespace LibGL::Rendering::Resources
 {
     REGISTER_RESOURCE_TYPE(Shader);
 
-    Shader::Shader(const Shader& other) :
-        IResource(other), m_source(other.m_source)
+    Shader::Shader(const Shader& other)
+        : IResource(other), m_source(other.m_source)
     {
         if (other.m_program != 0)
         ASSERT(parseSource());
     }
 
-    Shader::Shader(Shader&& other) noexcept :
-        m_source(std::move(other.m_source)), m_program(other.m_program)
+    Shader::Shader(Shader&& other) noexcept
+        : m_source(std::move(other.m_source)), m_program(other.m_program)
     {
         other.m_program = 0;
     }
@@ -51,7 +49,7 @@ namespace LibGL::Rendering::Resources
         if (&other == this)
             return *this;
 
-        m_source = other.m_source;
+        m_source  = other.m_source;
         m_program = other.m_program;
 
         other.m_program = 0;
@@ -228,7 +226,7 @@ namespace LibGL::Rendering::Resources
                 continue;
 
             const size_t lineSize = line.size();
-            const size_t curPos = !sourceStream.eof() ? static_cast<size_t>(sourceStream.tellg()) - 1 : source.size();
+            const size_t curPos   = !sourceStream.eof() ? static_cast<size_t>(sourceStream.tellg()) - 1 : source.size();
             const size_t startPos = curPos - lineSize;
 
             line.erase(0, 9); // Remove the #include
@@ -275,7 +273,7 @@ namespace LibGL::Rendering::Resources
 
         processIncludes(source);
         const char* shaderSource = source.c_str();
-        const auto  sourceSize = static_cast<GLint>(source.size());
+        const auto  sourceSize   = static_cast<GLint>(source.size());
 
         glShaderSource(shaderId, 1, &shaderSource, &sourceSize);
         glCompileShader(shaderId);
@@ -319,7 +317,10 @@ namespace LibGL::Rendering::Resources
             std::string        token;
 
             iStrStream >> token;
-            std::ranges::transform(token, token.begin(), [](const char p_c) { return static_cast<char>(std::tolower(p_c)); });
+            std::ranges::transform(token, token.begin(), [](const char p_c)
+            {
+                return static_cast<char>(std::tolower(p_c));
+            });
 
             const GLuint shaderType = getTypeFromToken(token);
 

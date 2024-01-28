@@ -4,28 +4,28 @@
 
 namespace LibGL::Rendering
 {
-	Buffer::Buffer(Buffer&& other) noexcept
-		: m_bufferIndex(other.m_bufferIndex)
-	{
-		other.m_bufferIndex = 0;
-	}
+    Buffer::Buffer(Buffer&& other) noexcept
+        : m_bufferIndex(other.m_bufferIndex)
+    {
+        other.m_bufferIndex = 0;
+    }
 
-	Buffer::~Buffer()
-	{
-		glDeleteBuffers(1, &m_bufferIndex);
-	}
+    Buffer::~Buffer()
+    {
+        glDeleteBuffers(1, &m_bufferIndex);
+    }
 
-	Buffer& Buffer::operator=(Buffer&& other) noexcept
-	{
-		if (&other == this)
-			return *this;
+    Buffer& Buffer::operator=(Buffer&& other) noexcept
+    {
+        if (&other == this)
+            return *this;
 
-		glDeleteBuffers(1, &m_bufferIndex);
+        glDeleteBuffers(1, &m_bufferIndex);
 
-		m_bufferIndex = other.m_bufferIndex;
+        m_bufferIndex = other.m_bufferIndex;
 
-		other.m_bufferIndex = 0;
+        other.m_bufferIndex = 0;
 
-		return *this;
-	}
+        return *this;
+    }
 }

@@ -1,7 +1,6 @@
 #pragma once
-
-#include <unordered_map>
 #include <string>
+#include <unordered_map>
 
 #define REGISTER_RESOURCE_TYPE(Type) static uint8_t reg_##Type = (LibGL::Resources::IResource::registerType<Type>(), 0)
 

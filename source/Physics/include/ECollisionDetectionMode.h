@@ -2,10 +2,10 @@
 
 namespace LibGL::Physics
 {
-	enum class ECollisionDetectionMode
-	{
-		DISCRETE,
-		CONTINUOUS,
-		NONE
-	};
+    enum class ECollisionDetectionMode
+    {
+        DISCRETE,
+        CONTINUOUS,
+        NONE
+    };
 }

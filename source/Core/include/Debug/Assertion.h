@@ -1,7 +1,7 @@
 #pragma once
-#include <cstdlib>
-
 #include "Debug/Log.h"
+
+#include <cstdlib>
 
 #ifndef ASSERT
 #ifdef _DEBUG

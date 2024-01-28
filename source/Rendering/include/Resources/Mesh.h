@@ -1,13 +1,13 @@
 ﻿#pragma once
-#include <Vector/Vector2.h>
-#include <Vector/Vector3.h>
-
-#include "Resources/IResource.h"
-
 #include "Core/Vertex.h"
 #include "Core/VertexAttributes.h"
 #include "Core/Buffers/IndexBuffer.h"
 #include "Core/Buffers/VertexBuffer.h"
+
+#include "Resources/IResource.h"
+
+#include "Vector/Vector2.h"
+#include "Vector/Vector3.h"
 
 namespace LibGL::Rendering::Resources
 {

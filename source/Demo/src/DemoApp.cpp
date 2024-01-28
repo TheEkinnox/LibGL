@@ -1,5 +1,7 @@
 #include "DemoApp.h"
 
+#include "DemoContext.h"
+
 #include <Angle.h>
 #include <Arithmetic.h>
 #include <BoxCollider.h>
@@ -21,8 +23,6 @@
 #include <Resources/Texture.h>
 
 #include <Utility/ServiceLocator.h>
-
-#include "DemoContext.h"
 
 #define MOVE_SPEED .5f
 #define ROTATION_SPEED 30_deg
