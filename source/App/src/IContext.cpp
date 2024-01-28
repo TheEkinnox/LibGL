@@ -1,6 +1,6 @@
 #include "IContext.h"
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 #include <GLFW/glfw3.h>
 
 #include "Debug/Log.h"
@@ -33,7 +33,7 @@ namespace LibGL::Application
 		m_window->makeCurrentContext();
 
 		// Load GLAD's OpenGL function pointers
-		if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
+		if (!gladLoadGL(glfwGetProcAddress))
 		{
 			DEBUG_LOG("Failed to initialize GLAD\n");
 			throw GLADInitFailed("Failed to initialize GLAD");

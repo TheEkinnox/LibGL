@@ -1,6 +1,6 @@
 #include "Core/Buffers/Buffer.h"
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 namespace LibGL::Rendering
 {

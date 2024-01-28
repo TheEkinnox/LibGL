@@ -1,4 +1,4 @@
-#include <glad/glad.h>
+#include <glad/gl.h>
 #include <Vector/Vector3.h>
 
 #include "Core/VertexAttributes.h"

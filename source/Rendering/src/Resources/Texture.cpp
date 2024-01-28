@@ -2,7 +2,7 @@
 #include <Debug/Assertion.h>
 #include "Resources/Texture.h"
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_ASSERT(x) ASSERT(x)

@@ -5,7 +5,7 @@
 #include <Debug/Assertion.h>
 #include <Debug/Log.h>
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 #include <Utility/utility.h>
 

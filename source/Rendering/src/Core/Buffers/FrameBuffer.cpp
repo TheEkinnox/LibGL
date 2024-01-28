@@ -1,6 +1,6 @@
 #include "Core/Buffers/FrameBuffer.h"
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 namespace LibGL::Rendering
 {
