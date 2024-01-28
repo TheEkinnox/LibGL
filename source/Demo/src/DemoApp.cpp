@@ -159,7 +159,6 @@ namespace LibGL::Demo
         auto& resourceManager = LGL_SERVICE(ResourceManager);
 
         std::vector<std::future<IResource*>> tasks;
-        std::vector<std::future<Shader*>>    shaderTasks;
 
         const auto loadStart = std::chrono::high_resolution_clock::now();
 
@@ -390,23 +389,23 @@ namespace LibGL::Demo
         const bool shouldControlModel = m_controllableModel && inputManager.isKeyDown(EKey::KEY_LEFT_ALT);
         Entity*    target = shouldControlModel ? static_cast<Entity*>(m_controllableModel) : static_cast<Entity*>(&camera);
 
-        TVector3<Degree> angles = target->getRotation().toYawPitchRoll();
+        TVector3<Degree> angles = target->getEuler(ERotationOrder::YXZ);
 
         // Rotation
         if (inputManager.isKeyDown(EKey::KEY_UP))
-            angles.m_y += ROTATION_SPEED * deltaTime;
-
-        if (inputManager.isKeyDown(EKey::KEY_DOWN))
-            angles.m_y -= ROTATION_SPEED * deltaTime;
-
-        if (inputManager.isKeyDown(EKey::KEY_Q) || inputManager.isKeyDown(EKey::KEY_LEFT))
             angles.m_x += ROTATION_SPEED * deltaTime;
 
-        if (inputManager.isKeyDown(EKey::KEY_E) || inputManager.isKeyDown(EKey::KEY_RIGHT))
+        if (inputManager.isKeyDown(EKey::KEY_DOWN))
             angles.m_x -= ROTATION_SPEED * deltaTime;
 
-        angles.m_y = clamp(angles.m_y, -90_deg, 90_deg);
-        target->setRotation(Quaternion(angles));
+        if (inputManager.isKeyDown(EKey::KEY_Q) || inputManager.isKeyDown(EKey::KEY_LEFT))
+            angles.m_y += ROTATION_SPEED * deltaTime;
+
+        if (inputManager.isKeyDown(EKey::KEY_E) || inputManager.isKeyDown(EKey::KEY_RIGHT))
+            angles.m_y -= ROTATION_SPEED * deltaTime;
+
+        angles.m_x = clamp(angles.m_x, -90_deg, 90_deg);
+        target->setEuler(angles, ERotationOrder::YXZ);
 
         Vector3 direction;
 
@@ -493,15 +492,15 @@ namespace LibGL::Demo
             return;
 
         Camera&          camera = Camera::getCurrent();
-        TVector3<Degree> angles = camera.getRotation().toYawPitchRoll();
+        TVector3<Degree> angles = camera.getEuler(ERotationOrder::YXZ);
 
-        angles.m_x -= rotationSpeed * mouseDelta.m_x;
-        angles.m_x.wrap();
+        angles.m_y -= rotationSpeed * mouseDelta.m_x;
+        angles.m_y.wrap();
 
-        angles.m_y -= rotationSpeed * mouseDelta.m_y;
-        angles.m_y = clamp(angles.m_y, -90_deg, 90_deg);
+        angles.m_x -= rotationSpeed * mouseDelta.m_y;
+        angles.m_x = clamp(angles.m_x, -90_deg, 90_deg);
 
-        camera.setRotation(Quaternion(angles));
+        camera.setEuler(angles, ERotationOrder::YXZ);
     }
 
     void DemoApp::render()
