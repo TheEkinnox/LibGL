@@ -1,5 +1,5 @@
 #shader vertex
 #include "assets/shaders/Split.vert"
 
-#shader fragment
+#shader Frag
 #include "assets/shaders/Split.frag"

@@ -191,22 +191,24 @@ namespace LibGL::Rendering::Resources
 
     uint32_t Shader::getTypeFromToken(const std::string& shaderType)
     {
-        if (shaderType == "vertex")
+        if (shaderType == "vertex" || shaderType == "vert" || shaderType == "vs")
             return GL_VERTEX_SHADER;
 
-        if (shaderType == "fragment")
+        if (shaderType == "fragment" || shaderType == "frag" || shaderType == "fs")
             return GL_FRAGMENT_SHADER;
 
-        if (shaderType == "geometry")
+        if (shaderType == "geometry" || shaderType == "geo" || shaderType == "gs")
             return GL_GEOMETRY_SHADER;
 
-        if (shaderType == "tess_evaluation")
+        if (shaderType == "tesselation_evaluation" || shaderType == "tess_evaluation"
+            || shaderType == "tesselation_eval" || shaderType == "tess_eval" || shaderType == "tes")
             return GL_TESS_EVALUATION_SHADER;
 
-        if (shaderType == "tess_control")
+        if (shaderType == "tesselation_control" || shaderType == "tess_control"
+            || shaderType == "tesselation_ctrl" || shaderType == "tess_ctrl" || shaderType == "tcs")
             return GL_TESS_CONTROL_SHADER;
 
-        if (shaderType == "compute")
+        if (shaderType == "compute" || shaderType == "com" || shaderType == "cs")
             return GL_COMPUTE_SHADER;
 
         return GL_INVALID_VALUE;
@@ -317,6 +319,8 @@ namespace LibGL::Rendering::Resources
             std::string        token;
 
             iStrStream >> token;
+            std::ranges::transform(token, token.begin(), [](const char p_c) { return static_cast<char>(std::tolower(p_c)); });
+
             const GLuint shaderType = getTypeFromToken(token);
 
             if (shaderType != GL_INVALID_VALUE)
