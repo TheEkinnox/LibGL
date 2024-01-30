@@ -15,11 +15,7 @@
 
 #else
 
-#define ASSERT(condition, ...) if (!(condition))    \
-{                                                   \
-    __VA_OPT__(DEBUG_LOG(__VA_ARGS__);)             \
-    abort();                                        \
-} ((void)0)
+#define ASSERT(condition, ...) ((void)0)
 
 #endif // _DEBUG
 #endif // !ASSERT
