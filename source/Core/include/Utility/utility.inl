@@ -25,7 +25,7 @@ namespace LibGL::Utility
 
             // Create a buffer of the computed size
             const size_t bufferSize = intSize;
-            const auto   buffer = static_cast<char*>(alloca(bufferSize * sizeof(char)));
+            const auto   buffer     = static_cast<char*>(alloca(bufferSize * sizeof(char)));
 
             // Write the formatted string in the buffer
             std::snprintf(buffer, bufferSize, format, args...);
@@ -37,17 +37,20 @@ namespace LibGL::Utility
         }
     }
 
-    inline void trimStringStart(std::string& str, const std::function<bool(char)>& compareFunc)
+    template <class CompareFunc>
+    void trimStringStart(std::string& str, CompareFunc compareFunc)
     {
         str.erase(str.begin(), std::ranges::find_if_not(str, compareFunc));
     }
 
-    inline void trimStringEnd(std::string& str, const std::function<bool(char)>& compareFunc)
+    template <class CompareFunc>
+    void trimStringEnd(std::string& str, CompareFunc compareFunc)
     {
         str.erase(std::find_if_not(str.rbegin(), str.rend(), compareFunc).base(), str.end());
     }
 
-    inline void trimString(std::string& str, const std::function<bool(char)>& compareFunc)
+    template <class CompareFunc>
+    void trimString(std::string& str, CompareFunc compareFunc)
     {
         trimStringEnd(str, compareFunc);
         trimStringStart(str, compareFunc);
