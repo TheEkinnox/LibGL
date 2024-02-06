@@ -17,10 +17,13 @@ namespace LibGL::Rendering::Resources
 
     bool Mesh::load(const char* fileName)
     {
-        std::vector<std::string> lines = LibGL::Utility::readFile(fileName);
+        std::ifstream fs(fileName);
 
-        if (lines.empty())
+        if (!fs.is_open())
+        {
+            std::cerr << "Unable to open model file at path \"" << fileName << '\"' << std::endl;
             return false;
+        }
 
         m_vertices.clear();
         m_indices.clear();
@@ -28,7 +31,8 @@ namespace LibGL::Rendering::Resources
         std::vector<Vector3> positions, normals;
         std::vector<Vector2> uvs;
 
-        for (std::string& line : lines)
+        std::string line;
+        while (std::getline(fs, line))
         {
             std::string token(line.substr(0, 2));
 
