@@ -10,6 +10,8 @@
 #define STBI_ASSERT(x) ASSERT(x)
 #include <stb_image.h>
 
+#define TEXTURE_MAX_SLOT GL_TEXTURE31 - GL_TEXTURE0
+
 namespace LibGL::Rendering::Resources
 {
     REGISTER_RESOURCE_TYPE(Texture);
@@ -240,6 +242,8 @@ namespace LibGL::Rendering::Resources
 
     void Texture::bind(const uint8_t slot) const
     {
+        ASSERT(slot <= TEXTURE_MAX_SLOT, "Texture slot %d is out of bounds. Max value: %d", slot, TEXTURE_MAX_SLOT);
+
         glActiveTexture(GL_TEXTURE0 + slot);
         glBindTexture(GL_TEXTURE_2D, m_id);
 
@@ -251,6 +255,8 @@ namespace LibGL::Rendering::Resources
 
     void Texture::unbind(const uint8_t slot)
     {
+        ASSERT(slot <= TEXTURE_MAX_SLOT, "Texture slot %d is out of bounds. Max value: %d", slot, TEXTURE_MAX_SLOT);
+
         glActiveTexture(GL_TEXTURE0 + slot);
         glBindTexture(GL_TEXTURE_2D, 0);
     }
