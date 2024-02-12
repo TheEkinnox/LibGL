@@ -51,9 +51,7 @@ namespace LibGL::Rendering::Resources
 
     bool Mesh::init()
     {
-        m_vbo = VertexBuffer(m_vertices);
-        m_ebo = IndexBuffer(m_indices);
-        m_vao = VertexAttributes(m_vbo, m_ebo);
+        m_vao = VertexAttributes(VertexBuffer(m_vertices), IndexBuffer(m_indices));
 
         return true;
     }
@@ -61,8 +59,6 @@ namespace LibGL::Rendering::Resources
     void Mesh::draw() const
     {
         m_vao.bind();
-        m_vbo.bind();
-        m_ebo.bind();
 
         glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(m_indices.size()),
             GL_UNSIGNED_INT, nullptr);

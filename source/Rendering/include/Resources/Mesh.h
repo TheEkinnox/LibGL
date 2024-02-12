@@ -56,8 +56,6 @@ namespace LibGL::Rendering::Resources
                        const std::vector<LibMath::Vector2>& uvs);
 
     private:
-        VertexBuffer     m_vbo;
-        IndexBuffer      m_ebo;
         VertexAttributes m_vao;
     };
 }
