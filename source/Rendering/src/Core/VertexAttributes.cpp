@@ -28,6 +28,8 @@ namespace LibGL::Rendering
         // texture coordinates attribute
         glEnableVertexAttribArray(2);
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<void*>(offsetof(Vertex, m_textureUV)));
+
+        unbind();
     }
 
     VertexAttributes::VertexAttributes(VertexAttributes&& other) noexcept
