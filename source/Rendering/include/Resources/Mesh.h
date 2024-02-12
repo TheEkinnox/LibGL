@@ -1,8 +1,6 @@
 ﻿#pragma once
 #include "Core/Vertex.h"
 #include "Core/VertexAttributes.h"
-#include "Core/Buffers/IndexBuffer.h"
-#include "Core/Buffers/VertexBuffer.h"
 
 #include "Resources/IResource.h"
 
