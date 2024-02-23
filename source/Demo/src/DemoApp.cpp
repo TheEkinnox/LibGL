@@ -404,7 +404,7 @@ namespace LibGL::Demo
         if (inputManager.isKeyDown(EKey::KEY_E) || inputManager.isKeyDown(EKey::KEY_RIGHT))
             angles.m_y -= ROTATION_SPEED * deltaTime;
 
-        angles.m_x = clamp(angles.m_x, -90_deg, 90_deg);
+        angles.m_x = clamp(angles.m_x, -85_deg, 85_deg);
         target->setEuler(angles, ERotationOrder::YXZ);
 
         Vector3 direction;
