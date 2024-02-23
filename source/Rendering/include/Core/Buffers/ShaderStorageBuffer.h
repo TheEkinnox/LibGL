@@ -33,15 +33,20 @@ namespace LibGL::Rendering
         /**
          * \brief Sends the data block to the buffer
          * \param data The data block to send
-         * \param count The number of elements in the block
+         * \param size The data block's size in bytes
+         */
+        void sendBlocks(const void* data, size_t size) const;
+
+        /**
+         * \brief Sends the given objects array to the buffer
+         * \param data The objects array to send
+         * \param count The number of elements in the array
          */
         template <typename T>
-        void sendBlocks(T* data, size_t count) const;
+        void sendBlocks(const T* data, size_t count) const;
 
     private:
         uint32_t m_bindingPoint = 0;
-
-        void sendBlocks(const void* data, size_t blockSize) const;
     };
 }
 

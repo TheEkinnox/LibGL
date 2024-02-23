@@ -34,10 +34,10 @@ namespace LibGL::Rendering
         m_bindingPoint = 0;
     }
 
-    void ShaderStorageBuffer::sendBlocks(const void* data, const size_t blockSize) const
+    void ShaderStorageBuffer::sendBlocks(const void* data, const size_t size) const
     {
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_bufferIndex);
-        glBufferData(GL_SHADER_STORAGE_BUFFER, static_cast<GLsizeiptr>(blockSize), data, GL_DYNAMIC_DRAW);
+        glBufferData(GL_SHADER_STORAGE_BUFFER, static_cast<GLsizeiptr>(size), data, GL_DYNAMIC_DRAW);
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     }
 }
