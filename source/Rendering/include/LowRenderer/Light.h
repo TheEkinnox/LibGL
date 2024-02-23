@@ -1,6 +1,5 @@
 #pragma once
 #include "Core/Color.h"
-#include "Enums/ELightType.h"
 #include "Resources/Shader.h"
 
 #include <Matrix/Matrix4.h>

@@ -1,4 +1,6 @@
 #include "LowRenderer/Light.h"
+
+#include "Enums/ELightType.h"
 #include "Resources/Shader.h"
 
 using namespace LibMath;
@@ -29,7 +31,7 @@ namespace LibGL::Rendering
         return lightMat;
     }
 
-    DirectionalLight::DirectionalLight(const Light& light, const LibMath::Vector3& direction)
+    DirectionalLight::DirectionalLight(const Light& light, const Vector3& direction)
         : Light(light), m_direction(direction)
     {
     }
@@ -64,8 +66,7 @@ namespace LibGL::Rendering
     {
     }
 
-    PointLight::PointLight(const Light&           light, const LibMath::Vector3& position,
-                           const AttenuationData& attenuationData)
+    PointLight::PointLight(const Light& light, const Vector3& position, const AttenuationData& attenuationData)
         : Light(light), m_position(position), m_attenuationData(attenuationData)
     {
     }
