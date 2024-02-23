@@ -194,7 +194,8 @@ namespace LibGL::Demo
         m_scene.clear();
 
         auto& resourceManager = LGL_SERVICE(ResourceManager);
-        auto& camera = Camera::getCurrent();
+        auto& camera          = Camera::getCurrent();
+
         camera.setPosition({ 0.f, 1.8f, 0.f });
         camera.setRotation(Quaternion::identity());
 
@@ -320,7 +321,7 @@ namespace LibGL::Demo
     void DemoApp::handleKeyboard()
     {
         const auto& inputManager = LGL_SERVICE(InputManager);
-        auto&       camera = Camera::getCurrent();
+        Camera&     camera       = Camera::getCurrent();
 
         if (inputManager.isKeyDown(EKey::KEY_ESCAPE))
             LGL_SERVICE(Window).setShouldClose(true);
@@ -371,11 +372,11 @@ namespace LibGL::Demo
             m_dirLight.m_direction.rotate(Degree(ROTATION_SPEED * deltaTime), Vector3::up());
 
         static const Matrix4 lightProjection = orthographicProjection(-10.f, 10.f, -10.f, 10.f, .01f, 20.f);
-        static const Matrix4 frontToUpMat = rotationFromTo(Vector3::front(), Vector3::up());
+        static const Matrix4 frontToUpMat    = rotationFromTo(Vector3::front(), Vector3::up());
 
-        const Vector3 lightUp = (frontToUpMat * Vector4(m_dirLight.m_direction, 0.f)).xyz();
+        const Vector3 lightUp   = (frontToUpMat * Vector4(m_dirLight.m_direction, 0.f)).xyz();
         const Matrix4 lightView = lookAt(m_dirLight.m_direction * -8.f, Vector3::zero(), lightUp);
-        m_lightViewProjection = lightProjection * lightView;
+        m_lightViewProjection   = lightProjection * lightView;
 
         // Movement
         float moveSpeed = MOVE_SPEED;
@@ -449,7 +450,7 @@ namespace LibGL::Demo
             if (inputManager.isKeyDown(EKey::KEY_LEFT_SHIFT) || inputManager.isKeyDown(EKey::KEY_RIGHT_SHIFT))
                 camera.translate(Vector3::down() * moveSpeed);
 
-            m_spotLight.m_position = camera.getPosition();
+            m_spotLight.m_position  = camera.getPosition();
             m_spotLight.m_direction = camera.forward();
         }
 
@@ -457,7 +458,7 @@ namespace LibGL::Demo
         {
             RaycastHit  hitInfo;
             const auto& camCollider = camera.getComponent<ICollider>();
-            Vector3     castOffset = Vector3::zero();
+            Vector3     castOffset  = Vector3::zero();
 
             if (camCollider != nullptr)
                 castOffset = camera.forward() * (camCollider->getBounds().m_sphereRadius + .01f);
@@ -483,7 +484,7 @@ namespace LibGL::Demo
 
         //update camera rotation
         const Radian  rotationSpeed = ROTATION_SPEED * MOUSE_SENSITIVITY * m_context->m_timer->getDeltaTime();
-        const Vector2 mouseDelta = inputManager.getMouseDelta();
+        const Vector2 mouseDelta    = inputManager.getMouseDelta();
 
         if (rotationSpeed == 0_deg || mouseDelta == Vector2::zero())
             return;
