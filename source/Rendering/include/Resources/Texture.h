@@ -46,6 +46,12 @@ namespace LibGL::Rendering::Resources
         bool init() override;
 
         /**
+         * \brief Gets the texture's internal id
+         * \return The texture's id
+         */
+        uint32_t getId() const;
+
+        /**
          * \brief Binds the texture to the current OpenGL context
          * \param slot The slot the texture is bound to
          */
@@ -80,11 +86,6 @@ namespace LibGL::Rendering::Resources
          * \param textureFilter The texture's new magnification filter
          */
         void setMagFilter(ETextureFilter textureFilter);
-
-        /**
-         * \brief Attaches the texture to the current frame buffer
-         */
-        void attachToFrameBuffer(EFrameBufferAttachment attachmentMode) const;
 
         /**
          * \brief Provides read access to the texture's width

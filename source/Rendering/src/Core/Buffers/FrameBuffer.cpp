@@ -6,18 +6,18 @@ namespace LibGL::Rendering
 {
     FrameBuffer::FrameBuffer()
     {
-        glGenFramebuffers(1, &m_bufferIndex);
+        glGenFramebuffers(1, &m_id);
     }
 
     FrameBuffer::FrameBuffer(FrameBuffer&& other) noexcept
-        : m_bufferIndex(other.m_bufferIndex)
+        : m_id(other.m_id)
     {
-        other.m_bufferIndex = 0;
+        other.m_id = 0;
     }
 
     FrameBuffer::~FrameBuffer()
     {
-        glDeleteFramebuffers(1, &m_bufferIndex);
+        glDeleteFramebuffers(1, &m_id);
     }
 
     FrameBuffer& FrameBuffer::operator=(FrameBuffer&& other) noexcept
@@ -25,20 +25,34 @@ namespace LibGL::Rendering
         if (this == &other)
             return *this;
 
-        glDeleteFramebuffers(1, &m_bufferIndex);
-        m_bufferIndex       = other.m_bufferIndex;
-        other.m_bufferIndex = 0;
+        glDeleteFramebuffers(1, &m_id);
+        m_id       = other.m_id;
+        other.m_id = 0;
 
         return *this;
     }
 
     void FrameBuffer::bind() const
     {
-        glBindFramebuffer(GL_FRAMEBUFFER, m_bufferIndex);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_id);
     }
 
-    void FrameBuffer::unbind()
+    void FrameBuffer::unbind() const
     {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
+    void FrameBuffer::attach(const Resources::Texture& texture, const EFrameBufferAttachment attachmentMode) const
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, m_id);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, static_cast<GLenum>(attachmentMode), GL_TEXTURE_2D, texture.getId(), 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    }
+
+    void FrameBuffer::detach(const EFrameBufferAttachment attachmentMode) const
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, m_id);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, static_cast<GLenum>(attachmentMode), GL_TEXTURE_2D, 0, 0);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 }

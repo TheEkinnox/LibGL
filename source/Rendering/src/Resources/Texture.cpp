@@ -240,6 +240,11 @@ namespace LibGL::Rendering::Resources
         return true;
     }
 
+    uint32_t Texture::getId() const
+    {
+        return m_id;
+    }
+
     void Texture::bind(const uint8_t slot) const
     {
         ASSERT(slot <= TEXTURE_MAX_SLOT, "Texture slot %d is out of bounds. Max value: %d", slot, TEXTURE_MAX_SLOT);
@@ -279,11 +284,6 @@ namespace LibGL::Rendering::Resources
     void Texture::setMagFilter(const ETextureFilter textureFilter)
     {
         m_magFilter = textureFilter;
-    }
-
-    void Texture::attachToFrameBuffer(const EFrameBufferAttachment attachmentMode) const
-    {
-        glFramebufferTexture2D(GL_FRAMEBUFFER, static_cast<GLenum>(attachmentMode), GL_TEXTURE_2D, m_id, 0);
     }
 
     int Texture::getWidth() const

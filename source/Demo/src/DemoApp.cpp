@@ -53,10 +53,7 @@ namespace LibGL::Demo
         // Initialize debugger
         Debug::Log::openFile("debug.log");
 
-        m_frameBuffer.bind();
-        m_shadowMap.attachToFrameBuffer(EFrameBufferAttachment::DEPTH);
-        FrameBuffer::unbind();
-
+        m_frameBuffer.attach(m_shadowMap, EFrameBufferAttachment::DEPTH);
         m_lightsSSBO.bind(0);
     }
 
@@ -519,7 +516,7 @@ namespace LibGL::Demo
         Shader*                shadowMapShader = resourceManager.get<Shader>("assets/shaders/Depth.glsl");
         sceneRenderer.render(m_lightViewProjection, shadowMapShader);
 
-        FrameBuffer::unbind();
+        m_frameBuffer.unbind();
 
         const Vector2I windowSize = m_context->m_window->getSize();
         renderer.setViewPort(0, 0, windowSize.m_x, windowSize.m_y);
