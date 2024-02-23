@@ -528,7 +528,7 @@ namespace LibGL::Demo
         m_lightMatrices[1] = m_dirLight.getMatrix();
         m_lightMatrices[2] = m_spotLight.getMatrix();
 
-        m_lightsSSBO.sendBlocks(m_lightMatrices.data(), m_lightMatrices.size());
+        m_lightsSSBO.setData(m_lightMatrices.data(), m_lightMatrices.size());
         updateLitShader("assets/shaders/Split.glsl");
         sceneRenderer.render(cam.getViewProjectionMatrix(), nullptr);
     }

@@ -1,41 +1,46 @@
 #pragma once
-#include "Core/Buffers/Buffer.h"
 #include "Enums/EAccessSpecifier.h"
 
 namespace LibGL::Rendering
 {
-    class ShaderStorageBuffer : public Buffer
+    class ShaderStorageBuffer final
     {
     public:
-        ShaderStorageBuffer() = default;
-        explicit ShaderStorageBuffer(EAccessSpecifier accessSpecifier);
+        explicit ShaderStorageBuffer(EAccessSpecifier accessSpecifier, uint32_t bindIndex = 0);
+        ShaderStorageBuffer(const ShaderStorageBuffer& other) = delete;
+        ShaderStorageBuffer(ShaderStorageBuffer&& other) noexcept;
+
+        ~ShaderStorageBuffer();
+
+        ShaderStorageBuffer& operator=(const ShaderStorageBuffer& other) = delete;
+        ShaderStorageBuffer& operator=(ShaderStorageBuffer&& other) noexcept;
 
         /**
-         * \brief Sets the ssbo's binding point
+         * \brief Sets the ssbo's bind index
          */
-        void setBindingPoint(uint32_t bindingPoint);
+        void setBindIndex(uint32_t bindIndex);
 
         /**
-         * \brief Binds the ssbo at the given binding point
+         * \brief Binds the ssbo at the given bind index
          */
-        void bind(uint32_t bindingPoint);
+        void bind(uint32_t bindIndex);
 
         /**
-         * \brief Binds the ssbo to the current binding point
+         * \brief Binds the ssbo to the curren bind index
          */
-        void bind() const override;
+        void bind() const;
 
         /**
-         * \brief Unbinds the ssbo from the current binding point
+         * \brief Unbinds the ssbo from the current bind index
          */
-        void unbind();
+        void unbind() const;
 
         /**
-         * \brief Sends the data block to the buffer
+         * \brief Sends the given data block to the buffer
          * \param data The data block to send
          * \param size The data block's size in bytes
          */
-        void sendBlocks(const void* data, size_t size) const;
+        void setRawData(const void* data, size_t size) const;
 
         /**
          * \brief Sends the given objects array to the buffer
@@ -43,10 +48,29 @@ namespace LibGL::Rendering
          * \param count The number of elements in the array
          */
         template <typename T>
-        void sendBlocks(const T* data, size_t count) const;
+        void setData(const T* data, size_t count) const;
+
+        /**
+         * \brief Sets the buffer's data starting at the given offset
+         * \param data The data block to send
+         * \param size The data block's size in bytes
+         * \param offset The updated data block's offset
+         */
+        void setRawSubData(const void* data, size_t size, ptrdiff_t offset) const;
+
+        /**
+         * \brief Sets the buffer's data starting at the given offset
+         * \param data The objects array to send
+         * \param count The number of elements in the array
+         * \param offset The updated data block's offset
+         */
+        template <typename T>
+        void setSubData(const T* data, size_t count, ptrdiff_t offset) const;
 
     private:
-        uint32_t m_bindingPoint = 0;
+        uint32_t         m_id;
+        uint32_t         m_bindIndex;
+        EAccessSpecifier m_accessSpecifier;
     };
 }
 
