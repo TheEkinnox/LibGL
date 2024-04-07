@@ -310,6 +310,7 @@ namespace LibGL::Rendering::Resources
             return GL_RGBA;
         default:
             ASSERT(false, "Invalid channels count. Accepted 1, 2, 3 or 4 but received \"%d\".\n", m_channels);
+            return GL_INVALID_ENUM;
         }
     }
 }
