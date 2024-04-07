@@ -15,7 +15,7 @@
 
 #else
 
-#define ASSERT(condition, ...) ((void)condition)
+#define ASSERT(condition, ...) ((void)(condition))
 
 #endif // _DEBUG
 #endif // !ASSERT
