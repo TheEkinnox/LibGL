@@ -5,10 +5,11 @@
 #include "Utility/ThreadPool.h"
 #include "Utility/utility.h"
 
+#include <cstring>
 #include <ranges>
 
-#define MIN_BATCH_SIZE 0LLU
-#define MAX_BATCH_SIZE ~0LLU
+#define MIN_BATCH_SIZE static_cast<size_t>(0)
+#define MAX_BATCH_SIZE ~static_cast<size_t>(0)
 
 using namespace LibMath;
 using namespace LibGL::Utility;
