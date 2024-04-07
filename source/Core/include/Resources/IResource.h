@@ -2,7 +2,7 @@
 #include <string>
 #include <unordered_map>
 
-#define REGISTER_RESOURCE_TYPE(Type) static uint8_t reg_##Type = (LibGL::Resources::IResource::registerType<Type>(), 0)
+#define REGISTER_RESOURCE_TYPE(Type) static uint8_t reg_##Type = (LibGL::Resources::IResource::registerType<Type>(#Type), 0)
 
 namespace LibGL::Resources
 {
@@ -40,9 +40,10 @@ namespace LibGL::Resources
         /**
          * \brief Registers the given resource type (required for the create function)
          * \tparam T The Resource type to register
+         * \param name The registered resource type's name
          */
         template <typename T>
-        static constexpr void registerType();
+        static constexpr void registerType(const std::string& name);
 
         /**
          * \brief Tries to allocate a resource of the given registered resource type.

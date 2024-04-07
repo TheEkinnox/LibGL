@@ -12,11 +12,9 @@ namespace LibGL::Resources
     }
 
     template <typename T>
-    constexpr void IResource::registerType()
+    constexpr void IResource::registerType(const std::string& name)
     {
         static_assert(std::is_base_of_v<IResource, T>);
-
-        const std::string name = typeid(T).raw_name();
 
         ASSERT(!m_resourceTypes.contains(name), "Resource type \"%s\" has already been registered", name.c_str());
 
