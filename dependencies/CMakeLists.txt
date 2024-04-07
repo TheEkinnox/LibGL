@@ -26,7 +26,7 @@ set(LIBMATH_BUILD_TESTS OFF)
 
 FetchContent_MakeAvailable(LibMath)
 
-add_subdirectory(glad)
+add_subdirectory(GLAD)
 
 # Set shared variables
 set(STB_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/STB PARENT_SCOPE)
