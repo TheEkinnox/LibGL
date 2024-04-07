@@ -4,6 +4,8 @@
 #include "EForceMode.h"
 #include "Vector/Vector3.h"
 
+#include <cstdint>
+
 namespace LibGL::Physics
 {
     class ICollider;
