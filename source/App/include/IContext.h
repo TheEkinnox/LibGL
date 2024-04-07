@@ -2,6 +2,7 @@
 #include "Window.h"
 #include "Utility/Timer.h"
 
+#include <memory>
 #include <stdexcept>
 
 namespace LibGL::Application
