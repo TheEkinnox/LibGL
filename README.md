@@ -2,6 +2,8 @@
 
 > A lightweight C++ OpenGL game development library
 
+[![Build](https://github.com/TheEkinnox/LibGL/actions/workflows/main.yml/badge.svg)](https://github.com/TheEkinnox/LibGL/actions/workflows/main.yml)
+
 ___
 
 ### Creation context
