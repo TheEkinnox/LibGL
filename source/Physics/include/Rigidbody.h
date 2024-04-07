@@ -10,13 +10,13 @@ namespace LibGL::Physics
 {
     class ICollider;
 
-    inline static LibMath::Vector3 g_gravity(0.f, -9.8f, 0.f);
-    inline static float            g_friction = .4f;
-    inline static uint8_t          g_continuousCollisionSteps = 8;
-
     class Rigidbody final : public Component
     {
     public:
+        inline static LibMath::Vector3 s_gravity{0.f, -9.8f, 0.f};
+        inline static float            s_friction = .4f;
+        inline static uint8_t          s_continuousCollisionSteps = 8;
+
         LibMath::Vector3 m_velocity = LibMath::Vector3::zero();
 
         ECollisionDetectionMode m_collisionDetectionMode = ECollisionDetectionMode::DISCRETE;

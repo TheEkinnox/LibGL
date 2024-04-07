@@ -83,7 +83,7 @@ namespace LibGL::Physics
         }
 
         if (m_useGravity)
-            addForce(g_gravity, EForceMode::ACCELERATION);
+            addForce(s_gravity, EForceMode::ACCELERATION);
 
         if (isSleeping())
         {
@@ -127,7 +127,7 @@ namespace LibGL::Physics
             stepsCount = 1;
             break;
         case ECollisionDetectionMode::CONTINUOUS:
-            stepsCount = g_continuousCollisionSteps;
+            stepsCount = s_continuousCollisionSteps;
             break;
         case ECollisionDetectionMode::NONE:
         default:
@@ -202,7 +202,7 @@ namespace LibGL::Physics
                         addForce((velocity * normalMask).magnitude() * normal, EForceMode::VELOCITY_CHANGE);
                     }
 
-                    addForce(-velocity * frictionMask * g_friction * g_gravity.magnitude(), EForceMode::ACCELERATION);
+                    addForce(-velocity * frictionMask * s_friction * s_gravity.magnitude(), EForceMode::ACCELERATION);
 
                     checkedColliders.push_back(worldCollider->getId());
                 }
