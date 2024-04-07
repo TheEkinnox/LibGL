@@ -1,6 +1,8 @@
 #pragma once
 #include "Enums/EAccessSpecifier.h"
 
+#include <cstddef>
+
 namespace LibGL::Rendering
 {
     class ShaderStorageBuffer final
