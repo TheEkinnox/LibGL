@@ -51,7 +51,9 @@ namespace LibGL::Rendering::Resources
 
     bool Mesh::init()
     {
-        m_vao = VertexAttributes(VertexBuffer(m_vertices), IndexBuffer(m_indices));
+        m_vbo = VertexBuffer(m_vertices);
+        m_ebo = IndexBuffer(m_indices);
+        m_vao = VertexAttributes(m_vbo, m_ebo);
 
         return true;
     }
