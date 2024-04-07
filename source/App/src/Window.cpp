@@ -2,6 +2,8 @@
 
 #include "Debug/Log.h"
 
+#include <climits>
+
 #include <GLFW/glfw3.h>
 
 using namespace LibGL::Application::Exceptions;
