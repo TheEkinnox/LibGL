@@ -1,6 +1,6 @@
 # LibGL
 
-> A lightweight c++ OpenGL application framework
+> A lightweight C++ OpenGL game development library
 
 ___
 
@@ -19,7 +19,7 @@ The library offers useful features for game development, as well as a simple dem
 - `Core`: Graph data structure, Logging, Assertions, Eventing, Resource Management, Service Locator, Thread Pool, Timer, Common utility functions
 - `App`: Windowing, Input management, Application context
 - `Entities`: Component-based scene management
-- `Physics`: Simple rigid body physics without angular velocity, Ray casting, Collider overlap testing (similar to unity's `Physics.Overlap` functions)
+- `Physics`: Simple rigid body physics without angular velocity, Ray casting, Collider overlap testing (similar to [Unity's](https://unity.com/) `Physics.Overlap` functions)
 - `Rendering`: OpenGL Rendering Engine, Blinn-Phong shading, Shadow Mapping
 
 Since the main focus of this project was the renderer, I used the following libraries to facilitate some parts of the development:
@@ -31,7 +31,8 @@ Since the main focus of this project was the renderer, I used the following libr
 
 ### What I learned
 
-Creating a modular rendering library in C++ using OpenGL allowed me to deepen my knowledge of C++, while also consolidating my planning and organization skills. Furthermore, this exercise was a great opportunity for me to learn more about the various challenges of library design and software architecture. Finally, I learned a lot about graphics programming and OpenGL, from GLSL shader development to useful rendering techniques such as shadow mapping.
+Creating a modular rendering library in C++ using OpenGL allowed me to deepen my knowledge of C++, while also consolidating my planning and organization skills. Furthermore, this exercise was a great opportunity to learn more about the various challenges of library design and software architecture. Finally, I learned a lot about graphics programming and OpenGL, from GLSL shader development to useful rendering techniques such as shadow mapping.
+
 ### Project's progression :
 
 The library is, although constantly being improved, usable, and has been used to create [a 3D puzzle game](https://noxcorporation.net/en/project/pfa).
