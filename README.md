@@ -8,7 +8,7 @@ ___
 
 ### Creation context
 
-Created in 3 weeks from March 13th to 31st 2024 during my second semester in [Game Engine Programming](https://www.isart.ca/programmes/programmes-courts/programmeur-moteur-jeu-video/) at [Isart Digital](https://www.isart.ca/).
+Created in 3 weeks from March 13th to 31st 2023 during my second semester in [Game Engine Programming](https://www.isart.ca/programmes/programmes-courts/programmeur-moteur-jeu-video/) at [Isart Digital](https://www.isart.ca/).
 
 ### My goal
 
