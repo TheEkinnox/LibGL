@@ -68,7 +68,7 @@ namespace LibGL::Physics
     }
 
     ICollider::ICollider(ICollider&& other) noexcept
-        : Component(std::forward<ICollider>(other)), m_bounds(other.m_bounds)
+        : Component(std::forward<ICollider>(other)), m_bounds(std::move(other.m_bounds))
     {
         m_colliders.push_back(this);
     }
