@@ -5,6 +5,8 @@
 #include "Interpolation.h"
 #include "Vector/Vector4.h"
 
+#include <algorithm>
+
 using namespace LibMath;
 
 namespace LibGL::Physics
