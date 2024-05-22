@@ -298,8 +298,8 @@ namespace LibGL::Demo
         m_spotLight =
         {
             Color(1, 1, 1, 8),
-            camera.getPosition(),
-            camera.forward(),
+            camera.getWorldPosition(),
+            camera.worldBack(),
             AttenuationData(10),
             {
                 cos(0_deg),
@@ -450,8 +450,8 @@ namespace LibGL::Demo
             if (inputManager.isKeyDown(EKey::KEY_LEFT_SHIFT) || inputManager.isKeyDown(EKey::KEY_RIGHT_SHIFT))
                 camera.translate(Vector3::down() * moveSpeed);
 
-            m_spotLight.m_position  = camera.getPosition();
-            m_spotLight.m_direction = camera.forward();
+            m_spotLight.m_position  = camera.getWorldPosition();
+            m_spotLight.m_direction = camera.worldBack();
         }
 
         if (inputManager.isKeyPressed(EKey::KEY_C))
