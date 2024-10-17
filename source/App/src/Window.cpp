@@ -1,17 +1,15 @@
 #include "Window.h"
 
-#include "Debug/Log.h"
+#include "Debug/Assertion.h"
 
 #include <climits>
 
 #include <GLFW/glfw3.h>
 
-using namespace LibGL::Application::Exceptions;
-
 namespace LibGL::Application
 {
-    Window::Window(const dimensions_t size, const char* title) :
-        m_title(title), m_size(size), m_minSize(0, 0), m_maxSize(INT_MAX, INT_MAX), m_refreshRate(GLFW_DONT_CARE),
+    Window::Window(const dimensions_t size, const char* title)
+        : m_title(title), m_size(size), m_minSize(0, 0), m_maxSize(INT_MAX, INT_MAX), m_refreshRate(GLFW_DONT_CARE),
         m_isFullScreen(false)
     {
         // Initialize and configure glfw
@@ -30,8 +28,7 @@ namespace LibGL::Application
 
         if (m_glfwWindow == nullptr)
         {
-            DEBUG_LOG("Failed to create GLFW window\n");
-            throw WindowCreationFailed("Failed to create GLFW window");
+            ASSERT(false, "Failed to create GLFW window\n");
         }
 
         glfwGetWindowPos(m_glfwWindow, &m_pos.m_x, &m_pos.m_y);

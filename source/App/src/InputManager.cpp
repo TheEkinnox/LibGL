@@ -7,7 +7,6 @@
 #include <functional>
 #include <GLFW/glfw3.h>
 
-using namespace LibGL::Application::Exceptions;
 using namespace LibGL::Utility;
 
 namespace LibGL::Application

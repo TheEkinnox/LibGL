@@ -15,25 +15,6 @@ using GLFWwindow = struct GLFWwindow;
 
 namespace LibGL::Application
 {
-    namespace Exceptions
-    {
-        class WindowCreationFailed : public std::runtime_error
-        {
-        public:
-            WindowCreationFailed() : runtime_error("Window creation failed")
-            {
-            }
-
-            explicit WindowCreationFailed(const std::string& message) : runtime_error(message.c_str())
-            {
-            }
-
-            explicit WindowCreationFailed(const char* message) : runtime_error(message)
-            {
-            }
-        };
-    }
-
     class Window
     {
     public:

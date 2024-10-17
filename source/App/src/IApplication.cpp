@@ -2,8 +2,6 @@
 
 namespace LibGL::Application
 {
-    using namespace Exceptions;
-
     void IApplication::run()
     {
         onStart();

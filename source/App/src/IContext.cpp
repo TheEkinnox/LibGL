@@ -1,13 +1,12 @@
 #include "IContext.h"
 
-#include "Debug/Log.h"
+#include "Debug/Assertion.h"
 #include "Utility/ServiceLocator.h"
 
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
 
 using namespace LibGL::Utility;
-using namespace LibGL::Application::Exceptions;
 
 namespace LibGL::Application
 {
@@ -34,8 +33,7 @@ namespace LibGL::Application
         // Load GLAD's OpenGL function pointers
         if (!gladLoadGL(glfwGetProcAddress))
         {
-            DEBUG_LOG("Failed to initialize GLAD\n");
-            throw GLADInitFailed("Failed to initialize GLAD");
+            ASSERT(false, "Glad initialization failed\n");
         }
 
         // Setup OpenGL debugging

@@ -30,7 +30,6 @@
 #define TEST_POOL 0
 
 using namespace LibMath;
-using namespace LibMath::Exceptions;
 using namespace LibMath::Literal;
 using namespace LibGL::Utility;
 using namespace LibGL::Resources;
@@ -38,7 +37,6 @@ using namespace LibGL::Rendering;
 using namespace LibGL::Rendering::Resources;
 using namespace LibGL::Physics;
 using namespace LibGL::Application;
-using namespace LibGL::Application::Exceptions;
 
 #define SHADOW_MAP_WIDTH 1024
 #define SHADOW_MAP_HEIGHT SHADOW_MAP_WIDTH

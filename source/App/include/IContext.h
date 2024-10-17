@@ -3,29 +3,9 @@
 #include "Utility/Timer.h"
 
 #include <memory>
-#include <stdexcept>
 
 namespace LibGL::Application
 {
-    namespace Exceptions
-    {
-        class GLADInitFailed : public std::runtime_error
-        {
-        public:
-            GLADInitFailed() : runtime_error("Glad initialization failed")
-            {
-            }
-
-            explicit GLADInitFailed(const std::string& message) : runtime_error(message.c_str())
-            {
-            }
-
-            explicit GLADInitFailed(const char* message) : runtime_error(message)
-            {
-            }
-        };
-    }
-
     class IContext
     {
     public:
